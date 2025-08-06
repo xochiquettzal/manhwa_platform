@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Yeni Kayıt Ekle</h1>
+<form method="POST" action="">
+    {{ form.hidden_tag() }}
+    <p>{{ form.original_title.label }}<br>{{ form.original_title(size=32) }}</p>
+    <p>{{ form.english_title.label }}<br>{{ form.english_title(size=32) }}</p>
+    <p>{{ form.record_type.label }}<br>{{ form.record_type() }}</p>
+    <p>{{ form.image_url.label }}<br>{{ form.image_url(size=32) }}</p>
+    <p>{{ form.submit() }}</p>
+</form>
+<a href="{{ url_for('admin.dashboard') }}">Panele Geri Dön</a>
+{% endblock %}

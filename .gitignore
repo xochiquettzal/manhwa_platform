@@ -1,0 +1,23 @@
+# .gitignore
+
+# Python
+__pycache__/
+*.pyc
+
+# Virtual Environment
+venv/
+.venv/
+
+# Instance Folder
+instance/
+
+# Database
+*.db
+*.sqlite3
+
+# Environment variables
+.env
+
+# IDE / Editor specific
+.vscode/
+.idea/
