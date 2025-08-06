@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="tr">
+<!-- Dil bilgisi, Babel tarafından otomatik olarak ayarlanacak -->
+<html lang="{{ get_locale() }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title or 'Anasayfa' }} - Lyst.</title>
+    <title>{{ title or _('Anasayfa') }} - Lyst.</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📚</text></svg>">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
@@ -15,18 +16,23 @@
             <div class="header-actions">
                 {% if current_user.is_authenticated %}
                     {% if current_user.is_admin %}
-                        <a href="{{ url_for('admin.dashboard') }}" class="header-link">Admin</a>
+                        <a href="{{ url_for('admin.dashboard') }}" class="header-link">{{ _('Admin') }}</a>
                     {% endif %}
-                    <a href="{{ url_for('auth.logout') }}" class="header-link">Çıkış Yap</a>
+                    <a href="{{ url_for('auth.logout') }}" class="header-link">{{ _('Çıkış Yap') }}</a>
                 {% else %}
-                    <a href="{{ url_for('auth.login') }}" class="header-link">Giriş Yap</a>
-                    <a href="{{ url_for('auth.register') }}" class="header-link">Kayıt Ol</a>
+                    <a href="{{ url_for('auth.login') }}" class="header-link">{{ _('Giriş Yap') }}</a>
+                    <a href="{{ url_for('auth.register') }}" class="header-link">{{ _('Kayıt Ol') }}</a>
                 {% endif %}
+
+                <!-- Dil Değiştirme Linkleri -->
+                <a href="{{ url_for('set_language', lang='tr') }}" class="header-link">TR</a>
+                <a href="{{ url_for('set_language', lang='en') }}" class="header-link">EN</a>
+
                 <div class="theme-select-wrapper">
-                    <button id="theme-btn" title="Temayı Değiştir"><svg id="theme-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"></svg></button>
+                    <button id="theme-btn" title="{{ _('Temayı Değiştir') }}"><svg id="theme-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"></svg></button>
                     <div id="theme-menu">
-                        <div class="theme-option" data-theme="light"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.061l1.591-1.59zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5h2.25a.75.75 0 01.75.75zM17.834 18.894a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 10-1.061 1.06l1.59 1.591zM12 18a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0v-2.25A.75.75 0 0112 18zM5.106 17.834a.75.75 0 001.06 1.06l1.591-1.59a.75.75 0 00-1.06-1.061l-1.591 1.59zM4.5 12a.75.75 0 01-.75.75H1.5a.75.75 0 010-1.5h2.25a.75.75 0 01.75.75zM6.166 5.106a.75.75 0 00-1.06 1.06l1.59 1.591a.75.75 0 001.061-1.06l-1.59-1.591z"></path></svg><span>Açık</span></div>
-                        <div class="theme-option" data-theme="dark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 003.463-.69.75.75 0 01.981.981A10.503 10.503 0 0118 18a10.5 10.5 0 01-10.5-10.5c0-1.31.249-2.548.7-3.662a.75.75 0 01.819.162z" clip-rule="evenodd"></path></svg><span>Koyu</span></div>
+                        <div class="theme-option" data-theme="light"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.061l1.591-1.59zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5h2.25a.75.75 0 01.75.75zM17.834 18.894a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 10-1.061 1.06l1.59 1.591zM12 18a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0v-2.25A.75.75 0 0112 18zM5.106 17.834a.75.75 0 001.06 1.06l1.591-1.59a.75.75 0 00-1.06-1.061l-1.591 1.59zM4.5 12a.75.75 0 01-.75.75H1.5a.75.75 0 010-1.5h2.25a.75.75 0 01.75.75zM6.166 5.106a.75.75 0 00-1.06 1.06l1.59 1.591a.75.75 0 001.061-1.06l-1.59-1.591z"></path></svg><span>{{ _('Açık') }}</span></div>
+                        <div class="theme-option" data-theme="dark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 003.463-.69.75.75 0 01.981.981A10.503 10.503 0 0118 18a10.5 10.5 0 01-10.5-10.5c0-1.31.249-2.548.7-3.662a.75.75 0 01.819.162z" clip-rule="evenodd"></path></svg><span>{{ _('Koyu') }}</span></div>
                     </div>
                 </div>
             </div>
@@ -35,27 +41,24 @@
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                     {% for category, message in messages %}
-                        <div class="flash {{ category }}">{{ message }}</div>
+                        <div class="flash {{ category }}">{{ _(message) }}</div>
                     {% endfor %}
                 {% endif %}
             {% endwith %}
             {% block content %}{% endblock %}
         </main>
     </div>
-
-    <!-- Modern Silme Onayı Modalı (Tüm sayfalarda kullanılabilir) -->
     <div id="confirm-delete-modal" class="modal">
         <div class="modal-content confirm-modal-content">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z" clip-rule="evenodd" /></svg>
-            <h2 id="confirm-title">Emin misiniz?</h2>
-            <p id="confirm-text">Bu işlem geri alınamaz.</p>
+            <h2 id="confirm-title">{{ _('Emin misiniz?') }}</h2>
+            <p id="confirm-text">{{ _('Bu işlem geri alınamaz.') }}</p>
             <div class="modal-actions center">
-                <button id="cancel-delete-btn" class="btn btn-secondary">İptal</button>
-                <button id="confirm-delete-btn" class="btn btn-danger">Evet, Sil</button>
+                <button id="cancel-delete-btn" class="btn btn-secondary">{{ _('İptal') }}</button>
+                <button id="confirm-delete-btn" class="btn btn-danger">{{ _('Evet, Sil') }}</button>
             </div>
         </div>
     </div>
-
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const themeBtn = document.getElementById('theme-btn');

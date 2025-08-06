@@ -1,4 +1,4 @@
-# models.py (Final Sürümü)
+# models.py (Synopsis Eklenmiş Final Hali)
 
 from extensions import db
 from flask_login import UserMixin
@@ -34,3 +34,4 @@ class MasterRecord(db.Model):
     english_title = db.Column(db.String(200))
     record_type = db.Column(db.String(50), default='Manhwa')
     image_url = db.Column(db.String(255))
+    synopsis = db.Column(db.Text) # Yeni konu alanı

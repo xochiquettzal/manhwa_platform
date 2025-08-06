@@ -9,7 +9,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const entryModal = document.getElementById('entry-modal');
     const confirmDeleteModal = document.getElementById('confirm-delete-modal');
 
-    if (!entryModal || !listContainer || !confirmDeleteModal) return;
+    if (!entryModal || !listContainer || !confirmDeleteModal) {
+        console.error("Gerekli admin elementleri bulunamadı. HTML'i kontrol edin.");
+        return;
+    }
 
     const entryForm = document.getElementById('entry-form');
     const closeModalBtn = document.getElementById('close-entry-modal-btn');
@@ -76,6 +79,7 @@ document.addEventListener('DOMContentLoaded', function() {
             entryForm.querySelector('#english_title').value = record.english_title || '';
             entryForm.querySelector('#record_type').value = record.record_type;
             entryForm.querySelector('#image_url').value = record.image_url || '';
+            entryForm.querySelector('#synopsis').value = record.synopsis || '';
             
             entryModal.querySelector('h2').textContent = 'Kaydı Düzenle';
             deleteBtn.style.display = 'inline-flex';
@@ -118,6 +122,8 @@ document.addEventListener('DOMContentLoaded', function() {
         itemToDeleteId = document.getElementById('record-id-input').value;
         if(itemToDeleteId){
             closeModal(entryModal);
+            const confirmText = confirmDeleteModal.querySelector('#confirm-text');
+            confirmText.textContent = "Bu kayıt kütüphaneden kalıcı olarak silinecektir. Bu işlem geri alınamaz.";
             openModal(confirmDeleteModal);
         }
     });

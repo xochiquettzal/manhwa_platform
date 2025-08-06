@@ -10,7 +10,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const updateModal = document.getElementById('update-item-modal');
     const confirmDeleteModal = document.getElementById('confirm-delete-modal');
     
-    if (!updateModal || !confirmDeleteModal) return; 
+    if (!updateModal || !confirmDeleteModal || !listContainer) {
+        console.error("Gerekli dashboard elementleri bulunamadı. HTML'i kontrol edin.");
+        return; 
+    }
     
     const updateForm = document.getElementById('update-item-form');
     const closeModalBtn = document.getElementById('close-update-modal-btn');
@@ -105,16 +108,14 @@ document.addEventListener('DOMContentLoaded', function() {
             if (recordType === 'Anime') {
                 statusSelect.querySelector('option[value="Okunuyor"]').style.display = 'none';
                 statusSelect.querySelector('option[value="İzleniyor"]').style.display = 'block';
-                // Eğer mevcut durum Okunuyor ise, İzleniyor'a çevir
                 if (item.dataset.status === 'Okunuyor') {
                     statusSelect.value = 'İzleniyor';
                 } else {
                     statusSelect.value = item.dataset.status;
                 }
-            } else { // Manhwa, Manga, etc.
+            } else {
                 statusSelect.querySelector('option[value="Okunuyor"]').style.display = 'block';
                 statusSelect.querySelector('option[value="İzleniyor"]').style.display = 'none';
-                 // Eğer mevcut durum İzleniyor ise, Okunuyor'a çevir
                  if (item.dataset.status === 'İzleniyor') {
                     statusSelect.value = 'Okunuyor';
                 } else {
@@ -125,8 +126,10 @@ document.addEventListener('DOMContentLoaded', function() {
             updateModal.querySelector('#user-list-id-input').value = item.dataset.userListId;
             updateModal.querySelector('#update-modal-title').textContent = item.dataset.recordTitle;
             updateModal.querySelector('#details-image').src = item.dataset.recordImage || 'https://via.placeholder.com/250x360.png?text=Yok';
+            updateModal.querySelector('#details-synopsis').textContent = item.dataset.synopsis || "";
             updateForm.querySelector('#chapter-input').value = item.dataset.chapter;
             updateForm.querySelector('#notes-input').value = item.dataset.notes;
+            
             openModal(updateModal);
         });
     });
@@ -161,13 +164,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // --- MODERN LİSTEDEN SİLME MANTIĞI ---
+    // --- LİSTEDEN SİLME MANTIĞI (Modern Modal ile) ---
     const deleteBtn = document.getElementById('delete-item-btn');
     if(deleteBtn) {
         deleteBtn.addEventListener('click', () => {
             itemToDeleteId = document.getElementById('user-list-id-input').value;
-            closeModal(updateModal); // Önceki modalı kapat
-            openModal(confirmDeleteModal); // Onay modalını aç
+            closeModal(updateModal);
+            openModal(confirmDeleteModal);
         });
     }
 
@@ -178,9 +181,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     confirmDeleteBtn.addEventListener('click', async () => {
         if (itemToDeleteId) {
-            const response = await fetch(`/list/delete/${itemToDeleteId}`, {
-                method: 'POST',
-            });
+            const response = await fetch(`/list/delete/${itemToDeleteId}`, { method: 'POST' });
             if (response.ok) {
                 window.location.reload();
             } else {

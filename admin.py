@@ -1,4 +1,4 @@
-# admin.py (Final Sürümü)
+# admin.py (Synopsis Eklenmiş Final Hali)
 
 import os
 from flask import Blueprint, render_template, request, jsonify, current_app
@@ -35,7 +35,7 @@ def get_records():
 @admin_required
 def get_record(record_id):
     record = MasterRecord.query.get_or_404(record_id)
-    return jsonify({'id': record.id, 'original_title': record.original_title, 'english_title': record.english_title, 'record_type': record.record_type, 'image_url': record.image_url})
+    return jsonify({'id': record.id, 'original_title': record.original_title, 'english_title': record.english_title, 'record_type': record.record_type, 'image_url': record.image_url, 'synopsis': record.synopsis})
 
 @admin_bp.route('/api/record/add', methods=['POST'])
 @login_required
@@ -49,7 +49,7 @@ def add_record():
             filename = secure_filename(file.filename)
             file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
             image_path = f"/uploads/{filename}"
-    new_record = MasterRecord(original_title=request.form['original_title'], english_title=request.form.get('english_title', ''), record_type=request.form.get('record_type', 'Manhwa'), image_url=image_path)
+    new_record = MasterRecord(original_title=request.form['original_title'], english_title=request.form.get('english_title', ''), record_type=request.form.get('record_type', 'Manhwa'), image_url=image_path, synopsis=request.form.get('synopsis', ''))
     db.session.add(new_record)
     db.session.commit()
     return jsonify({'message': 'Kayıt başarıyla eklendi.'}), 201
@@ -70,6 +70,7 @@ def update_record(record_id):
     record.original_title = request.form['original_title']
     record.english_title = request.form.get('english_title', '')
     record.record_type = request.form.get('record_type', 'Manhwa')
+    record.synopsis = request.form.get('synopsis', '')
     record.image_url = image_path
     db.session.commit()
     return jsonify({'message': 'Kayıt başarıyla güncellendi.'})

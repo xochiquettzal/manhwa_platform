@@ -1,8 +1,10 @@
-# app.py (Final Sürümü)
+# app.py (Jinja2 Hatası Düzeltilmiş Final Hali)
 
 import os
-from flask import Flask, send_from_directory
-from extensions import db, migrate, login_manager, mail
+from flask import Flask, send_from_directory, request, session, redirect, url_for
+# YENİ İMPORT: Babel'den get_locale'i import ediyoruz
+from flask_babel import get_locale
+from extensions import db, migrate, login_manager, mail, babel
 from models import User
 from dotenv import load_dotenv
 
@@ -16,6 +18,8 @@ def create_app():
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///platform.db'
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'default-super-secret-key-change-it')
     app.config['UPLOAD_FOLDER'] = 'uploads'
+    app.config['LANGUAGES'] = ['en', 'tr']
+    app.config['BABEL_DEFAULT_LOCALE'] = 'en'
     
     # --- E-POSTA KONFİGÜRASYONU ---
     app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER')
@@ -30,26 +34,44 @@ def create_app():
     migrate.init_app(app, db)
     mail.init_app(app)
     
+    # --- DİL SEÇİM FONKSİYONU ---
+    def locale_selector():
+        if 'language' in session and session['language'] in app.config['LANGUAGES']:
+            return session.get('language')
+        return request.accept_languages.best_match(app.config['LANGUAGES'])
+
+    babel.init_app(app, locale_selector=locale_selector)
+
+    # YENİ BÖLÜM: get_locale'i şablonlara (Jinja2) tanıtıyoruz
+    @app.context_processor
+    def inject_locale():
+        return dict(get_locale=get_locale)
+
     # --- LOGIN MANAGER YAPILANDIRMASI ---
     login_manager.init_app(app)
     login_manager.login_view = 'auth.login'
-    login_manager.login_message = None # Giriş yap uyarısını kaldır
+    login_manager.login_message = None
 
     # --- USER LOADER ---
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))
 
-    # --- BLUEPRINT'LERİ (UYGULAMA BÖLÜMLERİNİ) KAYDETME ---
+    # --- BLUEPRINT'LERİ (UYGULAMA BÖLÜMÜ) KAYDETME ---
     with app.app_context():
         from auth import auth_bp
         app.register_blueprint(auth_bp, url_prefix='/auth')
-
         from admin import admin_bp
         app.register_blueprint(admin_bp, url_prefix='/admin')
-        
         from main import main_bp
         app.register_blueprint(main_bp)
+
+    # --- DİL DEĞİŞTİRME ROUTE ---
+    @app.route('/language/<lang>')
+    def set_language(lang=None):
+        if lang in app.config['LANGUAGES']:
+            session['language'] = lang
+        return redirect(request.referrer or url_for('main.index'))
 
     # --- YÜKLENEN DOSYALAR İÇİN ROUTE ---
     @app.route('/uploads/<path:filename>')

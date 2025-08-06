@@ -3,26 +3,26 @@
     <div class="dashboard-controls">
         <div id="search-container">
             <div class="search-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M10.5 3.75a6.75 6.75 0 100 13.5 6.75 6.75 0 000-13.5zM2.25 10.5a8.25 8.25 0 1114.59 5.28l4.69 4.69a.75.75 0 11-1.06 1.06l-4.69-4.69A8.25 8.25 0 012.25 10.5z" clip-rule="evenodd" /></svg></div>
-            <input type="text" id="search-box" placeholder="Listene eklemek için ara...">
+            <input type="text" id="search-box" placeholder="{{ _('Listene eklemek için ara...') }}">
             <div id="search-results"></div>
         </div>
         <div id="filter-container">
-            <button class="filter-btn active" data-status="all">Tümü</button>
-            <button class="filter-btn" data-status="İzleniyor">İzleniyor</button>
-            <button class="filter-btn" data-status="Okunuyor">Okunuyor</button>
-            <button class="filter-btn" data-status="Tamamlandı">Tamamlandı</button>
-            <button class="filter-btn" data-status="Planlandı">Planlandı</button>
-            <button class="filter-btn" data-status="Bırakıldı">Bırakıldı</button>
+            <button class="filter-btn active" data-status="all">{{ _('Tümü') }}</button>
+            <button class="filter-btn" data-status="İzleniyor">{{ _('İzleniyor') }}</button>
+            <button class="filter-btn" data-status="Okunuyor">{{ _('Okunuyor') }}</button>
+            <button class="filter-btn" data-status="Tamamlandı">{{ _('Tamamlandı') }}</button>
+            <button class="filter-btn" data-status="Planlandı">{{ _('Planlandı') }}</button>
+            <button class="filter-btn" data-status="Bırakıldı">{{ _('Bırakıldı') }}</button>
         </div>
     </div>
     <div id="user-list-container">
         {% for item in user_list %}
-            <div class="manhwa-card" data-user-list-id="{{ item.list_item.id }}" data-record-image="{{ item.record.image_url or '' }}" data-status="{{ item.list_item.status }}" data-chapter="{{ item.list_item.current_chapter }}" data-notes="{{ item.list_item.notes or '' }}" data-record-title="{{ item.record.original_title }}" data-record-type="{{ item.record.record_type }}">
+            <div class="manhwa-card" data-user-list-id="{{ item.list_item.id }}" data-record-image="{{ item.record.image_url or '' }}" data-status="{{ item.list_item.status }}" data-chapter="{{ item.list_item.current_chapter }}" data-notes="{{ item.list_item.notes or '' }}" data-record-title="{{ item.record.original_title }}" data-record-type="{{ item.record.record_type }}" data-synopsis="{{ item.record.synopsis or '' }}">
                 <div class="card-image-wrapper"><img src="{{ item.record.image_url or 'https://via.placeholder.com/250x350.png?text=Yok' }}" class="card-image" loading="lazy"></div>
                 <div class="card-info"><h3 class="card-title">{{ item.record.original_title }}</h3></div>
             </div>
         {% else %}
-            <p style="color: var(--text-secondary); grid-column: 1 / -1; text-align: center;">Listen henüz boş. Arama yaparak yeni kayıtlar ekleyebilirsin!</p>
+            <p style="color: var(--text-secondary); grid-column: 1 / -1; text-align: center;">{{ _('Listen henüz boş. Arama yaparak yeni kayıtlar ekleyebilirsin!') }}</p>
         {% endfor %}
     </div>
     <div id="update-item-modal" class="modal">
@@ -32,16 +32,20 @@
                 <img id="details-image" src="" alt="Kapak Fotoğrafı" class="details-image">
                 <div class="details-form-container">
                     <h2 id="update-modal-title"></h2>
+                    <div class="details-notes">
+                        <h3>{{ _('Konu') }}</h3>
+                        <p id="details-synopsis"></p>
+                    </div>
                     <form id="update-item-form" class="details-form">
                         <input type="hidden" id="user-list-id-input">
                         <div class="form-content">
-                            <div class="form-group"><label for="status-input">Durum:</label><select id="status-input" name="status"><option value="İzleniyor">İzleniyor</option><option value="Okunuyor">Okunuyor</option><option value="Tamamlandı">Tamamlandı</option><option value="Planlandı">Planlandı</option><option value="Bırakıldı">Bırakıldı</option></select></div>
-                            <div class="form-group"><label for="chapter-input">Okunan Bölüm/Bölüm:</label><input type="number" id="chapter-input" name="chapter" min="0"></div>
-                            <div class="form-group"><label for="notes-input">Kişisel Notlar:</label><textarea id="notes-input" name="notes" rows="4"></textarea></div>
+                            <div class="form-group"><label for="status-input">{{ _('Durum:') }}</label><select id="status-input" name="status"><option value="İzleniyor">{{ _('İzleniyor') }}</option><option value="Okunuyor">{{ _('Okunuyor') }}</option><option value="Tamamlandı">{{ _('Tamamlandı') }}</option><option value="Planlandı">{{ _('Planlandı') }}</option><option value="Bırakıldı">{{ _('Bırakıldı') }}</option></select></div>
+                            <div class="form-group"><label for="chapter-input">{{ _('Okunan Bölüm/Bölüm:') }}</label><input type="number" id="chapter-input" name="chapter" min="0"></div>
+                            <div class="form-group"><label for="notes-input">{{ _('Kişisel Notlar:') }}</label><textarea id="notes-input" name="notes" rows="4"></textarea></div>
                         </div>
                         <div class="modal-actions">
-                             <button type="button" id="delete-item-btn" class="btn btn-danger">Listeden Sil</button>
-                             <button type="submit" class="btn btn-primary">Değişiklikleri Kaydet</button>
+                             <button type="button" id="delete-item-btn" class="btn btn-danger">{{ _('Listeden Sil') }}</button>
+                             <button type="submit" class="btn btn-primary">{{ _('Değişiklikleri Kaydet') }}</button>
                         </div>
                     </form>
                 </div>

@@ -1,0 +1,244 @@
+# English translations for PROJECT.
+# Copyright (C) 2025 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2025-08-06 22:24+0300\n"
+"PO-Revision-Date: 2025-08-06 22:24+0300\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: templates/base.html:7
+msgid "Anasayfa"
+msgstr "Homepage"
+
+#: templates/base.html:19
+msgid "Admin"
+msgstr "Admin"
+
+#: templates/base.html:21
+msgid "Çıkış Yap"
+msgstr "Logout"
+
+#: templates/auth/login.html:5 templates/auth/login.html:26
+#: templates/auth/register.html:47 templates/base.html:23
+msgid "Giriş Yap"
+msgstr "Login"
+
+#: templates/auth/register.html:42 templates/base.html:24
+msgid "Kayıt Ol"
+msgstr "Sign Up"
+
+#: templates/base.html:32
+msgid "Temayı Değiştir"
+msgstr "Change Theme"
+
+#: templates/base.html:34
+msgid "Açık"
+msgstr "Light"
+
+#: templates/base.html:35
+msgid "Koyu"
+msgstr "Dark"
+
+#: templates/base.html:54
+msgid "Emin misiniz?"
+msgstr "Are you sure?"
+
+#: templates/base.html:55
+msgid "Bu işlem geri alınamaz."
+msgstr "This action cannot be undone."
+
+#: templates/base.html:57
+msgid "İptal"
+msgstr "Cancel"
+
+#: templates/base.html:58
+msgid "Evet, Sil"
+msgstr "Yes, Delete"
+
+#: templates/dashboard.html:6
+msgid "Listene eklemek için ara..."
+msgstr "Search to add to your list..."
+
+#: templates/dashboard.html:10
+msgid "Tümü"
+msgstr "All"
+
+#: templates/dashboard.html:11 templates/dashboard.html:42
+msgid "İzleniyor"
+msgstr "Watching"
+
+#: templates/dashboard.html:12 templates/dashboard.html:42
+msgid "Okunuyor"
+msgstr "Reading"
+
+#: templates/dashboard.html:13 templates/dashboard.html:42
+msgid "Tamamlandı"
+msgstr "Completed"
+
+#: templates/dashboard.html:14 templates/dashboard.html:42
+msgid "Planlandı"
+msgstr "Planned"
+
+#: templates/dashboard.html:15 templates/dashboard.html:42
+msgid "Bırakıldı"
+msgstr "Dropped"
+
+#: templates/dashboard.html:25
+msgid "Listen henüz boş. Arama yaparak yeni kayıtlar ekleyebilirsin!"
+msgstr "Your list is empty. Start by searching to add new entries!"
+
+#: templates/dashboard.html:36
+msgid "Konu"
+msgstr "Synopsis"
+
+#: templates/dashboard.html:42
+msgid "Durum:"
+msgstr "Status:"
+
+#: templates/dashboard.html:43
+msgid "Okunan Bölüm/Bölüm:"
+msgstr "Progress/Chapter:"
+
+#: templates/dashboard.html:44
+msgid "Kişisel Notlar:"
+msgstr "Personal Notes:"
+
+#: templates/dashboard.html:47
+msgid "Listeden Sil"
+msgstr "Remove from List"
+
+#: templates/admin/dashboard.html:30 templates/dashboard.html:48
+msgid "Değişiklikleri Kaydet"
+msgstr "Save Changes"
+
+#: templates/admin/dashboard.html:6
+msgid "Kütüphanede kayıt ara..."
+msgstr "Search in the library..."
+
+#: templates/admin/dashboard.html:8
+msgid "Yeni Kayıt Ekle"
+msgstr "Add New Entry"
+
+#: templates/admin/dashboard.html:14
+msgid "Yeni Kütüphane Kaydı"
+msgstr "New Library Entry"
+
+#: templates/admin/dashboard.html:18
+msgid "Orijinal Başlık:"
+msgstr "Original Title:"
+
+#: templates/admin/dashboard.html:19
+msgid "İngilizce Başlık:"
+msgstr "English Title:"
+
+#: templates/admin/dashboard.html:22
+msgid "Konu:"
+msgstr "Synopsis:"
+
+#: templates/admin/dashboard.html:25
+msgid "Tür:"
+msgstr "Type:"
+
+#: templates/admin/dashboard.html:26
+msgid "veya Resim URL:"
+msgstr "or Image URL:"
+
+#: templates/admin/dashboard.html:26
+msgid "URL yapıştırın"
+msgstr "Paste URL"
+
+#: templates/admin/dashboard.html:27
+msgid "Resim Dosyası Seç:"
+msgstr "Select Image File:"
+
+#: templates/admin/dashboard.html:29
+msgid "Kaydı Sil"
+msgstr "Delete Entry"
+
+#: templates/auth/confirm_email.html:4
+msgid "Hesap Onayı"
+msgstr "Account Confirmation"
+
+#: templates/auth/confirm_email.html:5
+msgid "Merhaba"
+msgstr "Hello"
+
+#: templates/auth/confirm_email.html:6
+msgid "Hesabını onaylamak için lütfen aşağıdaki linke tıkla:"
+msgstr "Please click the link below to confirm your account:"
+
+#: templates/auth/confirm_email.html:9
+msgid "Eğer bu isteği sen yapmadıysan, bu e-postayı görmezden gelebilirsin."
+msgstr "If you did not make this request, please ignore this email."
+
+#: templates/auth/login.html:11
+msgid "E-posta veya Kullanıcı Adı"
+msgstr "Email or Username"
+
+#: templates/auth/login.html:12
+msgid "Kullanıcı adınız veya e-postanız"
+msgstr "Your username or email"
+
+#: templates/auth/login.html:16 templates/auth/register.html:26
+msgid "Şifre"
+msgstr "Password"
+
+#: templates/auth/login.html:22
+msgid "Beni hatırla"
+msgstr "Remember me"
+
+#: templates/auth/login.html:31
+msgid "Hesabın yok mu?"
+msgstr "Don't have an account?"
+
+#: templates/auth/login.html:31
+msgid "Hemen Kayıt Ol"
+msgstr "Sign Up Now"
+
+#: templates/auth/register.html:5
+msgid "Hesap Oluştur"
+msgstr "Create Account"
+
+#: templates/auth/register.html:10
+msgid "Kullanıcı Adı"
+msgstr "Username"
+
+#: templates/auth/register.html:11
+msgid "Kullanıcı adınızı seçin"
+msgstr "Choose your username"
+
+#: templates/auth/register.html:18
+msgid "E-posta"
+msgstr "Email"
+
+#: templates/auth/register.html:19
+msgid "E-posta adresiniz"
+msgstr "Your email address"
+
+#: templates/auth/register.html:27
+msgid "Güçlü bir şifre belirleyin"
+msgstr "Choose a strong password"
+
+#: templates/auth/register.html:34
+msgid "Şifreyi Doğrula"
+msgstr "Confirm Password"
+
+#: templates/auth/register.html:35
+msgid "Şifrenizi tekrar girin"
+msgstr "Enter your password again"
+
+#: templates/auth/register.html:47
+msgid "Zaten bir hesabın var mı?"
+msgstr "Already have an account?"

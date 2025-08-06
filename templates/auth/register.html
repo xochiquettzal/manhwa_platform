@@ -1,33 +1,50 @@
 {% extends "base.html" %}
+
 {% block content %}
 <div class="form-wrapper">
-    <h1>Hesap Oluştur</h1>
+    <h1>{{ _('Hesap Oluştur') }}</h1>
     <form method="POST" action="">
         {{ form.hidden_tag() }}
+        
         <div class="form-group">
-            {{ form.username.label }}
-            {{ form.username(placeholder="Kullanıcı adınızı seçin") }}
-            {% for error in form.username.errors %}<p class="error-message">{{ error }}</p>{% endfor %}
+            <label for="username">{{ _('Kullanıcı Adı') }}</label>
+            {{ form.username(placeholder=_('Kullanıcı adınızı seçin')) }}
+            {% for error in form.username.errors %}
+                <p class="error-message">{{ _(error) }}</p>
+            {% endfor %}
         </div>
+        
         <div class="form-group">
-            {{ form.email.label }}
-            {{ form.email(placeholder="E-posta adresiniz") }}
-            {% for error in form.email.errors %}<p class="error-message">{{ error }}</p>{% endfor %}
+            <label for="email">{{ _('E-posta') }}</label>
+            {{ form.email(placeholder=_('E-posta adresiniz')) }}
+            {% for error in form.email.errors %}
+                <p class="error-message">{{ _(error) }}</p>
+            {% endfor %}
         </div>
+        
         <div class="form-group">
-            {{ form.password.label }}
-            {{ form.password(placeholder="Güçlü bir şifre belirleyin") }}
-            {% for error in form.password.errors %}<p class="error-message">{{ error }}</p>{% endfor %}
+            <label for="password">{{ _('Şifre') }}</label>
+            {{ form.password(placeholder=_('Güçlü bir şifre belirleyin')) }}
+            {% for error in form.password.errors %}
+                <p class="error-message">{{ _(error) }}</p>
+            {% endfor %}
         </div>
+        
         <div class="form-group">
-            {{ form.confirm_password.label }}
-            {{ form.confirm_password(placeholder="Şifrenizi tekrar girin") }}
-            {% for error in form.confirm_password.errors %}<p class="error-message">{{ error }}</p>{% endfor %}
+            <label for="confirm_password">{{ _('Şifreyi Doğrula') }}</label>
+            {{ form.confirm_password(placeholder=_('Şifrenizi tekrar girin')) }}
+            {% for error in form.confirm_password.errors %}
+                <p class="error-message">{{ _(error) }}</p>
+            {% endfor %}
         </div>
+        
         <div class="form-group">
-            <button type="submit" class="btn btn-primary">Kayıt Ol</button>
+            <button type="submit" class="btn btn-primary">{{ _('Kayıt Ol') }}</button>
         </div>
     </form>
-    <p class="subtext">Zaten bir hesabın var mı? <a href="{{ url_for('auth.login') }}">Giriş Yap</a></p>
+    
+    <p class="subtext">
+        {{ _('Zaten bir hesabın var mı?') }} <a href="{{ url_for('auth.login') }}">{{ _('Giriş Yap') }}</a>
+    </p>
 </div>
 {% endblock %}
