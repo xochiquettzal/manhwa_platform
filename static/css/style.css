@@ -1,128 +1,59 @@
-/* static/css/style.css (Sıfırdan Tasarlanmış Modern Arayüz) */
+/* static/css/style.css (Tüm Dosya - Modern Modal Stilleriyle) */
 
 /* --- 1. Global & Tema Değişkenleri --- */
-:root {
-    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    --border-radius-sm: 4px;
-    --border-radius-md: 8px;
-    --transition-fast: all 0.2s ease-in-out;
-}
-
-body[data-theme="dark"] {
-    --bg-primary: #12181b;
-    --bg-secondary: #1a2025;
-    --text-primary: #e2e8f0;
-    --text-secondary: #94a3b8;
-    --border-primary: #334155;
-    --accent-primary: #38bdf8;
-    --accent-primary-hover: #0ea5e9;
-    --danger-primary: #f43f5e;
-}
-
-body[data-theme="light"] {
-    --bg-primary: #f1f5f9;
-    --bg-secondary: #ffffff;
-    --text-primary: #0f172a;
-    --text-secondary: #64748b;
-    --border-primary: #cbd5e1;
-    --accent-primary: #0ea5e9;
-    --accent-primary-hover: #0284c7;
-    --danger-primary: #e11d48;
-}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+:root { --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; --border-radius: 8px; --transition: all 0.2s ease-in-out; }
+body[data-theme="dark"] { --bg-primary: #111827; --bg-secondary: #1f2937; --bg-tertiary: #374151; --text-primary: #f9fafb; --text-secondary: #9ca3af; --border-primary: #374151; --accent-primary: #3b82f6; --accent-hover: #2563eb; --danger-primary: #ef4444; --danger-hover: #dc2626; }
+body[data-theme="light"] { --bg-primary: #f3f4f6; --bg-secondary: #ffffff; --bg-tertiary: #e5e7eb; --text-primary: #111827; --text-secondary: #4b5563; --border-primary: #d1d5db; --accent-primary: #3b82f6; --accent-hover: #2563eb; --danger-primary: #ef4444; --danger-hover: #dc2626; }
 
 /* --- 2. Temel & Layout Yapısı --- */
-body {
-    font-family: var(--font-sans);
-    background-color: var(--bg-primary);
-    color: var(--text-primary);
-    margin: 0;
-}
-.container {
-    width: 90%;
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 2rem 0;
-}
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-}
-header .logo { font-size: 1.75rem; font-weight: bold; text-decoration: none; color: var(--text-primary); }
+body { font-family: var(--font-sans); background-color: var(--bg-primary); color: var(--text-primary); margin: 0; line-height: 1.6; }
+.container { width: 90%; max-width: 1400px; margin: 0 auto; padding: 2rem 0; }
+header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+header .logo { font-size: 1.75rem; font-weight: 700; text-decoration: none; color: var(--text-primary); }
 .header-actions { display: flex; align-items: center; gap: 1rem; }
 
-/* --- 3. Kartlar (Dashboard) --- */
-#user-list-container, #admin-records-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 1.5rem;
-}
-.manhwa-card {
-    background-color: var(--bg-secondary);
-    border-radius: var(--border-radius-md);
-    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
-    overflow: hidden;
-    cursor: pointer;
-    transition: var(--transition-fast);
-}
-.manhwa-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1); }
+/* --- 3. Genel Butonlar ve Form Elemanları --- */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem 1.25rem; border: 1px solid transparent; border-radius: var(--border-radius); font-weight: 600; font-size: 0.9rem; cursor: pointer; text-decoration: none; transition: var(--transition); }
+.btn-primary { background-color: var(--accent-primary); color: #fff; }
+.btn-primary:hover { background-color: var(--accent-hover); }
+.btn-danger { background-color: var(--danger-primary); color: #fff; }
+.btn-danger:hover { background-color: var(--danger-hover); }
+.btn-secondary { background-color: var(--bg-tertiary); color: var(--text-primary); border-color: var(--border-primary); }
+.btn-secondary:hover { background-color: var(--border-primary); }
+.form-group { margin-bottom: 1.25rem; }
+.form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--text-secondary); }
+.form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.75rem; background-color: var(--bg-primary); border: 1px solid var(--border-primary); border-radius: var(--border-radius); color: var(--text-primary); font-size: 1rem; box-sizing: border-box; }
+
+/* --- 4. Modal Stilleri (Yeniden Tasarlandı) --- */
+.modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); backdrop-filter: blur(5px); animation: fadeIn 0.3s ease; }
+.modal-content { background-color: var(--bg-secondary); border-radius: var(--border-radius); margin: 5% auto; padding: 0; width: 90%; max-width: 800px; position: relative; overflow: hidden; animation: slideIn 0.3s ease; }
+.close-btn { position: absolute; top: 1rem; right: 1rem; font-size: 1.5rem; cursor: pointer; color: var(--text-secondary); z-index: 10; }
+.details-layout { display: flex; }
+.details-image { width: 300px; height: auto; object-fit: cover; flex-shrink: 0; }
+.details-form-container { display: flex; flex-direction: column; padding: 2rem; flex-grow: 1; }
+.details-form-container h2 { margin-top: 0; }
+.details-form { display: flex; flex-direction: column; height: 100%; }
+.form-content { flex-grow: 1; }
+.modal-actions { display: flex; gap: 1rem; margin-top: 1.5rem; justify-content: flex-end; }
+
+/* --- 5. Kartlar, Arama ve Diğer Bileşenler --- */
+/* Bu kısımlar önceki versiyondan alınmıştır ve hala geçerlidir. */
+#search-container { position: relative; margin-bottom: 2rem; display: flex; align-items: center; }
+#search-box { width: 100%; padding: 1rem 1rem 1rem 3.5rem; font-size: 1rem; background-color: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: var(--border-radius); color: var(--text-primary); }
+.search-icon { position: absolute; left: 1rem; color: var(--text-secondary); }
+#search-results { display: none; position: absolute; top: 100%; width: 100%; background-color: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: 0 0 var(--border-radius) var(--border-radius); max-height: 350px; overflow-y: auto; z-index: 999; }
+.search-item { display: flex; align-items: center; padding: 0.75rem; cursor: pointer; border-bottom: 1px solid var(--border-primary); }
+.search-item:hover { background-color: var(--bg-tertiary); }
+.search-item img { width: 40px; height: 60px; object-fit: cover; margin-right: 1rem; border-radius: 4px; }
+#user-list-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.5rem; }
+.manhwa-card { background-color: var(--bg-secondary); border-radius: var(--border-radius); box-shadow: 0 1px 3px rgba(0,0,0,0.1); overflow: hidden; position: relative; cursor: pointer; transition: var(--transition); }
+.manhwa-card:hover { transform: translateY(-5px); }
 .card-image-wrapper { width: 100%; height: 340px; }
 .card-image { width: 100%; height: 100%; object-fit: cover; }
-.card-title { padding: 1rem; font-weight: 600; }
-.card-progress { display: flex; justify-content: space-between; align-items: center; padding: 0 1rem 1rem; font-size: 0.875rem; color: var(--text-secondary); }
-.status-badge { padding: 0.25rem 0.5rem; border-radius: 9999px; font-weight: 500; font-size: 0.75rem; }
-.status-okunuyor { background-color: #38bdf8; color: #fff; }
-.status-tamamland- { background-color: #22c55e; color: #fff; } /* 'Tamamlandı' için 'd' düşebilir, kısa isim daha iyi */
-.status-planland- { background-color: #64748b; color: #fff; }
-.status-b-rak-ld- { background-color: #f43f5e; color: #fff; }
+.card-info { padding: 1rem; }
+.card-title { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-/* --- 4. Formlar (Login, Register, Admin, Modal) --- */
-.form-wrapper {
-    max-width: 450px;
-    margin: 2rem auto;
-    padding: 2rem;
-    background-color: var(--bg-secondary);
-    border-radius: var(--border-radius-md);
-    border: 1px solid var(--border-primary);
-}
-.form-wrapper h1, .modal-content h2 { margin-top: 0; text-align: center; }
-.form-group { margin-bottom: 1.25rem; }
-.form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
-.form-group input, .form-group select, .form-group textarea {
-    width: 100%;
-    padding: 0.75rem;
-    background-color: var(--bg-primary);
-    border: 1px solid var(--border-primary);
-    border-radius: var(--border-radius-sm);
-    color: var(--text-primary);
-    font-size: 1rem;
-    box-sizing: border-box;
-}
-.form-group .error-message { color: var(--danger-primary); font-size: 0.875rem; margin-top: 0.5rem; }
-.form-wrapper p { text-align: center; }
-
-/* --- 5. Butonlar & Arama & Filtreler --- */
-.btn {
-    display: inline-block;
-    width: 100%;
-    padding: 0.875rem;
-    border: none;
-    border-radius: var(--border-radius-sm);
-    font-weight: bold;
-    font-size: 1rem;
-    cursor: pointer;
-    text-align: center;
-    transition: var(--transition-fast);
-}
-.btn-primary { background-color: var(--accent-primary); color: #fff; }
-.btn-primary:hover { background-color: var(--accent-primary-hover); }
-#search-box { width: 100%; padding: 1rem; font-size: 1rem; background-color: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: var(--border-radius-md); color: var(--text-primary); margin-bottom: 0.5rem; }
-#filter-container { display: flex; gap: 0.75rem; margin: 2rem 0; }
-.filter-btn { padding: 0.5rem 1rem; border: 1px solid var(--border-primary); background-color: var(--bg-secondary); color: var(--text-secondary); border-radius: 9999px; cursor: pointer; font-weight: 500; }
-.filter-btn.active { background-color: var(--accent-primary); color: #fff; border-color: var(--accent-primary); }
-
-/* --- 6. Modallar --- */
-.modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(5px); }
-.modal-content { background-color: var(--bg-secondary); border-radius: var(--border-radius-md); margin: 10% auto; padding: 2rem; width: 90%; max-width: 500px; position: relative; }
-.close-btn { position: absolute; top: 1rem; right: 1rem; font-size: 1.5rem; cursor: pointer; color: var(--text-secondary); }
+/* Animasyonlar */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideIn { from { transform: translateY(-30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }

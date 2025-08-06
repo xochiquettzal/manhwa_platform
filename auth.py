@@ -10,30 +10,18 @@ auth_bp = Blueprint('auth', __name__)
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('main.index'))
-    
     form = RegistrationForm()
-    
-    # validate_on_submit(), formdaki tüm temel ve özel doğrulamaları çalıştırır.
-    # Eğer herhangi bir doğrulama (bizim yazdıklarımız dahil) başarısız olursa,
-    # bu blok 'False' döner ve form, hatalarla birlikte tekrar render edilir.
     if form.validate_on_submit():
-        # Bu bloğa sadece TÜM doğrulamalar başarılıysa girilir.
-        user = User(
-            username=form.username.data,
-            email=form.email.data,
-        )
+        user = User(username=form.username.data, email=form.email.data)
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-
         token = generate_confirmation_token(user.email)
         confirm_url = url_for('auth.confirm_email', token=token, _external=True)
         html = render_template('auth/confirm_email.html', confirm_url=confirm_url, user=user)
         send_email(user.email, 'Lütfen E-postanızı Onaylayın', html)
-
         flash('Onay linki e-posta adresinize gönderildi.', 'info')
         return redirect(url_for('auth.login'))
-        
     return render_template('auth/register.html', title='Kayıt Ol', form=form)
 
 @auth_bp.route('/confirm/<token>')
@@ -61,19 +49,21 @@ def login():
         return redirect(url_for('main.index'))
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
-        if user is None or not user.check_password(form.password.data):
-            flash('Geçersiz e-posta veya şifre.', 'danger')
-            return redirect(url_for('auth.login'))
+        # Madde 5: Hem e-posta hem de kullanıcı adı ile arama yapılıyor.
+        user = User.query.filter(
+            (User.email == form.login.data) | (User.username == form.login.data)
+        ).first()
         
-        if not user.confirmed:
-            flash('Lütfen giriş yapmadan önce e-posta adresinizi onaylayın.', 'warning')
+        if user and user.check_password(form.password.data):
+            if not user.confirmed:
+                flash('Lütfen giriş yapmadan önce e-posta adresinizi onaylayın.', 'warning')
+                return redirect(url_for('auth.login'))
+            login_user(user, remember=form.remember_me.data)
+            next_page = request.args.get('next')
+            return redirect(next_page) if next_page else redirect(url_for('main.index'))
+        else:
+            flash('Geçersiz E-posta/Kullanıcı Adı veya Şifre.', 'danger')
             return redirect(url_for('auth.login'))
-
-        login_user(user, remember=form.remember_me.data)
-        next_page = request.args.get('next')
-        return redirect(next_page) if next_page else redirect(url_for('main.index'))
-        
     return render_template('auth/login.html', title='Giriş Yap', form=form)
 
 @auth_bp.route('/logout')
