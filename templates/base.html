@@ -1,35 +1,59 @@
-<!-- templates/base.html -->
 <!DOCTYPE html>
-<html>
+<html lang="tr">
 <head>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ title or 'Manhwa Platformu' }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-<body>
-    <nav>
-        <a href="{{ url_for('main.index') }}">Ana Sayfa</a>
-        {% if current_user.is_authenticated %}
-            |
-            {% if current_user.is_admin %}
-                <a href="{{ url_for('admin.dashboard') }}">Admin Paneli</a> |
+<body data-theme="dark">
+
+    <div class="container">
+        <header>
+            <a href="{{ url_for('main.index') }}" class="logo">Platform</a>
+            <div class="header-actions">
+                <select id="theme-select">
+                    <option value="dark">Koyu Tema</option>
+                    <option value="light">Açık Tema</option>
+                </select>
+                {% if current_user.is_authenticated %}
+                    {% if current_user.is_admin %}
+                        <a href="{{ url_for('admin.dashboard') }}">Admin</a>
+                    {% endif %}
+                    <a href="{{ url_for('auth.logout') }}">Çıkış Yap</a>
+                {% endif %}
+            </div>
+        </header>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
             {% endif %}
-            <a href="{{ url_for('auth.logout') }}">Çıkış Yap ({{ current_user.username }})</a>
-        {% else %}
-            | <a href="{{ url_for('auth.login') }}">Giriş Yap</a>
-            | <a href="{{ url_for('auth.register') }}">Kayıt Ol</a>
-        {% endif %}
-    </nav>
-    <hr>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <ul>
-        {% for category, message in messages %}
-          <li class="{{ category }}">{{ message }}</li>
-        {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
-    
-    {% block content %}{% endblock %}
+        {% endwith %}
+
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeSelect = document.getElementById('theme-select');
+            const body = document.body;
+            const applyTheme = (theme) => {
+                body.dataset.theme = theme;
+                localStorage.setItem('manhwaTheme', theme);
+                if (themeSelect) themeSelect.value = theme;
+            };
+            if (themeSelect) {
+                themeSelect.addEventListener('change', () => applyTheme(themeSelect.value));
+            }
+            applyTheme(localStorage.getItem('manhwaTheme') || 'dark');
+        });
+    </script>
+    {% block scripts %}{% endblock %}
+
 </body>
 </html>

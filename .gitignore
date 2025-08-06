@@ -21,3 +21,6 @@ instance/
 # IDE / Editor specific
 .vscode/
 .idea/
+
+#Resimler
+uploads/

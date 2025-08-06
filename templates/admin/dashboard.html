@@ -1,15 +1,18 @@
 {% extends "base.html" %}
-
 {% block content %}
-<h1>Admin Paneli - Ana Kütüphane</h1>
-<a href="{{ url_for('admin.add_record') }}">Yeni Kayıt Ekle</a>
-<hr>
-<h2>Mevcut Kayıtlar ({{ records|length }})</h2>
-<ul>
-{% for record in records %}
-    <li>{{ record.original_title }} ({{ record.record_type }})</li>
-{% else %}
-    <li>Henüz hiç kayıt eklenmemiş.</li>
-{% endfor %}
-</ul>
+    <h1>Admin Paneli</h1>
+    <a href="{{ url_for('admin.add_record') }}" class="btn btn-primary" style="width: auto; margin-bottom: 2rem;">Yeni Kütüphane Kaydı Ekle</a>
+    
+    <div id="admin-records-list">
+        {% for record in records %}
+            <div class="manhwa-card" style="cursor: default;">
+                 <div class="card-image-wrapper">
+                    <img src="{{ record.image_url or 'https://via.placeholder.com/250x350.png?text=Yok' }}" class="card-image">
+                </div>
+                <div class="card-title">{{ record.original_title }}</div>
+            </div>
+        {% else %}
+            <p>Kütüphanede hiç kayıt yok.</p>
+        {% endfor %}
+    </div>
 {% endblock %}

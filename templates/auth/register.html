@@ -1,42 +1,43 @@
 {% extends "base.html" %}
-
 {% block content %}
-    <h1>Kayıt Ol</h1>
+<div class="form-wrapper">
+    <h1>Hesap Oluştur</h1>
     <form method="POST" action="">
         {{ form.hidden_tag() }}
-
-        <p>
-            {{ form.username.label }}<br>
-            {{ form.username(size=32) }}<br>
+        <div class="form-group">
+            {{ form.username.label }}
+            {{ form.username() }}
             {% for error in form.username.errors %}
-            <span style="color: red;">[{{ error }}]</span>
+                <p class="error-message">{{ error }}</p>
             {% endfor %}
-        </p>
-
-        <p>
-            {{ form.email.label }}<br>
-            {{ form.email(size=32) }}<br>
+        </div>
+        <div class="form-group">
+            {{ form.email.label }}
+            {{ form.email() }}
             {% for error in form.email.errors %}
-            <span style="color: red;">[{{ error }}]</span>
+                <p class="error-message">{{ error }}</p>
             {% endfor %}
-        </p>
-
-        <p>
-            {{ form.password.label }}<br>
-            {{ form.password(size=32) }}<br>
+        </div>
+        <div class="form-group">
+            {{ form.password.label }}
+            {{ form.password() }}
             {% for error in form.password.errors %}
-            <span style="color: red;">[{{ error }}]</span>
+                <p class="error-message">{{ error }}</p>
             {% endfor %}
-        </p>
-
-        <p>
-            {{ form.confirm_password.label }}<br>
-            {{ form.confirm_password(size=32) }}<br>
+        </div>
+        <div class="form-group">
+            {{ form.confirm_password.label }}
+            {{ form.confirm_password() }}
             {% for error in form.confirm_password.errors %}
-            <span style="color: red;">[{{ error }}]</span>
+                <p class="error-message">{{ error }}</p>
             {% endfor %}
-        </p>
-
-        <p>{{ form.submit() }}</p>
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">Kayıt Ol</button>
+        </div>
     </form>
+    <p>
+        Zaten bir hesabın var mı? <a href="{{ url_for('auth.login') }}">Giriş Yap</a>
+    </p>
+</div>
 {% endblock %}

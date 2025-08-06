@@ -1,167 +1,72 @@
-<!-- templates/dashboard.html -->
 {% extends "base.html" %}
 
 {% block content %}
-<style>
-    /* Bu sayfaya özel geçici stiller. Daha sonra CSS dosyasına taşınabilir. */
-    #search-container { margin-bottom: 2rem; }
-    #search-results { border: 1px solid #ccc; max-height: 200px; overflow-y: auto; margin-top: 5px; }
-    .search-item { padding: 8px; cursor: pointer; display: flex; align-items: center; gap: 10px; }
-    .search-item:hover { background-color: #f0f0f0; }
-    .search-item img { width: 40px; height: auto; }
+    <div id="search-container">
+        <input type="text" id="search-box" placeholder="Listene eklemek için ara...">
+        <div id="search-results"></div>
+    </div>
 
-    #filter-container { margin-bottom: 1rem; }
-    #filter-container .filter-btn { margin-right: 5px; }
-
-    #user-list-container .user-list-item { 
-        margin-bottom: 10px; 
-        padding: 10px; 
-        border: 1px solid #eee; 
-        border-radius: 5px;
-    }
-</style>
-
-<h1>Panelim</h1>
-
-<!-- Arama Bölümü -->
-<div id="search-container">
-    <h2>Kütüphaneden Ekle</h2>
-    <input type="text" id="search-box" placeholder="Anime/Manhwa adı ara..." size="50">
-    <div id="search-results"></div>
-</div>
-
-<hr>
-
-<!-- Kişisel Liste Bölümü -->
-<div>
-    <h2>Listem ({{ user_list|length }})</h2>
-    
-    <!-- Filtreleme Butonları -->
     <div id="filter-container">
-        <strong>Filtrele:</strong>
-        <button class="filter-btn" data-status="all">Tümü</button>
+        <button class="filter-btn active" data-status="all">Tüm Kayıtlar</button>
         <button class="filter-btn" data-status="Okunuyor">Okunuyor</button>
         <button class="filter-btn" data-status="Tamamlandı">Tamamlandı</button>
         <button class="filter-btn" data-status="Planlandı">Planlandı</button>
         <button class="filter-btn" data-status="Bırakıldı">Bırakıldı</button>
     </div>
-    
+
     <div id="user-list-container">
-    {% for item in user_list %}
-        <div class="user-list-item" data-status="{{ item.status }}">
-            <h4>{{ item.record.original_title }}</h4>
-            <p>Durum: {{ item.status }} | Okunan Bölüm: {{ item.current_chapter }}</p>
-            <!-- Düzenleme ve Silme butonları ileride buraya eklenecek -->
-        </div>
-    {% else %}
-        <p>Listenizde henüz bir kayıt yok. Yukarıdaki arama çubuğunu kullanarak kütüphaneden ekleme yapabilirsiniz.</p>
-    {% endfor %}
+        {% for item in user_list %}
+            <div class="manhwa-card"
+                 data-user-list-id="{{ item.list_item.id }}"
+                 data-status="{{ item.list_item.status }}"
+                 data-chapter="{{ item.list_item.current_chapter }}"
+                 data-notes="{{ item.list_item.notes or '' }}"
+                 data-record-title="{{ item.record.original_title }}">
+                <div class="card-image-wrapper">
+                    <img src="{{ item.record.image_url or 'https://via.placeholder.com/250x350.png?text=Yok' }}" class="card-image" loading="lazy">
+                </div>
+                <div class="card-title">{{ item.record.original_title }}</div>
+                <div class="card-progress">
+                    <span>Bölüm: {{ item.list_item.current_chapter }}</span>
+                    <span class="status-badge status-{{ item.list_item.status.lower()|replace('ı','-')|replace('ğ','-')|replace('ş','-') }}">{{ item.list_item.status }}</span>
+                </div>
+            </div>
+        {% else %}
+            <p>Listen henüz boş. Arama yaparak yeni kayıtlar ekleyebilirsin!</p>
+        {% endfor %}
     </div>
-</div>
 
-<!-- Bu script'i daha sonra ayrı bir .js dosyasına taşıyacağız -->
-<script>
-    // templates/dashboard.html içindeki script bloğunun tam hali
+    <div id="update-item-modal" class="modal">
+        <div class="modal-content">
+            <span id="close-update-modal-btn" class="close-btn">&times;</span>
+            <h2 id="update-modal-title">Kaydı Güncelle</h2>
+            <form id="update-item-form">
+                <input type="hidden" id="user-list-id-input">
+                <div class="form-group">
+                    <label for="status-input">Durum:</label>
+                    <select id="status-input" name="status">
+                        <option value="Okunuyor">Okunuyor</option>
+                        <option value="Tamamlandı">Tamamlandı</option>
+                        <option value="Planlandı">Planlandı</option>
+                        <option value="Bırakıldı">Bırakıldı</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="chapter-input">Okunan Bölüm:</label>
+                    <input type="number" id="chapter-input" name="chapter" min="0">
+                </div>
+                <div class="form-group">
+                    <label for="notes-input">Kişisel Notlar:</label>
+                    <textarea id="notes-input" name="notes" rows="4"></textarea>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Güncelle</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
 
-// --- Element Seçimleri ---
-const searchBox = document.getElementById('search-box');
-const searchResultsContainer = document.getElementById('search-results');
-const filterButtons = document.querySelectorAll('.filter-btn');
-const userListContainer = document.getElementById('user-list-container');
-
-// --- Canlı Arama Mantığı ---
-let searchTimeout;
-searchBox.addEventListener('keyup', (e) => {
-    clearTimeout(searchTimeout);
-    const query = e.target.value.trim();
-    
-    if (query.length < 2) {
-        searchResultsContainer.innerHTML = '';
-        searchResultsContainer.style.display = 'none';
-        return;
-    }
-    
-    // Kullanıcı yazmayı bıraktıktan 300ms sonra arama yap (sunucuyu yormamak için)
-    searchTimeout = setTimeout(async () => {
-        try {
-            const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
-            const results = await response.json();
-            
-            searchResultsContainer.innerHTML = ''; // Önceki sonuçları temizle
-            if (results.length > 0) {
-                results.forEach(record => {
-                    const itemDiv = document.createElement('div');
-                    itemDiv.className = 'search-item';
-                    itemDiv.dataset.id = record.id;
-                    itemDiv.innerHTML = `
-                        <img src="${record.image_url}" alt="">
-                        <span>${record.original_title}</span>
-                    `;
-                    searchResultsContainer.appendChild(itemDiv);
-                });
-                searchResultsContainer.style.display = 'block';
-            } else {
-                searchResultsContainer.innerHTML = '<div class="search-item">Sonuç bulunamadı.</div>';
-                searchResultsContainer.style.display = 'block';
-            }
-        } catch (error) {
-            console.error('Arama hatası:', error);
-        }
-    }, 300);
-});
-
-// Arama sonuçları dışına tıklanınca sonuçları gizle
-document.addEventListener('click', (e) => {
-    if (!searchBox.contains(e.target)) {
-        searchResultsContainer.style.display = 'none';
-    }
-});
-
-// --- Arama Sonucuna Tıklayıp Listeye Ekleme ---
-searchResultsContainer.addEventListener('click', async (e) => {
-    const searchItem = e.target.closest('.search-item');
-    if (searchItem && searchItem.dataset.id) {
-        const recordId = searchItem.dataset.id;
-        
-        try {
-            const response = await fetch(`/list/add/${recordId}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' }
-            });
-
-            if (response.ok) {
-                // Başarılı eklemeden sonra sayfayı yeniden yükleyerek
-                // hem flash mesajını görmek hem de listeyi güncellemek en basit yöntemdir.
-                window.location.reload(); 
-            } else {
-                const data = await response.json();
-                alert(`Hata: ${data.message}`);
-            }
-        } catch (error) {
-            console.error('Ekleme hatası:', error);
-        }
-    }
-});
-
-// --- Filtreleme Mantığı ---
-filterButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        const statusToFilter = button.dataset.status;
-        const allItems = userListContainer.querySelectorAll('.user-list-item');
-
-        // Aktif buton stilini ayarla
-        filterButtons.forEach(btn => btn.style.fontWeight = 'normal');
-        button.style.fontWeight = 'bold';
-        
-        allItems.forEach(item => {
-            if (statusToFilter === 'all' || item.dataset.status === statusToFilter) {
-                item.style.display = 'block'; // Göster
-            } else {
-                item.style.display = 'none'; // Gizle
-            }
-        });
-    });
-});
-</script>
-
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 {% endblock %}

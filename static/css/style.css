@@ -1,0 +1,128 @@
+/* static/css/style.css (Sıfırdan Tasarlanmış Modern Arayüz) */
+
+/* --- 1. Global & Tema Değişkenleri --- */
+:root {
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --border-radius-sm: 4px;
+    --border-radius-md: 8px;
+    --transition-fast: all 0.2s ease-in-out;
+}
+
+body[data-theme="dark"] {
+    --bg-primary: #12181b;
+    --bg-secondary: #1a2025;
+    --text-primary: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --border-primary: #334155;
+    --accent-primary: #38bdf8;
+    --accent-primary-hover: #0ea5e9;
+    --danger-primary: #f43f5e;
+}
+
+body[data-theme="light"] {
+    --bg-primary: #f1f5f9;
+    --bg-secondary: #ffffff;
+    --text-primary: #0f172a;
+    --text-secondary: #64748b;
+    --border-primary: #cbd5e1;
+    --accent-primary: #0ea5e9;
+    --accent-primary-hover: #0284c7;
+    --danger-primary: #e11d48;
+}
+
+/* --- 2. Temel & Layout Yapısı --- */
+body {
+    font-family: var(--font-sans);
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    margin: 0;
+}
+.container {
+    width: 90%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem 0;
+}
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+header .logo { font-size: 1.75rem; font-weight: bold; text-decoration: none; color: var(--text-primary); }
+.header-actions { display: flex; align-items: center; gap: 1rem; }
+
+/* --- 3. Kartlar (Dashboard) --- */
+#user-list-container, #admin-records-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1.5rem;
+}
+.manhwa-card {
+    background-color: var(--bg-secondary);
+    border-radius: var(--border-radius-md);
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+    overflow: hidden;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+.manhwa-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1); }
+.card-image-wrapper { width: 100%; height: 340px; }
+.card-image { width: 100%; height: 100%; object-fit: cover; }
+.card-title { padding: 1rem; font-weight: 600; }
+.card-progress { display: flex; justify-content: space-between; align-items: center; padding: 0 1rem 1rem; font-size: 0.875rem; color: var(--text-secondary); }
+.status-badge { padding: 0.25rem 0.5rem; border-radius: 9999px; font-weight: 500; font-size: 0.75rem; }
+.status-okunuyor { background-color: #38bdf8; color: #fff; }
+.status-tamamland- { background-color: #22c55e; color: #fff; } /* 'Tamamlandı' için 'd' düşebilir, kısa isim daha iyi */
+.status-planland- { background-color: #64748b; color: #fff; }
+.status-b-rak-ld- { background-color: #f43f5e; color: #fff; }
+
+/* --- 4. Formlar (Login, Register, Admin, Modal) --- */
+.form-wrapper {
+    max-width: 450px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: var(--bg-secondary);
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--border-primary);
+}
+.form-wrapper h1, .modal-content h2 { margin-top: 0; text-align: center; }
+.form-group { margin-bottom: 1.25rem; }
+.form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+.form-group input, .form-group select, .form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--border-radius-sm);
+    color: var(--text-primary);
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+.form-group .error-message { color: var(--danger-primary); font-size: 0.875rem; margin-top: 0.5rem; }
+.form-wrapper p { text-align: center; }
+
+/* --- 5. Butonlar & Arama & Filtreler --- */
+.btn {
+    display: inline-block;
+    width: 100%;
+    padding: 0.875rem;
+    border: none;
+    border-radius: var(--border-radius-sm);
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    text-align: center;
+    transition: var(--transition-fast);
+}
+.btn-primary { background-color: var(--accent-primary); color: #fff; }
+.btn-primary:hover { background-color: var(--accent-primary-hover); }
+#search-box { width: 100%; padding: 1rem; font-size: 1rem; background-color: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: var(--border-radius-md); color: var(--text-primary); margin-bottom: 0.5rem; }
+#filter-container { display: flex; gap: 0.75rem; margin: 2rem 0; }
+.filter-btn { padding: 0.5rem 1rem; border: 1px solid var(--border-primary); background-color: var(--bg-secondary); color: var(--text-secondary); border-radius: 9999px; cursor: pointer; font-weight: 500; }
+.filter-btn.active { background-color: var(--accent-primary); color: #fff; border-color: var(--accent-primary); }
+
+/* --- 6. Modallar --- */
+.modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(5px); }
+.modal-content { background-color: var(--bg-secondary); border-radius: var(--border-radius-md); margin: 10% auto; padding: 2rem; width: 90%; max-width: 500px; position: relative; }
+.close-btn { position: absolute; top: 1rem; right: 1rem; font-size: 1.5rem; cursor: pointer; color: var(--text-secondary); }
