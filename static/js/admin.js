@@ -1,4 +1,4 @@
-// static/js/admin.js (Yeni Dosya)
+// static/js/admin.js (Final Sürümü)
 
 document.addEventListener('DOMContentLoaded', function() {
 
@@ -7,16 +7,20 @@ document.addEventListener('DOMContentLoaded', function() {
     const searchBox = document.getElementById('admin-search-box');
     const addNewBtn = document.getElementById('add-new-record-btn');
     const entryModal = document.getElementById('entry-modal');
-    
-    if (!entryModal) return;
+    const confirmDeleteModal = document.getElementById('confirm-delete-modal');
+
+    if (!entryModal || !listContainer || !confirmDeleteModal) return;
 
     const entryForm = document.getElementById('entry-form');
     const closeModalBtn = document.getElementById('close-entry-modal-btn');
     const deleteBtn = document.getElementById('delete-record-btn');
-    
+    const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+    const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+    let itemToDeleteId = null;
+
     // --- YARDIMCI FONKSİYONLAR ---
-    const openModal = () => entryModal.style.display = 'block';
-    const closeModal = () => entryModal.style.display = 'none';
+    const openModal = (modal) => { if(modal) modal.style.display = 'block'; };
+    const closeModal = (modal) => { if(modal) modal.style.display = 'none'; };
 
     // --- KAYITLARI YÜKLEME VE GÖSTERME ---
     const loadRecords = async (query = '') => {
@@ -24,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const records = await response.json();
         listContainer.innerHTML = '';
         if (records.length === 0) {
-            listContainer.innerHTML = '<p>Sonuç bulunamadı veya hiç kayıt yok.</p>';
+            listContainer.innerHTML = '<p style="color: var(--text-secondary); grid-column: 1 / -1; text-align: center;">Sonuç bulunamadı veya hiç kayıt yok.</p>';
             return;
         }
         records.forEach(record => {
@@ -33,7 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
             card.dataset.id = record.id;
             card.innerHTML = `
                 <div class="card-image-wrapper">
-                    <img src="${record.image || 'https://via.placeholder.com/250x350.png?text=Yok'}" class="card-image">
+                    <img src="${record.image || 'https://via.placeholder.com/250x350.png?text=Yok'}" class="card-image" loading="lazy">
                 </div>
                 <div class="card-title">${record.title}</div>
             `;
@@ -55,8 +59,8 @@ document.addEventListener('DOMContentLoaded', function() {
         entryForm.reset();
         entryForm.querySelector('#record-id-input').value = '';
         entryModal.querySelector('h2').textContent = 'Yeni Kütüphane Kaydı';
-        deleteBtn.style.display = 'none'; // Yeni kayıtta silme butonu olmaz
-        openModal();
+        deleteBtn.style.display = 'none';
+        openModal(entryModal);
     });
 
     listContainer.addEventListener('click', async (e) => {
@@ -75,14 +79,17 @@ document.addEventListener('DOMContentLoaded', function() {
             
             entryModal.querySelector('h2').textContent = 'Kaydı Düzenle';
             deleteBtn.style.display = 'inline-flex';
-            openModal();
+            openModal(entryModal);
         }
     });
 
     // --- MODAL KAPATMA ---
-    closeModalBtn.addEventListener('click', closeModal);
+    closeModalBtn.addEventListener('click', () => closeModal(entryModal));
     window.addEventListener('click', (e) => {
-        if (e.target == entryModal) closeModal();
+        if (e.target == entryModal || e.target == confirmDeleteModal) {
+            closeModal(entryModal);
+            closeModal(confirmDeleteModal);
+        }
     });
 
     // --- FORM GÖNDERME (YENİ EKLEME & DÜZENLEME) ---
@@ -91,13 +98,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const id = document.getElementById('record-id-input').value;
         const formData = new FormData(entryForm);
         const url = id ? `/admin/api/record/update/${id}` : '/admin/api/record/add';
+        
         const response = await fetch(url, {
             method: 'POST',
             body: formData
         });
         
         if (response.ok) {
-            closeModal();
+            closeModal(entryModal);
             loadRecords(searchBox.value);
         } else {
             const data = await response.json();
@@ -105,14 +113,27 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // --- KAYIT SİLME ---
-    deleteBtn.addEventListener('click', async () => {
-        const id = document.getElementById('record-id-input').value;
-        if (id && confirm('Bu kaydı kütüphaneden kalıcı olarak silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.')) {
-            const response = await fetch(`/admin/api/record/delete/${id}`, { method: 'POST' });
+    // --- KAYIT SİLME (MODERN MODAL) ---
+    deleteBtn.addEventListener('click', () => {
+        itemToDeleteId = document.getElementById('record-id-input').value;
+        if(itemToDeleteId){
+            closeModal(entryModal);
+            openModal(confirmDeleteModal);
+        }
+    });
+
+    cancelDeleteBtn.addEventListener('click', () => {
+        closeModal(confirmDeleteModal);
+        itemToDeleteId = null;
+    });
+
+    confirmDeleteBtn.addEventListener('click', async () => {
+        if (itemToDeleteId) {
+            const response = await fetch(`/admin/api/record/delete/${itemToDeleteId}`, { method: 'POST' });
             if (response.ok) {
-                closeModal();
+                closeModal(confirmDeleteModal);
                 loadRecords(searchBox.value);
+                itemToDeleteId = null;
             } else {
                 alert('Silme işlemi sırasında bir hata oluştu.');
             }

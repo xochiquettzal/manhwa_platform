@@ -1,4 +1,4 @@
-# utils.py (Final Hali)
+# utils.py (Final Sürümü)
 from functools import wraps
 from flask import flash, redirect, url_for, current_app, render_template
 from flask_login import current_user

@@ -1,8 +1,8 @@
-"""Initial database setup
+"""Re-initializing database structure
 
-Revision ID: 324544c08255
+Revision ID: 29d6d0d6098f
 Revises: 
-Create Date: 2025-08-06 13:19:42.676211
+Create Date: 2025-08-06 20:53:44.693063
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '324544c08255'
+revision = '29d6d0d6098f'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -24,7 +24,8 @@ def upgrade():
     sa.Column('english_title', sa.String(length=200), nullable=True),
     sa.Column('record_type', sa.String(length=50), nullable=True),
     sa.Column('image_url', sa.String(length=255), nullable=True),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('original_title')
     )
     op.create_table('user',
     sa.Column('id', sa.Integer(), nullable=False),

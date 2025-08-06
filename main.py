@@ -1,4 +1,4 @@
-# main.py (Final Hali)
+# main.py (Final Sürümü)
 from flask import Blueprint, render_template, request, jsonify, flash
 from flask_login import login_required, current_user
 from models import db, MasterRecord, UserList
@@ -23,7 +23,7 @@ def search():
         db.or_(MasterRecord.original_title.ilike(search_term), MasterRecord.english_title.ilike(search_term)),
         MasterRecord.id.notin_(user_list_ids)
     ).limit(10).all()
-    results_dict = [{'id': record.id, 'title': record.original_title, 'image': record.image_url} for record in results]
+    results_dict = [{'id': record.id, 'title': record.original_title, 'image': record.image_url, 'type': record.record_type} for record in results]
     return jsonify(results_dict)
 
 @main_bp.route('/list/add/<int:record_id>', methods=['POST'])
@@ -43,8 +43,7 @@ def add_to_list(record_id):
 @login_required
 def update_list_item(user_list_id):
     item = UserList.query.get_or_404(user_list_id)
-    if item.user_id != current_user.id:
-        return jsonify({'success': False, 'message': 'Yetkisiz işlem.'}), 403
+    if item.user_id != current_user.id: return jsonify({'success': False, 'message': 'Yetkisiz işlem.'}), 403
     data = request.get_json()
     item.status = data.get('status', item.status)
     item.current_chapter = data.get('current_chapter', item.current_chapter)
@@ -57,8 +56,7 @@ def update_list_item(user_list_id):
 @login_required
 def delete_list_item(user_list_id):
     item = UserList.query.get_or_404(user_list_id)
-    if item.user_id != current_user.id:
-        return jsonify({'success': False, 'message': 'Yetkisiz işlem.'}), 403
+    if item.user_id != current_user.id: return jsonify({'success': False, 'message': 'Yetkisiz işlem.'}), 403
     db.session.delete(item)
     db.session.commit()
     flash("Kayıt listenizden başarıyla kaldırıldı.", "success")

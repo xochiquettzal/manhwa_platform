@@ -1,4 +1,4 @@
-/* static/css/style.css (Final Sürümü) */
+/* static/css/style.css (Tüm İstekleri İçeren Final Sürümü) */
 
 /* --- 1. Global & Tema Değişkenleri --- */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -41,6 +41,8 @@ header .logo { font-size: 1.75rem; font-weight: 700; text-decoration: none; colo
 .form-group .error-message { color: var(--danger-primary); font-size: 0.875rem; margin-top: 0.5rem; }
 .form-wrapper .subtext { text-align: center; margin-top: 1.5rem; color: var(--text-secondary); }
 .form-wrapper .subtext a { display: inline; color: var(--accent-primary); font-weight: 600; text-decoration: none; }
+/* Notlar alanının yeniden boyutlandırılmasını engelleme */
+.form-group textarea { resize: none; }
 
 /* --- 5. Butonlar --- */
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem 1.25rem; border: 1px solid transparent; border-radius: var(--border-radius); font-weight: 600; font-size: 0.9rem; cursor: pointer; text-decoration: none; transition: var(--transition); }
@@ -62,6 +64,9 @@ header .logo { font-size: 1.75rem; font-weight: 700; text-decoration: none; colo
 .search-item:last-child { border-bottom: none; }
 .search-item:hover { background-color: var(--bg-tertiary); }
 .search-item img { width: 40px; height: 60px; object-fit: cover; margin-right: 1rem; border-radius: 4px; flex-shrink: 0; }
+.search-item-info { display: flex; flex-direction: column; }
+.search-item-info span { font-weight: 500; }
+.search-item-info small { color: var(--text-secondary); font-size: 0.8rem; margin-top: 2px; }
 #filter-container { display: flex; background-color: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: var(--border-radius); padding: 0.25rem; }
 .filter-btn { padding: 0.5rem 1rem; border: none; background-color: transparent; color: var(--text-secondary); border-radius: 6px; cursor: pointer; font-weight: 500; transition: var(--transition); }
 .filter-btn.active { background-color: var(--bg-primary); color: var(--text-primary); }
@@ -86,6 +91,12 @@ header .logo { font-size: 1.75rem; font-weight: 700; text-decoration: none; colo
 .details-form { display: flex; flex-direction: column; height: 100%; }
 .form-content { flex-grow: 1; }
 .admin-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+/* Modern Silme Onayı Modalı Stilleri */
+.confirm-modal-content { max-width: 400px; text-align: center; }
+.confirm-modal-content svg { width: 48px; height: 48px; color: var(--danger-primary); margin: 0 auto 1rem; display: block; }
+.confirm-modal-content p { color: var(--text-secondary); margin-bottom: 1.5rem; }
+.modal-actions.center { justify-content: center; }
 
 /* Animasyonlar */
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
