@@ -1,20 +1,12 @@
-# app.py (Flash mesajı kaldırılmış, tam hali)
+# app.py (Final Sürümü)
 
 import os
 from flask import Flask, send_from_directory
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-from flask_login import LoginManager
-from flask_mail import Mail
+from extensions import db, migrate, login_manager, mail
+from models import User
 from dotenv import load_dotenv
-from models import db
 
 load_dotenv()
-
-# --- EKLENTİLERİ BAŞLATMA ---
-migrate = Migrate()
-login_manager = LoginManager()
-mail = Mail()
 
 def create_app():
     """Uygulama fabrikası fonksiyonu."""
@@ -33,7 +25,7 @@ def create_app():
     app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
     app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER')
 
-    # --- EKLENTİLERİ UYGULAMA İLE İLİŞKİLENDİRME ---
+    # --- EKLENTİLERİ BAŞLATMA ---
     db.init_app(app)
     migrate.init_app(app, db)
     mail.init_app(app)
@@ -41,16 +33,9 @@ def create_app():
     # --- LOGIN MANAGER YAPILANDIRMASI ---
     login_manager.init_app(app)
     login_manager.login_view = 'auth.login'
-    
-    # --- DEĞİŞİKLİK BURADA ---
-    # Varsayılan flash mesajını tamamen kaldırıyoruz.
-    login_manager.login_message = None
-    # --- DEĞİŞİKLİK SONU ---
-    
-    login_manager.login_message_category = "info"
+    login_manager.login_message = None # Giriş yap uyarısını kaldır
 
     # --- USER LOADER ---
-    from models import User
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))
@@ -69,8 +54,7 @@ def create_app():
     # --- YÜKLENEN DOSYALAR İÇİN ROUTE ---
     @app.route('/uploads/<path:filename>')
     def uploaded_file(filename):
-        upload_dir = os.path.join(os.getcwd(), app.config['UPLOAD_FOLDER'])
-        return send_from_directory(upload_dir, filename)
+        return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
     return app
 

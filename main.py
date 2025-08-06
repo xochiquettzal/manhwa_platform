@@ -1,6 +1,5 @@
-# main.py (Silme Fonksiyonu Eklenmiş Tam Hali)
-
-from flask import Blueprint, render_template, request, jsonify, flash, redirect, url_for
+# main.py (Final Hali)
+from flask import Blueprint, render_template, request, jsonify, flash
 from flask_login import login_required, current_user
 from models import db, MasterRecord, UserList
 
@@ -21,10 +20,7 @@ def search():
     search_term = f"%{query}%"
     user_list_ids = [item.master_record_id for item in current_user.list_items]
     results = MasterRecord.query.filter(
-        db.or_(
-            MasterRecord.original_title.ilike(search_term),
-            MasterRecord.english_title.ilike(search_term)
-        ),
+        db.or_(MasterRecord.original_title.ilike(search_term), MasterRecord.english_title.ilike(search_term)),
         MasterRecord.id.notin_(user_list_ids)
     ).limit(10).all()
     results_dict = [{'id': record.id, 'title': record.original_title, 'image': record.image_url} for record in results]
@@ -57,15 +53,12 @@ def update_list_item(user_list_id):
     flash("Kayıt başarıyla güncellendi!", "success")
     return jsonify({'success': True})
 
-# --- YENİ EKLENEN FONKSİYON ---
 @main_bp.route('/list/delete/<int:user_list_id>', methods=['POST'])
 @login_required
 def delete_list_item(user_list_id):
-    """Kullanıcının listesindeki bir öğeyi siler."""
     item = UserList.query.get_or_404(user_list_id)
     if item.user_id != current_user.id:
         return jsonify({'success': False, 'message': 'Yetkisiz işlem.'}), 403
-    
     db.session.delete(item)
     db.session.commit()
     flash("Kayıt listenizden başarıyla kaldırıldı.", "success")

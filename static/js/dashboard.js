@@ -1,4 +1,4 @@
-// static/js/dashboard.js (Tam ve Eksiksiz Hali)
+// static/js/dashboard.js (Modernleştirilmiş Final Sürümü)
 
 document.addEventListener('DOMContentLoaded', function() {
 
@@ -9,23 +9,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const listContainer = document.getElementById('user-list-container');
     const updateModal = document.getElementById('update-item-modal');
     
-    // Kodun çalışmaya devam etmesi için modal'ın varlığını kontrol et
-    if (!updateModal) {
-        console.error("Güncelleme modal'ı bulunamadı. HTML'i kontrol edin.");
-        return; 
-    }
+    if (!updateModal) return; 
     
     const updateForm = document.getElementById('update-item-form');
     const closeModalBtn = document.getElementById('close-update-modal-btn');
     const listItems = listContainer.querySelectorAll('.manhwa-card');
 
     // --- YARDIMCI FONKSİYONLAR ---
-    const openModal = (modal) => {
-        if(modal) modal.style.display = 'block';
-    };
-    const closeModal = (modal) => {
-        if(modal) modal.style.display = 'none';
-    };
+    const openModal = (modal) => { if(modal) modal.style.display = 'block'; };
+    const closeModal = (modal) => { if(modal) modal.style.display = 'none'; };
 
     // --- CANLI ARAMA MANTIĞI ---
     let searchTimeout;
@@ -47,7 +39,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     const itemDiv = document.createElement('div');
                     itemDiv.className = 'search-item';
                     itemDiv.dataset.id = record.id;
-                    itemDiv.innerHTML = `<img src="${record.image || 'https://via.placeholder.com/40x60.png?text=N/A'}"><span>${record.title}</span>`;
+                    itemDiv.innerHTML = `
+                        <img src="${record.image || 'https://via.placeholder.com/40x60.png?text=N/A'}" alt="${record.title}">
+                        <div class="search-item-info">
+                            <span>${record.title}</span>
+                        </div>
+                        <button class="search-item-add-btn" title="Listeye Ekle">+</button>
+                    `;
                     searchResults.appendChild(itemDiv);
                 });
             } else {
@@ -63,9 +61,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- LİSTEYE EKLEME MANTIĞI ---
     searchResults.addEventListener('click', async (e) => {
-        const targetItem = e.target.closest('.search-item');
-        if (targetItem) {
-            const recordId = targetItem.dataset.id;
+        const targetButton = e.target.closest('.search-item-add-btn');
+        if (targetButton) {
+            const recordId = targetButton.parentElement.dataset.id;
             const response = await fetch(`/list/add/${recordId}`, { method: 'POST' });
             if (response.ok) {
                 window.location.reload();

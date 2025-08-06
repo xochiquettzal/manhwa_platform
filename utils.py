@@ -1,32 +1,32 @@
+# utils.py (Final Hali)
+from functools import wraps
+from flask import flash, redirect, url_for, current_app, render_template
+from flask_login import current_user
 from flask_mail import Message
-from app import mail
-from flask import current_app, render_template, url_for
+from extensions import mail
 from itsdangerous import URLSafeTimedSerializer
 
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_admin:
+            flash("Bu sayfaya erişim yetkiniz yok.", "danger")
+            return redirect(url_for('main.index'))
+        return f(*args, **kwargs)
+    return decorated_function
+
 def send_email(to, subject, template):
-    """Genel e-posta gönderme fonksiyonu."""
-    msg = Message(
-        subject,
-        recipients=[to],
-        html=template,
-        sender=current_app.config['MAIL_DEFAULT_SENDER']
-    )
+    msg = Message(subject, recipients=[to], html=template, sender=current_app.config['MAIL_DEFAULT_SENDER'])
     mail.send(msg)
 
 def generate_confirmation_token(email):
-    """E-posta onayı için güvenli bir token oluşturur."""
     serializer = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
     return serializer.dumps(email, salt='email-confirmation-salt')
 
 def confirm_token(token, expiration=3600):
-    """Verilen token'ı doğrular. Süresi dolmuşsa (1 saat) False döner."""
     serializer = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
     try:
-        email = serializer.loads(
-            token,
-            salt='email-confirmation-salt',
-            max_age=expiration
-        )
+        email = serializer.loads(token, salt='email-confirmation-salt', max_age=expiration)
     except:
         return False
     return email
