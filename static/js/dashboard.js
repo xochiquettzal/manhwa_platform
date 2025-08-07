@@ -123,22 +123,26 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
             
+            // Zengin veri alanlarını dataset'ten çek
             const releaseYear = item.dataset.releaseYear;
             const source = item.dataset.source;
             const studios = item.dataset.studios;
             const tags = item.dataset.tags;
+            const synopsis = item.dataset.synopsis;
 
+            // Modal'daki formu ve detayları doldur
             updateModal.querySelector('#user-list-id-input').value = item.dataset.userListId;
             updateModal.querySelector('#update-modal-title').textContent = item.dataset.recordTitle;
-            updateModal.querySelector('#details-image').src = item.dataset.recordImage || 'https://via.placeholder.com/250x360.png?text=Yok';
-            updateModal.querySelector('#details-synopsis').textContent = item.dataset.synopsis || "Konu bilgisi mevcut değil.";
+            updateModal.querySelector('#details-image').src = item.dataset.recordImage || 'https://via.placeholder.com/250x375.png?text=Yok';
             
+            // YENİ: Zengin veri detay alanlarını doldur
             updateModal.querySelector('#details-release-year').textContent = releaseYear || 'N/A';
             updateModal.querySelector('#details-source').textContent = source || 'N/A';
             updateModal.querySelector('#details-studios').textContent = studios || 'N/A';
+            updateModal.querySelector('#details-synopsis').textContent = synopsis || "Konu bilgisi mevcut değil.";
 
             const tagsContainer = updateModal.querySelector('#details-tags');
-            tagsContainer.innerHTML = '';
+            tagsContainer.innerHTML = ''; // Etiketleri temizle
             if (tags) {
                 tags.split(',').forEach(tag => {
                     const tagElement = document.createElement('span');
@@ -150,6 +154,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 tagsContainer.textContent = 'N/A';
             }
             
+            // Form alanlarını doldurmaya devam et
             updateForm.querySelector('#chapter-input').value = item.dataset.chapter;
             updateForm.querySelector('#notes-input').value = item.dataset.notes;
             

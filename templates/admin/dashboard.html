@@ -5,36 +5,31 @@
             <div class="search-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M10.5 3.75a6.75 6.75 0 100 13.5 6.75 6.75 0 000-13.5zM2.25 10.5a8.25 8.25 0 1114.59 5.28l4.69 4.69a.75.75 0 11-1.06 1.06l-4.69-4.69A8.25 8.25 0 012.25 10.5z" clip-rule="evenodd" /></svg></div>
             <input type="text" id="admin-search-box" placeholder="{{ _('Kütüphanede kayıt ara...') }}">
         </div>
-        <!-- Toplu Ekleme Butonu Geri Geldi -->
-        <button id="bulk-import-btn" class="btn btn-secondary">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M11.25 4.533A9.708 9.708 0 001.5 12c0 5.374 4.366 9.75 9.75 9.75s9.75-4.376 9.75-9.75c0-4.04-2.463-7.48-5.895-8.914.472.24.922.527 1.343.856l.001.001.001.001a.75.75 0 01-1.06 1.06l-2.122-2.121a.75.75 0 010-1.061l2.121-2.12A.75.75 0 0115.3 1.061l-.001.001-.001.001a9.702 9.702 0 00-4.048-1.815zM3.82 6.322a.75.75 0 011.06 0l2.87 2.87a.75.75 0 01-1.06 1.06L3.82 7.383a.75.75 0 010-1.06zm13.217 1.06a.75.75 0 010 1.06l-2.87 2.87a.75.75 0 01-1.06-1.06l2.87-2.87a.75.75 0 011.06 0z" clip-rule="evenodd" /></svg>
-            <span>{{ _('Toplu Ekle') }}</span>
-        </button>
-        <button id="add-new-record-btn" class="btn btn-primary">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2h6z"></path></svg>
-            <span>{{ _('Yeni Kayıt Ekle') }}</span>
-        </button>
+        <button id="bulk-import-btn" class="btn btn-secondary"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M11.25 4.533A9.708 9.708 0 001.5 12c0 5.374 4.366 9.75 9.75 9.75s9.75-4.376 9.75-9.75c0-4.04-2.463-7.48-5.895-8.914.472.24.922.527 1.343.856l.001.001.001.001a.75.75 0 01-1.06 1.06l-2.122-2.121a.75.75 0 010-1.061l2.121-2.12A.75.75 0 0115.3 1.061l-.001.001-.001.001a9.702 9.702 0 00-4.048-1.815zM3.82 6.322a.75.75 0 011.06 0l2.87 2.87a.75.75 0 01-1.06 1.06L3.82 7.383a.75.75 0 010-1.06zm13.217 1.06a.75.75 0 010 1.06l-2.87 2.87a.75.75 0 01-1.06-1.06l2.87-2.87a.75.75 0 011.06 0z" clip-rule="evenodd" /></svg><span>{{ _('Toplu Ekle') }}</span></button>
+        <button id="add-new-record-btn" class="btn btn-primary"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2h6z"></path></svg><span>{{ _('Yeni Kayıt Ekle') }}</span></button>
     </div>
     <div id="admin-records-list"></div>
-
-    <!-- Admin Ekleme/Düzenleme Modalı -->
     <div id="entry-modal" class="modal">
         <div class="modal-content admin-modal-content">
             <span id="close-entry-modal-btn" class="close-btn">&times;</span>
             <h2 id="entry-modal-title"></h2>
             <form id="entry-form" enctype="multipart/form-data">
                 <input type="hidden" id="record-id-input" name="id">
+                <div class="form-group full-width"><label for="mal_id">MyAnimeList ID:</label><input type="number" id="mal_id" name="mal_id" required></div>
                 <div class="form-group full-width"><label for="original_title">{{ _('Orijinal Başlık:') }}</label><input type="text" id="original_title" name="original_title" required></div>
                 <div class="form-group full-width"><label for="english_title">{{ _('İngilizce Başlık:') }}</label><input type="text" id="english_title" name="english_title"></div>
-                <div class="form-group full-width"><label for="synopsis">{{ _('Konu:') }}</label><textarea id="synopsis" name="synopsis" rows="3"></textarea></div>
+                <div class="form-group full-width"><label for="synopsis">{{ _('Konu:') }}</label><textarea id="synopsis" name="synopsis" rows="4"></textarea></div>
                 <div class="admin-form-grid">
-                    <div class="form-group"><label for="record_type">{{ _('Tür:') }}</label><select id="record_type" name="record_type"><option value="Manhwa">Manhwa</option><option value="Anime">Anime</option><option value="Manga">Manga</option><option value="Webtoon">Webtoon</option></select></div>
-                    <div class="form-group"><label for="source">{{ _('Kaynak:') }}</label><input type="text" id="source" name="source" placeholder="Manga, Light Novel, vb."></div>
+                    <div class="form-group"><label for="record_type">{{ _('Tür:') }}</label><select id="record_type" name="record_type"><option value="Anime">Anime</option><option value="Manga">Manga</option><option value="Manhwa">Manhwa</option><option value="Webtoon">Webtoon</option></select></div>
+                    <div class="form-group"><label for="mal_type">MAL Türü:</label><input type="text" id="mal_type" name="mal_type" placeholder="TV, OVA, Manga, etc."></div>
+                    <div class="form-group"><label for="source">{{ _('Kaynak:') }}</label><input type="text" id="source" name="source" placeholder="Manga, Light Novel, etc."></div>
                     <div class="form-group"><label for="studios">{{ _('Stüdyo/Yayıncı:') }}</label><input type="text" id="studios" name="studios"></div>
                     <div class="form-group"><label for="release_year">{{ _('Yayın Yılı:') }}</label><input type="number" id="release_year" name="release_year" min="1900" max="2100"></div>
+                    <div class="form-group"><label for="total_episodes">{{ _('Toplam Bölüm/Chapter:') }}</label><input type="number" id="total_episodes" name="total_episodes"></div>
+                    <div class="form-group"><label for="score">Puan:</label><input type="text" id="score" name="score"></div>
+                    <div class="form-group"><label for="popularity">Popülerlik:</label><input type="number" id="popularity" name="popularity"></div>
                 </div>
                 <div class="form-group full-width"><label for="tags">{{ _('Etiketler (virgülle ayırın):') }}</label><input type="text" id="tags" name="tags" placeholder="Action, Shounen, Gore"></div>
-                <div class="form-group full-width"><label for="total_episodes">{{ _('Toplam Bölüm/Chapter:') }}</label><input type="number" id="total_episodes" name="total_episodes"></div>
                 <div class="admin-form-grid">
                     <div class="form-group"><label for="image_url">{{ _('veya Resim URL:') }}</label><input type="url" id="image_url" name="image_url" placeholder="{{ _('URL yapıştırın') }}"></div>
                     <div class="form-group"><label for="image_file">{{ _('Resim Dosyası Seç:') }}</label><input type="file" id="image_file" name="image_file" accept="image/*"></div>
@@ -46,21 +41,8 @@
             </form>
         </div>
     </div>
-    
-    <!-- Toplu Ekleme Modalı -->
     <div id="bulk-import-modal" class="modal">
-        <div class="modal-content">
-            <span id="close-bulk-modal-btn" class="close-btn">&times;</span>
-            <h2>{{ _('Toplu Kayıt Ekle') }}</h2>
-            <p style="color: var(--text-secondary);">{{ _('Lütfen .json formatında bir dosya seçin.') }}</p>
-            <form id="bulk-import-form" enctype="multipart/form-data">
-                <div class="form-group"><label for="import_file">{{ _('İçe Aktarılacak Dosya:') }}</label><input type="file" id="import_file" name="import_file" accept=".json" required></div>
-                <div class="modal-actions"><button type="submit" class="btn btn-primary">{{ _('İçe Aktar') }}</button></div>
-            </form>
-        </div>
+        <div class="modal-content"><span id="close-bulk-modal-btn" class="close-btn">&times;</span><h2>{{ _('Toplu Kayıt Ekle') }}</h2><p style="color: var(--text-secondary);">{{ _('Lütfen .json formatında bir dosya seçin.') }}</p><form id="bulk-import-form" enctype="multipart/form-data"><div class="form-group"><label for="import_file">{{ _('İçe Aktarılacak Dosya:') }}</label><input type="file" id="import_file" name="import_file" accept=".json" required></div><div class="modal-actions"><button type="submit" class="btn btn-primary">{{ _('İçe Aktar') }}</button></div></form></div>
     </div>
 {% endblock %}
-
-{% block scripts %}
-    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
-{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/admin.js') }}"></script>{% endblock %}

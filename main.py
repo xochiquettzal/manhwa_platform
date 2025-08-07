@@ -1,7 +1,9 @@
-# main.py (Final Sürümü)
+# main.py (Nihai Akıllı Sıralama ile Final Hali)
+
 from flask import Blueprint, render_template, request, jsonify, flash
 from flask_login import login_required, current_user
 from models import db, MasterRecord, UserList
+from sqlalchemy import case
 
 main_bp = Blueprint('main', __name__)
 
@@ -19,11 +21,33 @@ def search():
     if len(query) < 2: return jsonify([])
     search_term = f"%{query}%"
     user_list_ids = [item.master_record_id for item in current_user.list_items]
-    results = MasterRecord.query.filter(
+    
+    # --- YENİ VE GELİŞMİŞ AKILLI SIRALAMA MANTIĞI ---
+    # 1. mal_type'a göre bir öncelik puanı oluşturuyoruz.
+    # Düşük puan, daha yüksek öncelik anlamına gelir.
+    type_priority = case(
+        (MasterRecord.mal_type == 'TV', 1),
+        (MasterRecord.mal_type == 'Movie', 2),
+        (MasterRecord.mal_type == 'Manga', 3), # Manga da yüksek öncelikli
+        (MasterRecord.mal_type == 'Manhwa', 4),
+        (MasterRecord.mal_type == 'Webtoon', 5),
+        (MasterRecord.mal_type == 'OVA', 6),
+        (MasterRecord.mal_type == 'ONA', 7),
+        (MasterRecord.mal_type == 'Special', 8),
+        else_=9 # Diğer her şey en sonda
+    ).label('type_priority')
+
+    results_query = MasterRecord.query.add_columns(type_priority).filter(
         db.or_(MasterRecord.original_title.ilike(search_term), MasterRecord.english_title.ilike(search_term)),
         MasterRecord.id.notin_(user_list_ids)
+    ).order_by(
+        # 2. Sonuçları bu önceliklere göre sıralıyoruz.
+        MasterRecord.popularity, # ANA SIRALAMA: En popüler olan (en düşük sayı) en üste gelir.
+        type_priority          # İKİNCİL SIRALAMA: Popülerlikleri aynıysa, tür önceliği devreye girer.
     ).limit(10).all()
-    results_dict = [{'id': record.id, 'title': record.original_title, 'image': record.image_url, 'type': record.record_type} for record in results]
+
+    # Sonuçları dict'e çevirirken sadece MasterRecord'u al
+    results_dict = [{'id': record.MasterRecord.id, 'title': record.MasterRecord.original_title, 'image': record.MasterRecord.image_url, 'type': record.MasterRecord.mal_type} for record in results_query]
     return jsonify(results_dict)
 
 @main_bp.route('/list/add/<int:record_id>', methods=['POST'])

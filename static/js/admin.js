@@ -6,17 +6,20 @@ document.addEventListener('DOMContentLoaded', function() {
     const listContainer = document.getElementById('admin-records-list');
     const searchBox = document.getElementById('admin-search-box');
     const addNewBtn = document.getElementById('add-new-record-btn');
-    const bulkImportBtn = document.getElementById('bulk-import-btn'); // Yeni buton
+    const bulkImportBtn = document.getElementById('bulk-import-btn');
     const entryModal = document.getElementById('entry-modal');
-    const bulkImportModal = document.getElementById('bulk-import-modal'); // Yeni modal
+    const bulkImportModal = document.getElementById('bulk-import-modal');
     const confirmDeleteModal = document.getElementById('confirm-delete-modal');
 
-    if (!entryModal || !listContainer || !confirmDeleteModal || !bulkImportModal) return;
+    if (!entryModal || !listContainer || !confirmDeleteModal || !bulkImportModal) {
+        console.error("Gerekli admin elementleri bulunamadı. HTML'i kontrol edin.");
+        return;
+    }
 
     const entryForm = document.getElementById('entry-form');
-    const bulkImportForm = document.getElementById('bulk-import-form'); // Yeni form
-    const closeModalBtn = document.getElementById('close-entry-modal-btn');
-    const closeBulkModalBtn = document.getElementById('close-bulk-modal-btn'); // Yeni kapatma butonu
+    const bulkImportForm = document.getElementById('bulk-import-form');
+    const closeEntryModalBtn = document.getElementById('close-entry-modal-btn');
+    const closeBulkModalBtn = document.getElementById('close-bulk-modal-btn');
     const deleteBtn = document.getElementById('delete-record-btn');
     const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
     const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
@@ -80,6 +83,7 @@ document.addEventListener('DOMContentLoaded', function() {
             entryForm.querySelector('#original_title').value = record.original_title;
             entryForm.querySelector('#english_title').value = record.english_title || '';
             entryForm.querySelector('#record_type').value = record.record_type;
+            entryForm.querySelector('#mal_type').value = record.mal_type || '';
             entryForm.querySelector('#image_url').value = record.image_url || '';
             entryForm.querySelector('#synopsis').value = record.synopsis || '';
             entryForm.querySelector('#tags').value = record.tags || '';
@@ -87,6 +91,8 @@ document.addEventListener('DOMContentLoaded', function() {
             entryForm.querySelector('#studios').value = record.studios || '';
             entryForm.querySelector('#release_year').value = record.release_year || '';
             entryForm.querySelector('#total_episodes').value = record.total_episodes || '';
+            entryForm.querySelector('#score').value = record.score || '';
+            entryForm.querySelector('#popularity').value = record.popularity || '';
             
             entryModal.querySelector('h2').textContent = 'Kaydı Düzenle';
             deleteBtn.style.display = 'inline-flex';
@@ -95,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // --- MODAL KAPATMA ---
-    closeModalBtn.addEventListener('click', () => closeModal(entryModal));
+    closeEntryModalBtn.addEventListener('click', () => closeModal(entryModal));
     window.addEventListener('click', (e) => {
         if (e.target == entryModal || e.target == confirmDeleteModal) {
             closeModal(entryModal);
@@ -174,10 +180,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: formData,
             });
             const data = await response.json();
-            alert(data.message); // Sonucu kullanıcıya göster
+            alert(data.message);
             if (response.ok) {
                 closeModal(bulkImportModal);
-                loadRecords(); // Listeyi yenile
+                loadRecords();
             }
         } catch (error) {
             alert('Dosya yüklenirken bir hata oluştu.');
@@ -186,6 +192,7 @@ document.addEventListener('DOMContentLoaded', function() {
             submitButton.textContent = 'İçe Aktar';
         }
     });
+
 
     // --- BAŞLANGIÇ ---
     loadRecords();

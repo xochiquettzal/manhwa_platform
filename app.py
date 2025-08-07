@@ -1,8 +1,7 @@
-# app.py (Jinja2 Hatası Düzeltilmiş Final Hali)
+# app.py (Final Sürümü)
 
 import os
 from flask import Flask, send_from_directory, request, session, redirect, url_for
-# YENİ İMPORT: Babel'den get_locale'i import ediyoruz
 from flask_babel import get_locale
 from extensions import db, migrate, login_manager, mail, babel
 from models import User
@@ -11,7 +10,6 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def create_app():
-    """Uygulama fabrikası fonksiyonu."""
     app = Flask(__name__)
 
     # --- KONFİGÜRASYON ---
@@ -34,7 +32,6 @@ def create_app():
     migrate.init_app(app, db)
     mail.init_app(app)
     
-    # --- DİL SEÇİM FONKSİYONU ---
     def locale_selector():
         if 'language' in session and session['language'] in app.config['LANGUAGES']:
             return session.get('language')
@@ -42,7 +39,6 @@ def create_app():
 
     babel.init_app(app, locale_selector=locale_selector)
 
-    # YENİ BÖLÜM: get_locale'i şablonlara (Jinja2) tanıtıyoruz
     @app.context_processor
     def inject_locale():
         return dict(get_locale=get_locale)
@@ -57,7 +53,7 @@ def create_app():
     def load_user(user_id):
         return User.query.get(int(user_id))
 
-    # --- BLUEPRINT'LERİ (UYGULAMA BÖLÜMÜ) KAYDETME ---
+    # --- BLUEPRINT'LERİ (UYGULAMA BÖLÜMLERİNİ) KAYDETME ---
     with app.app_context():
         from auth import auth_bp
         app.register_blueprint(auth_bp, url_prefix='/auth')

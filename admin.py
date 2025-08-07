@@ -1,4 +1,4 @@
-# admin.py (Zengin Veri Alanları Eklenmiş Final Hali)
+# admin.py (Zengin Veri Alanlarını Yöneten Final Hali)
 
 import os
 import json
@@ -39,33 +39,34 @@ def get_record(record_id):
     return jsonify({
         'id': record.id, 'original_title': record.original_title, 'english_title': record.english_title,
         'record_type': record.record_type, 'image_url': record.image_url, 'synopsis': record.synopsis,
-        'tags': record.tags, 'source': record.source, 'studios': record.studios,
-        'release_year': record.release_year, 'total_episodes': record.total_episodes
+        'tags': record.tags, 'source': record.source, 'studios': record.studios, 'mal_id': record.mal_id,
+        'release_year': record.release_year, 'total_episodes': record.total_episodes,
+        'score': record.score, 'popularity': record.popularity, 'mal_type': record.mal_type
     })
 
 @admin_bp.route('/api/record/add', methods=['POST'])
 @login_required
 @admin_required
 def add_record():
-    if 'original_title' not in request.form or not request.form['original_title']: return jsonify({'message': 'Orijinal başlık zorunludur.'}), 400
-    image_path = request.form.get('image_url', '')
+    data = request.form
+    if not data.get('original_title'): return jsonify({'message': 'Orijinal başlık zorunludur.'}), 400
+    if not data.get('mal_id'): return jsonify({'message': 'MyAnimeList ID zorunludur.'}), 400
+    
+    image_path = data.get('image_url', '')
     if 'image_file' in request.files:
         file = request.files['image_file']
         if file and file.filename != '' and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
             image_path = f"/uploads/{filename}"
+            
     new_record = MasterRecord(
-        original_title=request.form['original_title'],
-        english_title=request.form.get('english_title', ''),
-        record_type=request.form.get('record_type', 'Manhwa'),
-        image_url=image_path,
-        synopsis=request.form.get('synopsis', ''),
-        tags=request.form.get('tags', ''),
-        source=request.form.get('source', ''),
-        studios=request.form.get('studios', ''),
-        release_year=request.form.get('release_year', None, type=int),
-        total_episodes=request.form.get('total_episodes', None, type=int)
+        mal_id=data.get('mal_id', type=int), original_title=data['original_title'],
+        english_title=data.get('english_title'), record_type=data.get('record_type'),
+        mal_type=data.get('mal_type'), image_url=image_path, synopsis=data.get('synopsis'),
+        tags=data.get('tags'), source=data.get('source'), studios=data.get('studios'),
+        release_year=data.get('release_year', type=int), total_episodes=data.get('total_episodes', type=int),
+        score=data.get('score', type=float), popularity=data.get('popularity', type=int)
     )
     db.session.add(new_record)
     db.session.commit()
@@ -76,26 +77,30 @@ def add_record():
 @admin_required
 def update_record(record_id):
     record = MasterRecord.query.get_or_404(record_id)
+    data = request.form
     image_path = record.image_url
-    if request.form.get('image_url'): image_path = request.form.get('image_url')
+    if data.get('image_url'): image_path = data.get('image_url')
     if 'image_file' in request.files:
         file = request.files['image_file']
         if file and file.filename != '' and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
             image_path = f"/uploads/{filename}"
-    
-    record.original_title = request.form['original_title']
-    record.english_title = request.form.get('english_title', '')
-    record.record_type = request.form.get('record_type', 'Manhwa')
-    record.synopsis = request.form.get('synopsis', '')
-    record.image_url = image_path
-    record.tags = request.form.get('tags', '')
-    record.source = request.form.get('source', '')
-    record.studios = request.form.get('studios', '')
-    record.release_year = request.form.get('release_year', None, type=int)
-    record.total_episodes = request.form.get('total_episodes', None, type=int)
 
+    record.mal_id = data.get('mal_id', type=int)
+    record.original_title = data['original_title']
+    record.english_title = data.get('english_title')
+    record.record_type = data.get('record_type')
+    record.mal_type = data.get('mal_type')
+    record.image_url = image_path
+    record.synopsis = data.get('synopsis')
+    record.tags = data.get('tags')
+    record.source = data.get('source')
+    record.studios = data.get('studios')
+    record.release_year = data.get('release_year', type=int)
+    record.total_episodes = data.get('total_episodes', type=int)
+    record.score = data.get('score', type=float)
+    record.popularity = data.get('popularity', type=int)
     db.session.commit()
     return jsonify({'message': 'Kayıt başarıyla güncellendi.'})
 
@@ -122,33 +127,28 @@ def bulk_import():
         data = json.load(file)
         if not isinstance(data, list): raise ValueError("JSON dosyası bir liste (array) içermelidir.")
         
-        existing_titles = {record.original_title for record in MasterRecord.query.all()}
+        existing_mal_ids = {record.mal_id for record in MasterRecord.query.all()}
         for item in data:
-            title = item.get('original_title')
-            if not isinstance(title, str) or not title or title in existing_titles:
+            mal_id = item.get('mal_id')
+            if not mal_id or mal_id in existing_mal_ids:
                 skipped_count += 1
                 continue
 
             new_record = MasterRecord(
-                original_title=title,
-                english_title=item.get('english_title'),
-                record_type=item.get('record_type', 'Manhwa'),
-                image_url=item.get('image_url'),
-                synopsis=item.get('synopsis'),
-                tags=item.get('tags'),
-                source=item.get('source'),
-                studios=item.get('studios'),
-                release_year=item.get('release_year'),
-                total_episodes=item.get('total_episodes')
+                mal_id=mal_id, original_title=item.get('original_title', 'N/A'),
+                english_title=item.get('english_title'), record_type=item.get('record_type', 'Anime'),
+                mal_type=item.get('mal_type'), image_url=item.get('image_url'), synopsis=item.get('synopsis'),
+                tags=item.get('tags'), source=item.get('source'), studios=item.get('studios'),
+                release_year=item.get('release_year'), total_episodes=item.get('total_episodes'),
+                score=item.get('score'), popularity=item.get('popularity')
             )
             db.session.add(new_record)
-            existing_titles.add(title)
+            existing_mal_ids.add(mal_id)
             added_count += 1
         
         db.session.commit()
-        message = f"{added_count} kayıt başarıyla eklendi. {skipped_count} kayıt (mevcut veya başlık eksik) atlandı."
+        message = f"{added_count} kayıt başarıyla eklendi. {skipped_count} kayıt (mevcut veya ID eksik) atlandı."
         return jsonify({'message': message})
-
     except Exception as e:
         db.session.rollback()
         return jsonify({'message': f"Bir hata oluştu: {str(e)}"}), 500
