@@ -108,15 +108,15 @@ document.addEventListener('DOMContentLoaded', function() {
             if (recordType === 'Anime') {
                 statusSelect.querySelector('option[value="Okunuyor"]').style.display = 'none';
                 statusSelect.querySelector('option[value="İzleniyor"]').style.display = 'block';
-                if (item.dataset.status === 'Okunuyor') {
+                if (item.dataset.status === 'Okunuyor' || !item.dataset.status) {
                     statusSelect.value = 'İzleniyor';
                 } else {
                     statusSelect.value = item.dataset.status;
                 }
-            } else {
+            } else { // Manhwa, Manga, etc.
                 statusSelect.querySelector('option[value="Okunuyor"]').style.display = 'block';
                 statusSelect.querySelector('option[value="İzleniyor"]').style.display = 'none';
-                 if (item.dataset.status === 'İzleniyor') {
+                 if (item.dataset.status === 'İzleniyor' || !item.dataset.status) {
                     statusSelect.value = 'Okunuyor';
                 } else {
                     statusSelect.value = item.dataset.status;
@@ -170,6 +170,8 @@ document.addEventListener('DOMContentLoaded', function() {
         deleteBtn.addEventListener('click', () => {
             itemToDeleteId = document.getElementById('user-list-id-input').value;
             closeModal(updateModal);
+            const confirmText = confirmDeleteModal.querySelector('#confirm-text');
+            confirmText.textContent = "Bu kayıt listenizden kalıcı olarak kaldırılacaktır.";
             openModal(confirmDeleteModal);
         });
     }

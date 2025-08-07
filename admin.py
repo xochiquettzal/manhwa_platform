@@ -1,6 +1,7 @@
-# admin.py (Synopsis Eklenmiş Final Hali)
+# admin.py (Sadece JSON ile Toplu Ekleme - Final Hali)
 
 import os
+import json
 from flask import Blueprint, render_template, request, jsonify, current_app
 from flask_login import login_required
 from werkzeug.utils import secure_filename
@@ -17,6 +18,8 @@ def allowed_file(filename): return '.' in filename and filename.rsplit('.', 1)[1
 @admin_required
 def dashboard():
     return render_template('admin/dashboard.html', title="Admin Paneli")
+
+# --- ADMIN API ENDPOINTS ---
 
 @admin_bp.route('/api/records')
 @login_required
@@ -83,3 +86,50 @@ def delete_record(record_id):
     db.session.delete(record)
     db.session.commit()
     return jsonify({'message': 'Kayıt başarıyla silindi.'})
+
+@admin_bp.route('/api/bulk-import', methods=['POST'])
+@login_required
+@admin_required
+def bulk_import():
+    if 'import_file' not in request.files:
+        return jsonify({'message': 'Dosya bulunamadı.'}), 400
+    
+    file = request.files['import_file']
+    if file.filename == '' or not file.filename.endswith('.json'):
+        return jsonify({'message': 'Lütfen geçerli bir .json dosyası seçin.'}), 400
+
+    added_count = 0
+    skipped_count = 0
+
+    try:
+        data = json.load(file)
+        if not isinstance(data, list):
+            raise ValueError("JSON dosyası bir liste (array) içermelidir.")
+        
+        existing_titles = {record.original_title for record in MasterRecord.query.all()}
+
+        for item in data:
+            title = item.get('original_title')
+            if not isinstance(title, str) or not title or title in existing_titles:
+                skipped_count += 1
+                continue
+
+            new_record = MasterRecord(
+                original_title=title,
+                english_title=item.get('english_title'),
+                record_type=item.get('record_type', 'Manhwa'),
+                image_url=item.get('image_url'),
+                synopsis=item.get('synopsis')
+            )
+            db.session.add(new_record)
+            existing_titles.add(title)
+            added_count += 1
+        
+        db.session.commit()
+        
+        message = f"{added_count} kayıt başarıyla eklendi. {skipped_count} kayıt (mevcut veya başlık eksik) atlandı."
+        return jsonify({'message': message})
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': f"Bir hata oluştu: {str(e)}"}), 500

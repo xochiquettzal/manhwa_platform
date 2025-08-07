@@ -24,3 +24,6 @@ instance/
 
 #Resimler
 uploads/
+
+#Datalar
+import_data/

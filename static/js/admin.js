@@ -6,16 +6,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const listContainer = document.getElementById('admin-records-list');
     const searchBox = document.getElementById('admin-search-box');
     const addNewBtn = document.getElementById('add-new-record-btn');
+    const bulkImportBtn = document.getElementById('bulk-import-btn'); // Yeni buton
     const entryModal = document.getElementById('entry-modal');
+    const bulkImportModal = document.getElementById('bulk-import-modal'); // Yeni modal
     const confirmDeleteModal = document.getElementById('confirm-delete-modal');
 
-    if (!entryModal || !listContainer || !confirmDeleteModal) {
-        console.error("Gerekli admin elementleri bulunamadı. HTML'i kontrol edin.");
-        return;
-    }
+    if (!entryModal || !listContainer || !confirmDeleteModal || !bulkImportModal) return;
 
     const entryForm = document.getElementById('entry-form');
+    const bulkImportForm = document.getElementById('bulk-import-form'); // Yeni form
     const closeModalBtn = document.getElementById('close-entry-modal-btn');
+    const closeBulkModalBtn = document.getElementById('close-bulk-modal-btn'); // Yeni kapatma butonu
     const deleteBtn = document.getElementById('delete-record-btn');
     const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
     const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
@@ -143,6 +144,40 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 alert('Silme işlemi sırasında bir hata oluştu.');
             }
+        }
+    });
+
+    // --- YENİ: Toplu Ekleme Modalı Mantığı ---
+    bulkImportBtn.addEventListener('click', () => {
+        bulkImportForm.reset();
+        openModal(bulkImportModal);
+    });
+
+    closeBulkModalBtn.addEventListener('click', () => closeModal(bulkImportModal));
+
+    bulkImportForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(bulkImportForm);
+        const submitButton = bulkImportForm.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+        submitButton.textContent = 'İşleniyor...';
+
+        try {
+            const response = await fetch('/admin/api/bulk-import', {
+                method: 'POST',
+                body: formData,
+            });
+            const data = await response.json();
+            alert(data.message); // Sonucu kullanıcıya göster
+            if (response.ok) {
+                closeModal(bulkImportModal);
+                loadRecords(); // Listeyi yenile
+            }
+        } catch (error) {
+            alert('Dosya yüklenirken bir hata oluştu.');
+        } finally {
+            submitButton.disabled = false;
+            submitButton.textContent = 'İçe Aktar';
         }
     });
 
