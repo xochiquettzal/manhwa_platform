@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // --- GÜNCELLEME MODALI'NI AÇMA (Akıllı Durum Mantığı) ---
+    // --- GÜNCELLEME MODALI'NI AÇMA (Zengin Veriyle) ---
     listItems.forEach(item => {
         item.addEventListener('click', () => {
             const recordType = item.dataset.recordType;
@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else {
                     statusSelect.value = item.dataset.status;
                 }
-            } else { // Manhwa, Manga, etc.
+            } else {
                 statusSelect.querySelector('option[value="Okunuyor"]').style.display = 'block';
                 statusSelect.querySelector('option[value="İzleniyor"]').style.display = 'none';
                  if (item.dataset.status === 'İzleniyor' || !item.dataset.status) {
@@ -123,10 +123,33 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
             
+            const releaseYear = item.dataset.releaseYear;
+            const source = item.dataset.source;
+            const studios = item.dataset.studios;
+            const tags = item.dataset.tags;
+
             updateModal.querySelector('#user-list-id-input').value = item.dataset.userListId;
             updateModal.querySelector('#update-modal-title').textContent = item.dataset.recordTitle;
             updateModal.querySelector('#details-image').src = item.dataset.recordImage || 'https://via.placeholder.com/250x360.png?text=Yok';
-            updateModal.querySelector('#details-synopsis').textContent = item.dataset.synopsis || "";
+            updateModal.querySelector('#details-synopsis').textContent = item.dataset.synopsis || "Konu bilgisi mevcut değil.";
+            
+            updateModal.querySelector('#details-release-year').textContent = releaseYear || 'N/A';
+            updateModal.querySelector('#details-source').textContent = source || 'N/A';
+            updateModal.querySelector('#details-studios').textContent = studios || 'N/A';
+
+            const tagsContainer = updateModal.querySelector('#details-tags');
+            tagsContainer.innerHTML = '';
+            if (tags) {
+                tags.split(',').forEach(tag => {
+                    const tagElement = document.createElement('span');
+                    tagElement.className = 'tag';
+                    tagElement.textContent = tag.trim();
+                    tagsContainer.appendChild(tagElement);
+                });
+            } else {
+                tagsContainer.textContent = 'N/A';
+            }
+            
             updateForm.querySelector('#chapter-input').value = item.dataset.chapter;
             updateForm.querySelector('#notes-input').value = item.dataset.notes;
             

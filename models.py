@@ -1,4 +1,4 @@
-# models.py (Synopsis Eklenmiş Final Hali)
+# models.py (Zengin Veri Alanları Eklenmiş Final Hali)
 
 from extensions import db
 from flask_login import UserMixin
@@ -34,4 +34,11 @@ class MasterRecord(db.Model):
     english_title = db.Column(db.String(200))
     record_type = db.Column(db.String(50), default='Manhwa')
     image_url = db.Column(db.String(255))
-    synopsis = db.Column(db.Text) # Yeni konu alanı
+    synopsis = db.Column(db.Text)
+    
+    # --- YENİ EKLENEN ALANLAR ---
+    tags = db.Column(db.String(300))      # Türler, Temalar, Demografi için (örn: "Action, Shounen, Gore")
+    source = db.Column(db.String(50))     # Kaynak (örn: "Manga", "Light Novel")
+    studios = db.Column(db.String(150))   # Stüdyo(lar)
+    release_year = db.Column(db.Integer)  # Yayın Yılı
+    total_episodes = db.Column(db.Integer)# Toplam Bölüm/Chapter

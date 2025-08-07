@@ -1,4 +1,4 @@
-# admin.py (Sadece JSON ile Toplu Ekleme - Final Hali)
+# admin.py (Zengin Veri Alanları Eklenmiş Final Hali)
 
 import os
 import json
@@ -19,8 +19,6 @@ def allowed_file(filename): return '.' in filename and filename.rsplit('.', 1)[1
 def dashboard():
     return render_template('admin/dashboard.html', title="Admin Paneli")
 
-# --- ADMIN API ENDPOINTS ---
-
 @admin_bp.route('/api/records')
 @login_required
 @admin_required
@@ -38,7 +36,12 @@ def get_records():
 @admin_required
 def get_record(record_id):
     record = MasterRecord.query.get_or_404(record_id)
-    return jsonify({'id': record.id, 'original_title': record.original_title, 'english_title': record.english_title, 'record_type': record.record_type, 'image_url': record.image_url, 'synopsis': record.synopsis})
+    return jsonify({
+        'id': record.id, 'original_title': record.original_title, 'english_title': record.english_title,
+        'record_type': record.record_type, 'image_url': record.image_url, 'synopsis': record.synopsis,
+        'tags': record.tags, 'source': record.source, 'studios': record.studios,
+        'release_year': record.release_year, 'total_episodes': record.total_episodes
+    })
 
 @admin_bp.route('/api/record/add', methods=['POST'])
 @login_required
@@ -52,7 +55,18 @@ def add_record():
             filename = secure_filename(file.filename)
             file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
             image_path = f"/uploads/{filename}"
-    new_record = MasterRecord(original_title=request.form['original_title'], english_title=request.form.get('english_title', ''), record_type=request.form.get('record_type', 'Manhwa'), image_url=image_path, synopsis=request.form.get('synopsis', ''))
+    new_record = MasterRecord(
+        original_title=request.form['original_title'],
+        english_title=request.form.get('english_title', ''),
+        record_type=request.form.get('record_type', 'Manhwa'),
+        image_url=image_path,
+        synopsis=request.form.get('synopsis', ''),
+        tags=request.form.get('tags', ''),
+        source=request.form.get('source', ''),
+        studios=request.form.get('studios', ''),
+        release_year=request.form.get('release_year', None, type=int),
+        total_episodes=request.form.get('total_episodes', None, type=int)
+    )
     db.session.add(new_record)
     db.session.commit()
     return jsonify({'message': 'Kayıt başarıyla eklendi.'}), 201
@@ -70,11 +84,18 @@ def update_record(record_id):
             filename = secure_filename(file.filename)
             file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
             image_path = f"/uploads/{filename}"
+    
     record.original_title = request.form['original_title']
     record.english_title = request.form.get('english_title', '')
     record.record_type = request.form.get('record_type', 'Manhwa')
     record.synopsis = request.form.get('synopsis', '')
     record.image_url = image_path
+    record.tags = request.form.get('tags', '')
+    record.source = request.form.get('source', '')
+    record.studios = request.form.get('studios', '')
+    record.release_year = request.form.get('release_year', None, type=int)
+    record.total_episodes = request.form.get('total_episodes', None, type=int)
+
     db.session.commit()
     return jsonify({'message': 'Kayıt başarıyla güncellendi.'})
 
@@ -91,23 +112,17 @@ def delete_record(record_id):
 @login_required
 @admin_required
 def bulk_import():
-    if 'import_file' not in request.files:
-        return jsonify({'message': 'Dosya bulunamadı.'}), 400
-    
+    if 'import_file' not in request.files: return jsonify({'message': 'Dosya bulunamadı.'}), 400
     file = request.files['import_file']
-    if file.filename == '' or not file.filename.endswith('.json'):
-        return jsonify({'message': 'Lütfen geçerli bir .json dosyası seçin.'}), 400
-
+    if file.filename == '' or not file.filename.endswith('.json'): return jsonify({'message': 'Lütfen geçerli bir .json dosyası seçin.'}), 400
+    
     added_count = 0
     skipped_count = 0
-
     try:
         data = json.load(file)
-        if not isinstance(data, list):
-            raise ValueError("JSON dosyası bir liste (array) içermelidir.")
+        if not isinstance(data, list): raise ValueError("JSON dosyası bir liste (array) içermelidir.")
         
         existing_titles = {record.original_title for record in MasterRecord.query.all()}
-
         for item in data:
             title = item.get('original_title')
             if not isinstance(title, str) or not title or title in existing_titles:
@@ -119,14 +134,18 @@ def bulk_import():
                 english_title=item.get('english_title'),
                 record_type=item.get('record_type', 'Manhwa'),
                 image_url=item.get('image_url'),
-                synopsis=item.get('synopsis')
+                synopsis=item.get('synopsis'),
+                tags=item.get('tags'),
+                source=item.get('source'),
+                studios=item.get('studios'),
+                release_year=item.get('release_year'),
+                total_episodes=item.get('total_episodes')
             )
             db.session.add(new_record)
             existing_titles.add(title)
             added_count += 1
         
         db.session.commit()
-        
         message = f"{added_count} kayıt başarıyla eklendi. {skipped_count} kayıt (mevcut veya başlık eksik) atlandı."
         return jsonify({'message': message})
 

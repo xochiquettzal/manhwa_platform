@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+
 {% block content %}
     <div class="dashboard-controls">
         <div id="search-container">
@@ -17,7 +18,19 @@
     </div>
     <div id="user-list-container">
         {% for item in user_list %}
-            <div class="manhwa-card" data-user-list-id="{{ item.list_item.id }}" data-record-image="{{ item.record.image_url or '' }}" data-status="{{ item.list_item.status }}" data-chapter="{{ item.list_item.current_chapter }}" data-notes="{{ item.list_item.notes or '' }}" data-record-title="{{ item.record.original_title }}" data-record-type="{{ item.record.record_type }}" data-synopsis="{{ item.record.synopsis or '' }}">
+            <div class="manhwa-card" 
+                data-user-list-id="{{ item.list_item.id }}" 
+                data-status="{{ item.list_item.status }}" 
+                data-chapter="{{ item.list_item.current_chapter }}" 
+                data-notes="{{ item.list_item.notes or '' }}" 
+                data-record-title="{{ item.record.original_title }}" 
+                data-record-image="{{ item.record.image_url or '' }}" 
+                data-record-type="{{ item.record.record_type }}" 
+                data-synopsis="{{ item.record.synopsis or '' }}"
+                data-tags="{{ item.record.tags or '' }}"
+                data-source="{{ item.record.source or '' }}"
+                data-studios="{{ item.record.studios or '' }}"
+                data-release-year="{{ item.record.release_year or '' }}">
                 <div class="card-image-wrapper"><img src="{{ item.record.image_url or 'https://via.placeholder.com/250x350.png?text=Yok' }}" class="card-image" loading="lazy"></div>
                 <div class="card-info"><h3 class="card-title">{{ item.record.original_title }}</h3></div>
             </div>
@@ -25,32 +38,44 @@
             <p style="color: var(--text-secondary); grid-column: 1 / -1; text-align: center;">{{ _('Listen henüz boş. Arama yaparak yeni kayıtlar ekleyebilirsin!') }}</p>
         {% endfor %}
     </div>
+
+    <!-- GÜNCELLEME/DETAY MODALI (Nihai Tasarım) -->
     <div id="update-item-modal" class="modal">
         <div class="modal-content details-modal-content">
             <span id="close-update-modal-btn" class="close-btn">&times;</span>
             <div class="details-layout">
-                <img id="details-image" src="" alt="Kapak Fotoğrafı" class="details-image">
-                <div class="details-form-container">
-                    <h2 id="update-modal-title"></h2>
-                    <div class="details-notes">
-                        <h3>{{ _('Konu') }}</h3>
-                        <p id="details-synopsis"></p>
+                <!-- ÜST BÖLÜM -->
+                <div class="details-top-section">
+                    <img id="details-image" src="" alt="Kapak Fotoğrafı" class="details-image">
+                    <div class="details-form-container">
+                        <h2 id="update-modal-title"></h2>
+                        <form id="update-item-form" class="details-form">
+                            <input type="hidden" id="user-list-id-input">
+                            <div class="form-content">
+                                <div class="form-group"><label for="status-input">{{ _('Durum:') }}</label><select id="status-input" name="status"><option value="İzleniyor">{{ _('İzleniyor') }}</option><option value="Okunuyor">{{ _('Okunuyor') }}</option><option value="Tamamlandı">{{ _('Tamamlandı') }}</option><option value="Planlandı">{{ _('Planlandı') }}</option><option value="Bırakıldı">{{ _('Bırakıldı') }}</option></select></div>
+                                <div class="form-group"><label for="chapter-input">{{ _('Okunan Bölüm/Bölüm:') }}</label><input type="number" id="chapter-input" name="chapter" min="0"></div>
+                                <div class="form-group"><label for="notes-input">{{ _('Kişisel Notlar:') }}</label><textarea id="notes-input" name="notes" rows="4"></textarea></div>
+                            </div>
+                            <div class="modal-actions">
+                                 <button type="button" id="delete-item-btn" class="btn btn-danger">{{ _('Listeden Sil') }}</button>
+                                 <button type="submit" class="btn btn-primary">{{ _('Değişiklikleri Kaydet') }}</button>
+                            </div>
+                        </form>
                     </div>
-                    <form id="update-item-form" class="details-form">
-                        <input type="hidden" id="user-list-id-input">
-                        <div class="form-content">
-                            <div class="form-group"><label for="status-input">{{ _('Durum:') }}</label><select id="status-input" name="status"><option value="İzleniyor">{{ _('İzleniyor') }}</option><option value="Okunuyor">{{ _('Okunuyor') }}</option><option value="Tamamlandı">{{ _('Tamamlandı') }}</option><option value="Planlandı">{{ _('Planlandı') }}</option><option value="Bırakıldı">{{ _('Bırakıldı') }}</option></select></div>
-                            <div class="form-group"><label for="chapter-input">{{ _('Okunan Bölüm/Bölüm:') }}</label><input type="number" id="chapter-input" name="chapter" min="0"></div>
-                            <div class="form-group"><label for="notes-input">{{ _('Kişisel Notlar:') }}</label><textarea id="notes-input" name="notes" rows="4"></textarea></div>
-                        </div>
-                        <div class="modal-actions">
-                             <button type="button" id="delete-item-btn" class="btn btn-danger">{{ _('Listeden Sil') }}</button>
-                             <button type="submit" class="btn btn-primary">{{ _('Değişiklikleri Kaydet') }}</button>
-                        </div>
-                    </form>
+                </div>
+                <!-- ALT BÖLÜM -->
+                <div class="details-bottom-section">
+                    <div class="info-item"><span class="info-label">{{ _('Yayın Yılı:') }}</span> <span id="details-release-year"></span></div>
+                    <div class="info-item"><span class="info-label">{{ _('Kaynak:') }}</span> <span id="details-source"></span></div>
+                    <div class="info-item"><span class="info-label">{{ _('Stüdyo:') }}</span> <span id="details-studios"></span></div>
+                    <div class="info-item tags full-width"><span class="info-label">{{ _('Etiketler:') }}</span> <span id="details-tags"></span></div>
+                    <div class="details-notes full-width"><h3 class="info-label">{{ _('Konu') }}</h3><p id="details-synopsis"></p></div>
                 </div>
             </div>
         </div>
     </div>
 {% endblock %}
-{% block scripts %}<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

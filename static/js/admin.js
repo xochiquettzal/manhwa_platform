@@ -75,12 +75,18 @@ document.addEventListener('DOMContentLoaded', function() {
             const record = await response.json();
             
             entryForm.reset();
+            // Tüm yeni alanları doldur
             entryForm.querySelector('#record-id-input').value = record.id;
             entryForm.querySelector('#original_title').value = record.original_title;
             entryForm.querySelector('#english_title').value = record.english_title || '';
             entryForm.querySelector('#record_type').value = record.record_type;
             entryForm.querySelector('#image_url').value = record.image_url || '';
             entryForm.querySelector('#synopsis').value = record.synopsis || '';
+            entryForm.querySelector('#tags').value = record.tags || '';
+            entryForm.querySelector('#source').value = record.source || '';
+            entryForm.querySelector('#studios').value = record.studios || '';
+            entryForm.querySelector('#release_year').value = record.release_year || '';
+            entryForm.querySelector('#total_episodes').value = record.total_episodes || '';
             
             entryModal.querySelector('h2').textContent = 'Kaydı Düzenle';
             deleteBtn.style.display = 'inline-flex';
