@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-08-06 22:24+0300\n"
+"POT-Creation-Date: 2025-08-08 15:11+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,37 +17,41 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: templates/base.html:7
+#: templates/base.html:6
 msgid "Anasayfa"
 msgstr ""
 
-#: templates/base.html:19
-msgid "Admin"
+#: templates/base.html:18 templates/dashboard.html:4
+msgid "Listem"
+msgstr ""
+
+#: templates/base.html:20
+msgid "Arama"
 msgstr ""
 
 #: templates/base.html:21
+msgid "En İyiler"
+msgstr ""
+
+#: templates/base.html:29
+msgid "Admin"
+msgstr ""
+
+#: templates/base.html:31
 msgid "Çıkış Yap"
 msgstr ""
 
 #: templates/auth/login.html:5 templates/auth/login.html:26
-#: templates/auth/register.html:47 templates/base.html:23
+#: templates/auth/register.html:47 templates/base.html:33
 msgid "Giriş Yap"
 msgstr ""
 
-#: templates/auth/register.html:42 templates/base.html:24
+#: templates/auth/register.html:42 templates/base.html:34
 msgid "Kayıt Ol"
 msgstr ""
 
-#: templates/base.html:32
+#: templates/base.html:36
 msgid "Temayı Değiştir"
-msgstr ""
-
-#: templates/base.html:34
-msgid "Açık"
-msgstr ""
-
-#: templates/base.html:35
-msgid "Koyu"
 msgstr ""
 
 #: templates/base.html:54
@@ -66,120 +70,295 @@ msgstr ""
 msgid "Evet, Sil"
 msgstr ""
 
-#: templates/dashboard.html:6
-msgid "Listene eklemek için ara..."
-msgstr ""
-
-#: templates/dashboard.html:10
+#: templates/dashboard.html:8
 msgid "Tümü"
 msgstr ""
 
-#: templates/dashboard.html:11 templates/dashboard.html:42
+#: templates/dashboard.html:9 templates/dashboard.html:124
 msgid "İzleniyor"
 msgstr ""
 
-#: templates/dashboard.html:12 templates/dashboard.html:42
+#: templates/dashboard.html:10 templates/dashboard.html:124
 msgid "Okunuyor"
 msgstr ""
 
-#: templates/dashboard.html:13 templates/dashboard.html:42
+#: templates/dashboard.html:11 templates/dashboard.html:124
 msgid "Tamamlandı"
 msgstr ""
 
-#: templates/dashboard.html:14 templates/dashboard.html:42
+#: templates/dashboard.html:12 templates/dashboard.html:124
 msgid "Planlandı"
 msgstr ""
 
-#: templates/dashboard.html:15 templates/dashboard.html:42
+#: templates/dashboard.html:13 templates/dashboard.html:124
 msgid "Bırakıldı"
 msgstr ""
 
-#: templates/dashboard.html:25
+#: templates/dashboard.html:21
+msgid "Listemde ara..."
+msgstr ""
+
+#: templates/dashboard.html:22 templates/dashboard.html:50
+#: templates/search.html:8 templates/search.html:53
+msgid "Temizle"
+msgstr ""
+
+#: templates/dashboard.html:26 templates/search.html:19
+msgid "Tüm Yıllar"
+msgstr ""
+
+#: templates/dashboard.html:32 templates/search.html:13
+msgid "Tüm Stüdyolar"
+msgstr ""
+
+#: templates/dashboard.html:38 templates/search.html:25
+msgid "Filtreler"
+msgstr ""
+
+#: templates/dashboard.html:41 templates/search.html:30
+msgid "Genre"
+msgstr ""
+
+#: templates/dashboard.html:51 templates/search.html:54
+msgid "Uygula"
+msgstr ""
+
+#: templates/dashboard.html:85
+msgid "Bölüm:"
+msgstr ""
+
+#: templates/dashboard.html:90
+msgid "Bir bölüm arttır"
+msgstr ""
+
+#: templates/dashboard.html:107
 msgid "Listen henüz boş. Arama yaparak yeni kayıtlar ekleyebilirsin!"
 msgstr ""
 
-#: templates/dashboard.html:36
-msgid "Konu"
-msgstr ""
-
-#: templates/dashboard.html:42
+#: templates/dashboard.html:124
 msgid "Durum:"
 msgstr ""
 
-#: templates/dashboard.html:43
-msgid "Okunan Bölüm/Bölüm:"
+#: templates/dashboard.html:125
+msgid "Puanım:"
 msgstr ""
 
-#: templates/dashboard.html:44
+#: templates/dashboard.html:125
+msgid "Puan Yok"
+msgstr ""
+
+#: templates/dashboard.html:127
+msgid "İzlenen/Okunan Bölüm:"
+msgstr ""
+
+#: templates/dashboard.html:128
 msgid "Kişisel Notlar:"
 msgstr ""
 
-#: templates/dashboard.html:47
+#: templates/dashboard.html:131
 msgid "Listeden Sil"
 msgstr ""
 
-#: templates/admin/dashboard.html:30 templates/dashboard.html:48
+#: templates/admin/dashboard.html:108 templates/dashboard.html:132
 msgid "Değişiklikleri Kaydet"
 msgstr ""
 
-#: templates/admin/dashboard.html:6
-msgid "Kütüphanede kayıt ara..."
+#: templates/admin/dashboard.html:72 templates/dashboard.html:138
+#: templates/search.html:82
+msgid "Yayın Yılı:"
+msgstr ""
+
+#: templates/admin/dashboard.html:64 templates/dashboard.html:139
+#: templates/search.html:83
+msgid "Kaynak:"
+msgstr ""
+
+#: templates/dashboard.html:140 templates/search.html:84
+msgid "Stüdyo:"
+msgstr ""
+
+#: templates/dashboard.html:141 templates/search.html:85
+msgid "Demografi:"
+msgstr ""
+
+#: templates/dashboard.html:142 templates/search.html:86
+msgid "Tema:"
+msgstr ""
+
+#: templates/dashboard.html:143 templates/search.html:87
+msgid "Etiketler:"
+msgstr ""
+
+#: templates/dashboard.html:144 templates/search.html:92
+msgid "Konu"
+msgstr ""
+
+#: templates/search.html:3
+msgid "Kütüphanede Ara"
+msgstr ""
+
+#: templates/search.html:7
+msgid "Anime, manga, vb. ara..."
+msgstr ""
+
+#: templates/search.html:28
+msgid "Filtrelerde ara..."
+msgstr ""
+
+#: templates/search.html:37
+msgid "Theme"
+msgstr ""
+
+#: templates/search.html:44
+msgid "Demografi"
+msgstr ""
+
+#: templates/search.html:59
+msgid "Popülerliğe Göre Sırala"
+msgstr ""
+
+#: templates/search.html:60
+msgid "Puana Göre Sırala"
+msgstr ""
+
+#: templates/search.html:69
+msgid "Daha fazla sonuç yükleniyor..."
+msgstr ""
+
+#: templates/top_records.html:4
+msgid "En Popüler Seriler"
+msgstr ""
+
+#: templates/top_records.html:5
+msgid ""
+"Sıralama, MyAnimeList verileri kullanılarak hesaplanan ağırlıklı puana "
+"göre yapılmıştır."
+msgstr ""
+
+#: templates/top_records.html:20
+msgid "bölüm"
+msgstr ""
+
+#: templates/top_records.html:20
+msgid "chapter"
+msgstr ""
+
+#: templates/top_records.html:22
+msgid "Konu bilgisi mevcut değil."
+msgstr ""
+
+#: templates/top_records.html:30
+msgid "kullanıcı"
+msgstr ""
+
+#: templates/top_records.html:34
+msgid "Sıralanacak yeterli kayıt bulunamadı."
+msgstr ""
+
+#: templates/admin/dashboard.html:4
+msgid "Admin Paneli"
 msgstr ""
 
 #: templates/admin/dashboard.html:8
-msgid "Yeni Kayıt Ekle"
+msgid "Kütüphanede kayıt ara..."
 msgstr ""
 
-#: templates/admin/dashboard.html:14
-msgid "Yeni Kütüphane Kaydı"
+#: templates/admin/dashboard.html:13
+msgid "Toplu Ekle"
 msgstr ""
 
-#: templates/admin/dashboard.html:18
+#: templates/admin/dashboard.html:17
+msgid "Yeni Ekle"
+msgstr ""
+
+#: templates/admin/dashboard.html:38
 msgid "Orijinal Başlık:"
 msgstr ""
 
-#: templates/admin/dashboard.html:19
+#: templates/admin/dashboard.html:42
 msgid "İngilizce Başlık:"
 msgstr ""
 
-#: templates/admin/dashboard.html:22
+#: templates/admin/dashboard.html:46
 msgid "Konu:"
 msgstr ""
 
-#: templates/admin/dashboard.html:25
+#: templates/admin/dashboard.html:51
 msgid "Tür:"
 msgstr ""
 
-#: templates/admin/dashboard.html:26
+#: templates/admin/dashboard.html:68
+msgid "Stüdyo/Yayıncı:"
+msgstr ""
+
+#: templates/admin/dashboard.html:76
+msgid "Toplam Bölüm/Chapter:"
+msgstr ""
+
+#: templates/admin/dashboard.html:93
+msgid "Etiketler (virgülle ayırın):"
+msgstr ""
+
+#: templates/admin/dashboard.html:98
 msgid "veya Resim URL:"
 msgstr ""
 
-#: templates/admin/dashboard.html:26
+#: templates/admin/dashboard.html:99
 msgid "URL yapıştırın"
 msgstr ""
 
-#: templates/admin/dashboard.html:27
+#: templates/admin/dashboard.html:102
 msgid "Resim Dosyası Seç:"
 msgstr ""
 
-#: templates/admin/dashboard.html:29
+#: templates/admin/dashboard.html:107
 msgid "Kaydı Sil"
 msgstr ""
 
-#: templates/auth/confirm_email.html:4
-msgid "Hesap Onayı"
+#: templates/admin/dashboard.html:118
+msgid "Toplu Kayıt Ekle"
+msgstr ""
+
+#: templates/admin/dashboard.html:119
+msgid "Lütfen .json formatında bir dosya seçin."
+msgstr ""
+
+#: templates/admin/dashboard.html:122
+msgid "İçe Aktarılacak Dosya:"
+msgstr ""
+
+#: templates/admin/dashboard.html:126
+msgid "İçe Aktar"
 msgstr ""
 
 #: templates/auth/confirm_email.html:5
-msgid "Merhaba"
+msgid "Hesap Onayı"
 msgstr ""
 
-#: templates/auth/confirm_email.html:6
-msgid "Hesabını onaylamak için lütfen aşağıdaki linke tıkla:"
+#: templates/auth/confirm_email.html:8
+msgid "Hesabınızı Onaylayın"
 msgstr ""
 
 #: templates/auth/confirm_email.html:9
-msgid "Eğer bu isteği sen yapmadıysan, bu e-postayı görmezden gelebilirsin."
+msgid "Merhaba"
+msgstr ""
+
+#: templates/auth/confirm_email.html:10
+msgid "Lyst. hesabınızı aktif hale getirmek için lütfen aşağıdaki linke tıklayın:"
+msgstr ""
+
+#: templates/auth/confirm_email.html:13
+msgid "Hesabı Onayla"
+msgstr ""
+
+#: templates/auth/confirm_email.html:16
+msgid ""
+"Eğer bu link çalışmazsa, aşağıdaki adresi kopyalayıp tarayıcınıza "
+"yapıştırabilirsiniz:"
+msgstr ""
+
+#: templates/auth/confirm_email.html:19
+msgid "Eğer bu isteği siz yapmadıysanız, bu e-postayı görmezden gelebilirsiniz."
 msgstr ""
 
 #: templates/auth/login.html:11
