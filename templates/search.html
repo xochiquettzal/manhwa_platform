@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+    <h1 class="page-title">{{ _('Kütüphanede Ara') }}</h1>
+    <div class="page-controls">
+        <div id="search-container">
+            <div class="search-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M10.5 3.75a6.75 6.75 0 100 13.5 6.75 6.75 0 000-13.5zM2.25 10.5a8.25 8.25 0 1114.59 5.28l4.69 4.69a.75.75 0 11-1.06 1.06l-4.69-4.69A8.25 8.25 0 012.25 10.5z" clip-rule="evenodd" /></svg></div>
+            <input type="text" id="search-box" placeholder="{{ _('Anime, manga, vb. ara...') }}">
+        </div>
+        <!-- GELİŞMİŞ FİLTRELEME ALANI -->
+        <div id="filter-container" class="search-filters">
+            <select id="studio-filter" class="filter-btn">
+                <option value="">{{ _('Tüm Stüdyolar') }}</option>
+                {% for studio in studios %}
+                    <option value="{{ studio }}">{{ studio }}</option>
+                {% endfor %}
+            </select>
+            <select id="sort-by-filter" class="filter-btn">
+                <option value="popularity">{{ _('Popülerliğe Göre Sırala') }}</option>
+                <option value="score">{{ _('Puana Göre Sırala') }}</option>
+            </select>
+        </div>
+    </div>
+    <div id="results-container">
+        <!-- Arama sonuçları JavaScript ile buraya yüklenecek -->
+    </div>
+    <div id="loader" style="display: none; text-align: center; padding: 2rem;">
+        <p>{{ _('Daha fazla sonuç yükleniyor...') }}</p>
+    </div>
+
+    <!-- Arama Sonucu Detay Modalı -->
+    <div id="details-modal" class="modal">
+        <div class="modal-content details-modal-content">
+            <span id="close-details-modal-btn" class="close-btn">&times;</span>
+            <div class="details-layout">
+                 <div class="details-top-section">
+                    <img id="details-image" src="" alt="Kapak Fotoğrafı" class="details-image">
+                    <div class="details-form-container">
+                        <h2 id="details-title"></h2>
+                         <div class="details-bottom-section" style="margin-top: 0;">
+                            <div class="info-item"><span class="info-label">{{ _('Yayın Yılı:') }}</span> <span id="details-release-year"></span></div>
+                            <div class="info-item"><span class="info-label">{{ _('Kaynak:') }}</span> <span id="details-source"></span></div>
+                            <div class="info-item"><span class="info-label">{{ _('Stüdyo:') }}</span> <span id="details-studios"></span></div>
+                            <div class="info-item tags full-width"><span class="info-label">{{ _('Etiketler:') }}</span> <span id="details-tags"></span></div>
+                        </div>
+                    </div>
+                </div>
+                 <div class="details-notes full-width" style="margin-top: 1rem;">
+                    <h3 class="info-label">{{ _('Konu') }}</h3>
+                    <p id="details-synopsis"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/search.js') }}"></script>
+{% endblock %}

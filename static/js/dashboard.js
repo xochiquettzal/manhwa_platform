@@ -1,17 +1,15 @@
-// static/js/dashboard.js (Final Sürümü)
+// static/js/dashboard.js (Nihai Sürüm - ID Düzeltmeleriyle)
 
 document.addEventListener('DOMContentLoaded', function() {
 
-    // --- ELEMENT SEÇİMLERİ ---
-    const searchBox = document.getElementById('search-box');
-    const searchResults = document.getElementById('search-results');
-    const filterContainer = document.getElementById('filter-container');
-    const listContainer = document.getElementById('user-list-container');
+    // --- ELEMENT SEÇİMLERİ (Spesifik ID'ler ile) ---
+    const searchBox = document.getElementById('my-list-search-box');
+    const filterContainer = document.getElementById('my-list-filter-container');
+    const listContainer = document.getElementById('results-container');
     const updateModal = document.getElementById('update-item-modal');
     const confirmDeleteModal = document.getElementById('confirm-delete-modal');
     
     if (!updateModal || !confirmDeleteModal || !listContainer) {
-        console.error("Gerekli dashboard elementleri bulunamadı. HTML'i kontrol edin.");
         return; 
     }
     
@@ -26,62 +24,31 @@ document.addEventListener('DOMContentLoaded', function() {
     const openModal = (modal) => { if(modal) modal.style.display = 'block'; };
     const closeModal = (modal) => { if(modal) modal.style.display = 'none'; };
 
-    // --- CANLI ARAMA MANTIĞI ---
-    let searchTimeout;
-    searchBox.addEventListener('keyup', (e) => {
-        clearTimeout(searchTimeout);
-        const query = e.target.value;
-        if (query.length < 2) {
-            searchResults.style.display = 'none';
-            return;
-        }
-        
-        searchTimeout = setTimeout(async () => {
-            const response = await fetch(`/api/search?q=${query}`);
-            const results = await response.json();
-            searchResults.innerHTML = '';
-            if (results.length > 0) {
-                searchResults.style.display = 'block';
-                results.forEach(record => {
-                    const itemDiv = document.createElement('div');
-                    itemDiv.className = 'search-item';
-                    itemDiv.dataset.id = record.id;
-                    itemDiv.innerHTML = `
-                        <img src="${record.image || 'https://via.placeholder.com/40x60.png?text=N/A'}" alt="${record.title}">
-                        <div class="search-item-info">
-                            <span>${record.title}</span>
-                            <small>${record.type}</small>
-                        </div>
-                    `;
-                    searchResults.appendChild(itemDiv);
-                });
-            } else {
-                searchResults.style.display = 'none';
-            }
-        }, 300);
-    });
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('#search-container')) {
-            searchResults.style.display = 'none';
-        }
-    });
+    // --- FİLTRELEME VE ARAMA MANTIĞI ---
+    const applyFilters = () => {
+        // null kontrolleri eklendi
+        const activeFilterButton = filterContainer ? filterContainer.querySelector('.filter-btn.active') : null;
+        if (!activeFilterButton) return;
 
-    // --- LİSTEYE EKLEME MANTIĞI (Tıklayarak) ---
-    searchResults.addEventListener('click', async (e) => {
-        const targetItem = e.target.closest('.search-item');
-        if (targetItem) {
-            const recordId = targetItem.dataset.id;
-            const response = await fetch(`/list/add/${recordId}`, { method: 'POST' });
-            if (response.ok) {
-                window.location.reload();
-            } else {
-                const data = await response.json();
-                alert(`Hata: ${data.message}`);
-            }
-        }
-    });
+        const statusToFilter = activeFilterButton.dataset.status;
+        const searchQuery = searchBox ? searchBox.value.toLowerCase() : '';
 
-    // --- FİLTRELEME MANTIĞI ---
+        listItems.forEach(item => {
+            const title = (item.dataset.recordTitle || '').toLowerCase();
+            const englishTitle = (item.dataset.recordEnglishTitle || '').toLowerCase();
+            const status = item.dataset.status;
+
+            const statusMatch = (statusToFilter === 'all' || status === statusToFilter);
+            const searchMatch = (title.includes(searchQuery) || englishTitle.includes(searchQuery));
+
+            if (statusMatch && searchMatch) {
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    };
+
     if (filterContainer) {
         filterContainer.addEventListener('click', (e) => {
             if (e.target.tagName === 'BUTTON') {
@@ -89,15 +56,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     filterContainer.querySelector('.active').classList.remove('active');
                 }
                 e.target.classList.add('active');
-                const statusToFilter = e.target.dataset.status;
-                listItems.forEach(item => {
-                    item.style.display = (statusToFilter === 'all' || item.dataset.status === statusToFilter) ? 'block' : 'none';
-                });
+                applyFilters();
             }
         });
     }
 
-    // --- GÜNCELLEME MODALI'NI AÇMA (Zengin Veriyle) ---
+    if (searchBox) {
+        searchBox.addEventListener('keyup', applyFilters);
+    }
+    
+    // --- GÜNCELLEME MODALI'NI AÇMA ---
     listItems.forEach(item => {
         item.addEventListener('click', () => {
             const recordType = item.dataset.recordType;
@@ -108,41 +76,29 @@ document.addEventListener('DOMContentLoaded', function() {
             if (recordType === 'Anime') {
                 statusSelect.querySelector('option[value="Okunuyor"]').style.display = 'none';
                 statusSelect.querySelector('option[value="İzleniyor"]').style.display = 'block';
-                if (item.dataset.status === 'Okunuyor' || !item.dataset.status) {
-                    statusSelect.value = 'İzleniyor';
-                } else {
-                    statusSelect.value = item.dataset.status;
-                }
+                statusSelect.value = (item.dataset.status === 'Okunuyor' || !item.dataset.status) ? 'İzleniyor' : item.dataset.status;
             } else {
                 statusSelect.querySelector('option[value="Okunuyor"]').style.display = 'block';
                 statusSelect.querySelector('option[value="İzleniyor"]').style.display = 'none';
-                 if (item.dataset.status === 'İzleniyor' || !item.dataset.status) {
-                    statusSelect.value = 'Okunuyor';
-                } else {
-                    statusSelect.value = item.dataset.status;
-                }
+                 statusSelect.value = (item.dataset.status === 'İzleniyor' || !item.dataset.status) ? 'Okunuyor' : item.dataset.status;
             }
             
-            // Zengin veri alanlarını dataset'ten çek
             const releaseYear = item.dataset.releaseYear;
             const source = item.dataset.source;
             const studios = item.dataset.studios;
             const tags = item.dataset.tags;
-            const synopsis = item.dataset.synopsis;
 
-            // Modal'daki formu ve detayları doldur
             updateModal.querySelector('#user-list-id-input').value = item.dataset.userListId;
             updateModal.querySelector('#update-modal-title').textContent = item.dataset.recordTitle;
             updateModal.querySelector('#details-image').src = item.dataset.recordImage || 'https://via.placeholder.com/250x375.png?text=Yok';
+            updateModal.querySelector('#details-synopsis').textContent = item.dataset.synopsis || "Konu bilgisi mevcut değil.";
             
-            // YENİ: Zengin veri detay alanlarını doldur
             updateModal.querySelector('#details-release-year').textContent = releaseYear || 'N/A';
             updateModal.querySelector('#details-source').textContent = source || 'N/A';
             updateModal.querySelector('#details-studios').textContent = studios || 'N/A';
-            updateModal.querySelector('#details-synopsis').textContent = synopsis || "Konu bilgisi mevcut değil.";
 
             const tagsContainer = updateModal.querySelector('#details-tags');
-            tagsContainer.innerHTML = ''; // Etiketleri temizle
+            tagsContainer.innerHTML = '';
             if (tags) {
                 tags.split(',').forEach(tag => {
                     const tagElement = document.createElement('span');
@@ -154,8 +110,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 tagsContainer.textContent = 'N/A';
             }
             
-            // Form alanlarını doldurmaya devam et
             updateForm.querySelector('#chapter-input').value = item.dataset.chapter;
+            updateForm.querySelector('#user-score-input').value = item.dataset.userScore;
             updateForm.querySelector('#notes-input').value = item.dataset.notes;
             
             openModal(updateModal);
@@ -178,6 +134,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const data = {
             status: document.getElementById('status-input').value,
             current_chapter: document.getElementById('chapter-input').value,
+            user_score: document.getElementById('user-score-input').value,
             notes: document.getElementById('notes-input').value
         };
         const response = await fetch(`/list/update/${userListId}`, {
@@ -192,23 +149,17 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // --- LİSTEDEN SİLME MANTIĞI (Modern Modal ile) ---
+    // --- LİSTEDEN SİLME MANTIĞI ---
     const deleteBtn = document.getElementById('delete-item-btn');
     if(deleteBtn) {
         deleteBtn.addEventListener('click', () => {
             itemToDeleteId = document.getElementById('user-list-id-input').value;
             closeModal(updateModal);
-            const confirmText = confirmDeleteModal.querySelector('#confirm-text');
-            confirmText.textContent = "Bu kayıt listenizden kalıcı olarak kaldırılacaktır.";
             openModal(confirmDeleteModal);
         });
     }
 
-    cancelDeleteBtn.addEventListener('click', () => {
-        closeModal(confirmDeleteModal);
-        itemToDeleteId = null;
-    });
-
+    cancelDeleteBtn.addEventListener('click', () => closeModal(confirmDeleteModal));
     confirmDeleteBtn.addEventListener('click', async () => {
         if (itemToDeleteId) {
             const response = await fetch(`/list/delete/${itemToDeleteId}`, { method: 'POST' });

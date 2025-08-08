@@ -1,4 +1,4 @@
-# auth.py (Final Sürümü)
+# auth.py (Nihai Sürüm)
 
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from models import db, User

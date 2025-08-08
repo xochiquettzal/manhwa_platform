@@ -11,15 +11,12 @@ load_dotenv()
 
 def create_app():
     app = Flask(__name__)
-
-    # --- KONFİGÜRASYON ---
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///platform.db'
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'default-super-secret-key-change-it')
     app.config['UPLOAD_FOLDER'] = 'uploads'
     app.config['LANGUAGES'] = ['en', 'tr']
     app.config['BABEL_DEFAULT_LOCALE'] = 'en'
     
-    # --- E-POSTA KONFİGÜRASYONU ---
     app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER')
     app.config['MAIL_PORT'] = int(os.environ.get('MAIL_PORT', 587))
     app.config['MAIL_USE_TLS'] = os.environ.get('MAIL_USE_TLS', 'true').lower() in ['true', 'on', '1']
@@ -27,7 +24,6 @@ def create_app():
     app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
     app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER')
 
-    # --- EKLENTİLERİ BAŞLATMA ---
     db.init_app(app)
     migrate.init_app(app, db)
     mail.init_app(app)
@@ -43,17 +39,14 @@ def create_app():
     def inject_locale():
         return dict(get_locale=get_locale)
 
-    # --- LOGIN MANAGER YAPILANDIRMASI ---
     login_manager.init_app(app)
     login_manager.login_view = 'auth.login'
     login_manager.login_message = None
 
-    # --- USER LOADER ---
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))
 
-    # --- BLUEPRINT'LERİ (UYGULAMA BÖLÜMLERİNİ) KAYDETME ---
     with app.app_context():
         from auth import auth_bp
         app.register_blueprint(auth_bp, url_prefix='/auth')
@@ -62,21 +55,18 @@ def create_app():
         from main import main_bp
         app.register_blueprint(main_bp)
 
-    # --- DİL DEĞİŞTİRME ROUTE ---
     @app.route('/language/<lang>')
     def set_language(lang=None):
         if lang in app.config['LANGUAGES']:
             session['language'] = lang
         return redirect(request.referrer or url_for('main.index'))
 
-    # --- YÜKLENEN DOSYALAR İÇİN ROUTE ---
     @app.route('/uploads/<path:filename>')
     def uploaded_file(filename):
         return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
     return app
 
-# Uygulamayı `python app.py` ile doğrudan çalıştırmak için
 if __name__ == '__main__':
     app = create_app()
     with app.app_context():

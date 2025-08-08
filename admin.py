@@ -1,4 +1,4 @@
-# admin.py (Zengin Veri Alanlarını Yöneten Final Hali)
+# admin.py (Nihai Sürüm - Zengin Veri Yönetimiyle)
 
 import os
 import json
@@ -37,11 +37,12 @@ def get_records():
 def get_record(record_id):
     record = MasterRecord.query.get_or_404(record_id)
     return jsonify({
-        'id': record.id, 'original_title': record.original_title, 'english_title': record.english_title,
-        'record_type': record.record_type, 'image_url': record.image_url, 'synopsis': record.synopsis,
-        'tags': record.tags, 'source': record.source, 'studios': record.studios, 'mal_id': record.mal_id,
+        'id': record.id, 'mal_id': record.mal_id, 'original_title': record.original_title,
+        'english_title': record.english_title, 'record_type': record.record_type,
+        'mal_type': record.mal_type, 'image_url': record.image_url, 'synopsis': record.synopsis,
+        'tags': record.tags, 'source': record.source, 'studios': record.studios,
         'release_year': record.release_year, 'total_episodes': record.total_episodes,
-        'score': record.score, 'popularity': record.popularity, 'mal_type': record.mal_type
+        'score': record.score, 'popularity': record.popularity, 'scored_by': record.scored_by
     })
 
 @admin_bp.route('/api/record/add', methods=['POST'])
@@ -66,7 +67,8 @@ def add_record():
         mal_type=data.get('mal_type'), image_url=image_path, synopsis=data.get('synopsis'),
         tags=data.get('tags'), source=data.get('source'), studios=data.get('studios'),
         release_year=data.get('release_year', type=int), total_episodes=data.get('total_episodes', type=int),
-        score=data.get('score', type=float), popularity=data.get('popularity', type=int)
+        score=data.get('score', type=float), popularity=data.get('popularity', type=int),
+        scored_by=data.get('scored_by', type=int)
     )
     db.session.add(new_record)
     db.session.commit()
@@ -101,6 +103,7 @@ def update_record(record_id):
     record.total_episodes = data.get('total_episodes', type=int)
     record.score = data.get('score', type=float)
     record.popularity = data.get('popularity', type=int)
+    record.scored_by = data.get('scored_by', type=int)
     db.session.commit()
     return jsonify({'message': 'Kayıt başarıyla güncellendi.'})
 
@@ -140,7 +143,7 @@ def bulk_import():
                 mal_type=item.get('mal_type'), image_url=item.get('image_url'), synopsis=item.get('synopsis'),
                 tags=item.get('tags'), source=item.get('source'), studios=item.get('studios'),
                 release_year=item.get('release_year'), total_episodes=item.get('total_episodes'),
-                score=item.get('score'), popularity=item.get('popularity')
+                score=item.get('score'), popularity=item.get('popularity'), scored_by=item.get('scored_by')
             )
             db.session.add(new_record)
             existing_mal_ids.add(mal_id)

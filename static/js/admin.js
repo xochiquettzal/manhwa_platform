@@ -1,4 +1,4 @@
-// static/js/admin.js (Final Sürümü)
+// static/js/admin.js (Nihai Sürüm)
 
 document.addEventListener('DOMContentLoaded', function() {
 
@@ -78,8 +78,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const record = await response.json();
             
             entryForm.reset();
-            // Tüm yeni alanları doldur
             entryForm.querySelector('#record-id-input').value = record.id;
+            entryForm.querySelector('#mal_id').value = record.mal_id || '';
             entryForm.querySelector('#original_title').value = record.original_title;
             entryForm.querySelector('#english_title').value = record.english_title || '';
             entryForm.querySelector('#record_type').value = record.record_type;
@@ -93,6 +93,7 @@ document.addEventListener('DOMContentLoaded', function() {
             entryForm.querySelector('#total_episodes').value = record.total_episodes || '';
             entryForm.querySelector('#score').value = record.score || '';
             entryForm.querySelector('#popularity').value = record.popularity || '';
+            entryForm.querySelector('#scored_by').value = record.scored_by || '';
             
             entryModal.querySelector('h2').textContent = 'Kaydı Düzenle';
             deleteBtn.style.display = 'inline-flex';
@@ -102,10 +103,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- MODAL KAPATMA ---
     closeEntryModalBtn.addEventListener('click', () => closeModal(entryModal));
+    closeBulkModalBtn.addEventListener('click', () => closeModal(bulkImportModal));
     window.addEventListener('click', (e) => {
-        if (e.target == entryModal || e.target == confirmDeleteModal) {
+        if (e.target == entryModal || e.target == confirmDeleteModal || e.target == bulkImportModal) {
             closeModal(entryModal);
             closeModal(confirmDeleteModal);
+            closeModal(bulkImportModal);
         }
     });
 
@@ -159,13 +162,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // --- YENİ: Toplu Ekleme Modalı Mantığı ---
+    // --- TOPLU EKLEME MODALI ---
     bulkImportBtn.addEventListener('click', () => {
         bulkImportForm.reset();
         openModal(bulkImportModal);
     });
-
-    closeBulkModalBtn.addEventListener('click', () => closeModal(bulkImportModal));
 
     bulkImportForm.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -192,7 +193,6 @@ document.addEventListener('DOMContentLoaded', function() {
             submitButton.textContent = 'İçe Aktar';
         }
     });
-
 
     // --- BAŞLANGIÇ ---
     loadRecords();

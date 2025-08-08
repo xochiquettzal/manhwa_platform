@@ -1,54 +1,137 @@
-# main.py (Nihai Akıllı Sıralama ile Final Hali)
+# main.py (Nihai ve Düzeltilmiş Sürüm)
 
-from flask import Blueprint, render_template, request, jsonify, flash
+from flask import Blueprint, render_template, request, jsonify, flash, redirect, url_for
 from flask_login import login_required, current_user
 from models import db, MasterRecord, UserList
-from sqlalchemy import case
+from sqlalchemy import case, func
 
 main_bp = Blueprint('main', __name__)
 
 @main_bp.route('/')
-@login_required
 def index():
-    user_list_items = db.session.query(UserList, MasterRecord).join(MasterRecord).filter(UserList.user_id == current_user.id).all()
-    user_list = [{'list_item': item.UserList, 'record': item.MasterRecord} for item in user_list_items]
-    return render_template('dashboard.html', title='Panelim', user_list=user_list)
+    # Ana sayfa artık Top listesine yönlendiriyor
+    return redirect(url_for('main.top_records'))
 
-@main_bp.route('/api/search')
+@main_bp.route('/my-list')
 @login_required
-def search():
-    query = request.args.get('q', '', type=str)
-    if len(query) < 2: return jsonify([])
-    search_term = f"%{query}%"
-    user_list_ids = [item.master_record_id for item in current_user.list_items]
+def my_list():
+    """Kullanıcının ana paneli - My List sayfası."""
+    # Bu sorgu bir demet listesi döndürür: [(UserList_obj, MasterRecord_obj), ...]
+    user_list_items_tuples = db.session.query(UserList, MasterRecord).join(MasterRecord).filter(UserList.user_id == current_user.id).all()
     
-    # --- YENİ VE GELİŞMİŞ AKILLI SIRALAMA MANTIĞI ---
-    # 1. mal_type'a göre bir öncelik puanı oluşturuyoruz.
-    # Düşük puan, daha yüksek öncelik anlamına gelir.
-    type_priority = case(
-        (MasterRecord.mal_type == 'TV', 1),
-        (MasterRecord.mal_type == 'Movie', 2),
-        (MasterRecord.mal_type == 'Manga', 3), # Manga da yüksek öncelikli
-        (MasterRecord.mal_type == 'Manhwa', 4),
-        (MasterRecord.mal_type == 'Webtoon', 5),
-        (MasterRecord.mal_type == 'OVA', 6),
-        (MasterRecord.mal_type == 'ONA', 7),
-        (MasterRecord.mal_type == 'Special', 8),
-        else_=9 # Diğer her şey en sonda
-    ).label('type_priority')
+    # Tüm etiketleri toplayıp filtreleme için hazırlama
+    all_tags = set()
+    # DÖNGÜ DÜZELTMESİ: Demeti doğrudan "açıyoruz" (unpacking)
+    for user_list_obj, record_obj in user_list_items_tuples:
+        if record_obj and record_obj.tags:
+            for tag in record_obj.tags.split(','):
+                all_tags.add(tag.strip())
+    
+    # Şablona göndereceğimiz veriyi oluşturuyoruz
+    user_list = [
+        {'list_item': user_list_obj, 'record': record_obj} 
+        for user_list_obj, record_obj in user_list_items_tuples
+    ]
+    return render_template('dashboard.html', title='Listem', user_list=user_list, tags=sorted(list(all_tags)))
 
-    results_query = MasterRecord.query.add_columns(type_priority).filter(
-        db.or_(MasterRecord.original_title.ilike(search_term), MasterRecord.english_title.ilike(search_term)),
-        MasterRecord.id.notin_(user_list_ids)
+@main_bp.route('/search')
+def search_page():
+    """Gelişmiş arama sayfasını render eder."""
+    studios = db.session.query(MasterRecord.studios).filter(MasterRecord.studios.isnot(None)).distinct().order_by(MasterRecord.studios).all()
+    studios = [s[0] for s in studios if s[0]]
+    
+    tags_query = db.session.query(MasterRecord.tags).filter(MasterRecord.tags.isnot(None)).all()
+    all_tags = set()
+    for row in tags_query:
+        if row[0]:
+            for tag in row[0].split(','):
+                all_tags.add(tag.strip())
+
+    return render_template('search.html', title='Arama', studios=studios, tags=sorted(list(all_tags)))
+
+@main_bp.route('/top')
+def top_records():
+    """Weighted Score'a göre sıralanmış Top listesini gösterir."""
+    m = 1000 
+    C = db.session.query(func.avg(MasterRecord.score)).filter(MasterRecord.score.isnot(None)).scalar() or 7.0
+    
+    weighted_score_formula = (
+        (MasterRecord.scored_by / (MasterRecord.scored_by + m)) * MasterRecord.score +
+        (m / (MasterRecord.scored_by + m)) * C
+    ).label('weighted_score')
+
+    top_list_query = db.session.query(MasterRecord, weighted_score_formula).filter(
+        MasterRecord.scored_by >= m,
+        MasterRecord.score.isnot(None)
     ).order_by(
-        # 2. Sonuçları bu önceliklere göre sıralıyoruz.
-        MasterRecord.popularity, # ANA SIRALAMA: En popüler olan (en düşük sayı) en üste gelir.
-        type_priority          # İKİNCİL SIRALAMA: Popülerlikleri aynıysa, tür önceliği devreye girer.
-    ).limit(10).all()
+        weighted_score_formula.desc()
+    ).limit(50).all()
+    
+    return render_template('top_records.html', title='En İyiler', top_list=top_list_query)
 
-    # Sonuçları dict'e çevirirken sadece MasterRecord'u al
-    results_dict = [{'id': record.MasterRecord.id, 'title': record.MasterRecord.original_title, 'image': record.MasterRecord.image_url, 'type': record.MasterRecord.mal_type} for record in results_query]
-    return jsonify(results_dict)
+# --- API Endpoints ---
+
+@main_bp.route('/api/advanced-search')
+def advanced_search():
+    """Gelişmiş arama ve sonsuz kaydırma için API."""
+    page = request.args.get('page', 1, type=int)
+    per_page = 20
+    query = request.args.get('q', '', type=str)
+    tags = request.args.get('tags', '', type=str)
+    studio = request.args.get('studio', '', type=str)
+    sort_by = request.args.get('sort_by', 'popularity', type=str)
+    
+    base_query = MasterRecord.query
+
+    if query:
+        search_term = f"%{query}%"
+        base_query = base_query.filter(db.or_(MasterRecord.original_title.ilike(search_term), MasterRecord.english_title.ilike(search_term)))
+    
+    if tags:
+        tag_list = [f"%{tag.strip()}%" for tag in tags.split(',')]
+        for tag in tag_list:
+            base_query = base_query.filter(MasterRecord.tags.ilike(tag))
+            
+    if studio:
+        base_query = base_query.filter(MasterRecord.studios == studio)
+        
+    if sort_by == 'score':
+        base_query = base_query.order_by(MasterRecord.score.desc().nullslast())
+    else:
+        base_query = base_query.order_by(MasterRecord.popularity.asc().nullslast())
+
+    pagination = base_query.paginate(page=page, per_page=per_page, error_out=False)
+    results = pagination.items
+    
+    user_list_record_ids = set()
+    if current_user.is_authenticated:
+        user_list_record_ids = {item.master_record_id for item in current_user.list_items}
+
+    results_dict = [{
+        'id': record.id, 'title': record.original_title, 'image': record.image_url, 
+        'type': record.mal_type, 'synopsis': record.synopsis, 'score': record.score,
+        'in_list': record.id in user_list_record_ids
+    } for record in results]
+    
+    return jsonify({
+        'results': results_dict,
+        'has_next': pagination.has_next
+    })
+
+
+@main_bp.route('/list/update/<int:user_list_id>', methods=['POST'])
+@login_required
+def update_list_item(user_list_id):
+    item = UserList.query.get_or_404(user_list_id)
+    if item.user_id != current_user.id: return jsonify({'success': False, 'message': 'Yetkisiz işlem.'}), 403
+    data = request.get_json()
+    item.status = data.get('status', item.status)
+    item.current_chapter = data.get('current_chapter', item.current_chapter)
+    item.user_score = data.get('user_score', item.user_score)
+    item.notes = data.get('notes', item.notes)
+    db.session.commit()
+    flash("Kayıt başarıyla güncellendi!", "success")
+    return jsonify({'success': True})
 
 @main_bp.route('/list/add/<int:record_id>', methods=['POST'])
 @login_required
@@ -60,21 +143,7 @@ def add_to_list(record_id):
     new_list_item = UserList(user_id=current_user.id, master_record_id=record_id, status='Planlandı')
     db.session.add(new_list_item)
     db.session.commit()
-    flash(f"'{master_record.original_title}' başarıyla listenize eklendi!", "success")
-    return jsonify({'success': True})
-
-@main_bp.route('/list/update/<int:user_list_id>', methods=['POST'])
-@login_required
-def update_list_item(user_list_id):
-    item = UserList.query.get_or_404(user_list_id)
-    if item.user_id != current_user.id: return jsonify({'success': False, 'message': 'Yetkisiz işlem.'}), 403
-    data = request.get_json()
-    item.status = data.get('status', item.status)
-    item.current_chapter = data.get('current_chapter', item.current_chapter)
-    item.notes = data.get('notes', item.notes)
-    db.session.commit()
-    flash("Kayıt başarıyla güncellendi!", "success")
-    return jsonify({'success': True})
+    return jsonify({'success': True, 'message': f"'{master_record.original_title}' başarıyla listenize eklendi!"})
 
 @main_bp.route('/list/delete/<int:user_list_id>', methods=['POST'])
 @login_required
@@ -83,5 +152,4 @@ def delete_list_item(user_list_id):
     if item.user_id != current_user.id: return jsonify({'success': False, 'message': 'Yetkisiz işlem.'}), 403
     db.session.delete(item)
     db.session.commit()
-    flash("Kayıt listenizden başarıyla kaldırıldı.", "success")
-    return jsonify({'success': True})
+    return jsonify({'success': True, 'message': "Kayıt listenizden başarıyla kaldırıldı."})

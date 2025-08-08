@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1 class="page-title">{{ _('En Popüler Seriler') }}</h1>
+    <p style="color: var(--text-secondary); margin-top: -1.5rem; margin-bottom: 2rem;">{{ _('Sıralama, MyAnimeList verileri kullanılarak hesaplanan ağırlıklı puana göre yapılmıştır.') }}</p>
+    
+    <div class="top-list">
+    {% for record, weighted_score in top_list %}
+        <div class="top-list-item">
+            <span class="top-rank">#{{ loop.index }}</span>
+            <img src="{{ record.image_url or 'https://via.placeholder.com/80x120.png?text=N/A' }}" alt="{{ record.original_title }}" class="top-image">
+            <div class="top-info">
+                <div>
+                    <a href="#" class="top-title">{{ record.original_title }}</a>
+                    <div class="top-details">
+                        <span>{{ record.mal_type }}</span>
+                        <span>&bull;</span>
+                        <span>{{ record.release_year }}</span>
+                        <span>&bull;</span>
+                        <span>{{ record.total_episodes or '?' }} {{ _('bölüm') if record.record_type == 'Anime' else _('chapter') }}</span>
+                    </div>
+                    <p class="top-synopsis">{{ record.synopsis or _('Konu bilgisi mevcut değil.') }}</p>
+                </div>
+            </div>
+            <div class="top-score-container">
+                <div class="top-score">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20px" height="20px" style="margin-right: 4px;"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.007z" clip-rule="evenodd"></path></svg>
+                    <span>{{ '%.2f'|format(record.score) }}</span>
+                </div>
+                <div class="top-details" style="text-align: right;">{{ "{:,.0f}".format(record.scored_by) }} {{ _('kullanıcı') }}</div>
+            </div>
+        </div>
+    {% else %}
+        <p>{{ _('Sıralanacak yeterli kayıt bulunamadı.') }}</p>
+    {% endfor %}
+    </div>
+{% endblock %}

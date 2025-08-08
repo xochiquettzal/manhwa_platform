@@ -1,4 +1,4 @@
-# models.py (mal_id ve Zengin Veri Alanları Eklenmiş Final Hali)
+# models.py (Nihai Sürüm - user_score alanı eklendi)
 
 from extensions import db
 from flask_login import UserMixin
@@ -10,6 +10,7 @@ class UserList(db.Model):
     master_record_id = db.Column(db.Integer, db.ForeignKey('master_record.id'), nullable=False)
     status = db.Column(db.String(50), default='Planlandı')
     current_chapter = db.Column(db.Integer, default=0)
+    user_score = db.Column(db.Integer, default=0) # YENİ: Kullanıcının 1-10 arası puanı (0 = Puanlanmamış)
     notes = db.Column(db.Text)
     record = db.relationship('MasterRecord')
 
@@ -44,3 +45,4 @@ class MasterRecord(db.Model):
     total_episodes = db.Column(db.Integer)
     score = db.Column(db.Float)
     popularity = db.Column(db.Integer)
+    scored_by = db.Column(db.Integer)

@@ -1,11 +1,21 @@
 <!DOCTYPE html>
-<html>
-<body>
-    <h3>{{ _('Hesap Onayı') }}</h3>
+<html lang="{{ get_locale() }}">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ _('Hesap Onayı') }}</title>
+</head>
+<body style="font-family: sans-serif; padding: 20px; line-height: 1.6;">
+    <h2 style="color: #333;">{{ _('Hesabınızı Onaylayın') }}</h2>
     <p>{{ _('Merhaba') }} {{ user.username }},</p>
-    <p>{{ _('Hesabını onaylamak için lütfen aşağıdaki linke tıkla:') }}</p>
-    <p><a href="{{ confirm_url }}">{{ confirm_url }}</a></p>
-    <br>
-    <p>{{ _('Eğer bu isteği sen yapmadıysan, bu e-postayı görmezden gelebilirsin.') }}</p>
+    <p>{{ _('Lyst. hesabınızı aktif hale getirmek için lütfen aşağıdaki linke tıklayın:') }}</p>
+    <p style="margin: 25px 0;">
+        <a href="{{ confirm_url }}" style="background-color: #3b82f6; color: #ffffff; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+            {{ _('Hesabı Onayla') }}
+        </a>
+    </p>
+    <p style="color: #666; font-size: 0.9em;">{{ _('Eğer bu link çalışmazsa, aşağıdaki adresi kopyalayıp tarayıcınıza yapıştırabilirsiniz:') }}</p>
+    <p style="font-size: 0.8em; color: #888;">{{ confirm_url }}</p>
+    <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+    <p style="color: #999; font-size: 0.8em;">{{ _('Eğer bu isteği siz yapmadıysanız, bu e-postayı görmezden gelebilirsiniz.') }}</p>
 </body>
 </html>
