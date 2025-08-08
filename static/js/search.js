@@ -88,12 +88,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="card-info">
                     <h3 class="card-title">${record.title}</h3>
                     <div class="card-bottom-info">
-                        <small>${record.type || ''}</small>
+                        <small>${record.type || ''} ${record.release_year ? '• ' + record.release_year : ''}</small>
                         <button class="add-to-list-btn ${record.in_list ? 'in-list' : ''}" 
                                 data-id="${record.id}" 
                                 title="${record.in_list ? 'Zaten Listede' : 'Listeye Ekle'}">
                             ${record.in_list ? '✓' : '+'}
                         </button>
+                    </div>
+                    <div class="card-bottom-info" style="margin-top: .25rem;">
+                        <div class="badges-row">
+                            ${record.status ? `<span class="badge ${record.status && record.status.toLowerCase().includes('airing') ? 'status-airing' : 'status-finished'}">${record.status}</span>` : ''}
+                            ${record.total_episodes ? `<span class="badge episodes">${record.total_episodes} bölüm</span>` : ''}
+                        </div>
+                        ${record.score ? `<small style="color: var(--accent-primary); font-weight: 700;">⭐ ${record.score.toFixed ? record.score.toFixed(2) : record.score}</small>` : ''}
                     </div>
                 </div>
             `;
@@ -180,6 +187,16 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!tagPanel.contains(e.target) && e.target !== tagToggle) tagPanel.classList.remove('open');
         });
         tagPanel.addEventListener('change', () => { refreshChips(); resetAndFetch(); });
+        const filterText = document.getElementById('filter-text-search');
+        if (filterText) {
+            filterText.addEventListener('input', () => {
+                const q = filterText.value.toLowerCase();
+                tagPanel.querySelectorAll('.tag-item').forEach(el => {
+                    const name = (el.textContent || '').toLowerCase();
+                    el.style.display = name.includes(q) ? 'flex' : 'none';
+                });
+            });
+        }
     }
     if (tagApply) tagApply.addEventListener('click', () => { tagPanel.classList.remove('open'); resetAndFetch(); });
     if (tagClear) tagClear.addEventListener('click', () => {

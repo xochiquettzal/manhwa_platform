@@ -168,9 +168,39 @@ document.addEventListener('DOMContentLoaded', function() {
     // initial selected chips render
     refreshChips();
     
+    // --- KARTTA +1 BÖLÜM ---
+    listContainer.addEventListener('click', async (e) => {
+        const incBtn = e.target.closest('.inc-chapter-btn');
+        const card = e.target.closest('.manhwa-card');
+        if (incBtn && card) {
+            e.stopPropagation();
+            const userListId = card.dataset.userListId;
+            const total = parseInt(card.dataset.totalEpisodes || '0', 10) || 0;
+            const current = parseInt(card.dataset.chapter || '0', 10) || 0;
+            const next = total > 0 ? Math.min(current + 1, total) : current + 1;
+            if (next === current) return; // zaten maksimum
+
+            const payload = { current_chapter: next };
+            const response = await fetch(`/list/update/${userListId}`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+            });
+            if (response.ok) {
+                card.dataset.chapter = String(next);
+                const counter = card.querySelector('.card-bottom-info span');
+                if (counter) {
+                    const totalText = total ? ` / ${total}` : '';
+                    counter.textContent = `Bölüm: ${next}${totalText}`;
+                }
+            } else {
+                alert('Güncelleme sırasında bir hata oluştu.');
+            }
+        }
+    });
+
     // --- GÜNCELLEME MODALI'NI AÇMA ---
     listItems.forEach(item => {
-        item.addEventListener('click', () => {
+        item.addEventListener('click', (e) => {
+            if (e.target.closest('.inc-chapter-btn')) return;
             const recordType = item.dataset.recordType;
             const statusSelect = updateForm.querySelector('#status-input');
             
@@ -190,6 +220,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const source = item.dataset.source;
             const studios = item.dataset.studios;
             const tags = item.dataset.tags;
+            const themes = item.dataset.themes;
+            const demographics = item.dataset.demographics;
 
             updateModal.querySelector('#user-list-id-input').value = item.dataset.userListId;
             updateModal.querySelector('#update-modal-title').textContent = item.dataset.recordTitle;
@@ -199,6 +231,8 @@ document.addEventListener('DOMContentLoaded', function() {
             updateModal.querySelector('#details-release-year').textContent = releaseYear || 'N/A';
             updateModal.querySelector('#details-source').textContent = source || 'N/A';
             updateModal.querySelector('#details-studios').textContent = studios || 'N/A';
+            const demEl = updateModal.querySelector('#details-demographics'); if (demEl) demEl.textContent = demographics || 'N/A';
+            const thEl = updateModal.querySelector('#details-themes'); if (thEl) thEl.textContent = themes || 'N/A';
 
             const tagsContainer = updateModal.querySelector('#details-tags');
             tagsContainer.innerHTML = '';
@@ -213,7 +247,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 tagsContainer.textContent = 'N/A';
             }
             
-            updateForm.querySelector('#chapter-input').value = item.dataset.chapter;
+            const totalEpisodes = parseInt(item.dataset.totalEpisodes || '0', 10) || 0;
+            const chapterInput = updateForm.querySelector('#chapter-input');
+            chapterInput.value = item.dataset.chapter;
+            if (totalEpisodes > 0) { chapterInput.setAttribute('max', String(totalEpisodes)); }
             updateForm.querySelector('#user-score-input').value = item.dataset.userScore;
             updateForm.querySelector('#notes-input').value = item.dataset.notes;
             

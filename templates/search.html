@@ -25,6 +25,7 @@
                 <button type="button" class="filter-btn tag-toggle" id="search-tag-toggle">{{ _('Filtreler') }}</button>
                 <div class="selected-chips" id="search-selected-chips"></div>
                 <div class="tag-panel" id="search-tag-panel">
+                    <input id="filter-text-search" type="text" placeholder="{{ _('Filtrelerde ara...') }}" class="search-box" style="height: 36px; padding-left: .75rem; margin-bottom: .5rem;">
                     <div class="tag-list">
                         <strong style="grid-column: 1 / -1; color: var(--text-primary);">{{ _('Genre') }}</strong>
                         {% for tag in tags %}

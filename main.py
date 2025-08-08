@@ -159,8 +159,16 @@ def advanced_search():
         user_list_record_ids = {item.master_record_id for item in current_user.list_items}
 
     results_dict = [{
-        'id': record.id, 'title': record.original_title, 'image': record.image_url, 
-        'type': record.mal_type, 'synopsis': record.synopsis, 'score': record.score,
+        'id': record.id,
+        'title': record.original_title,
+        'image': record.image_url,
+        'type': record.mal_type,
+        'record_type': record.record_type,
+        'synopsis': record.synopsis,
+        'score': record.score,
+        'status': record.status,
+        'release_year': record.release_year,
+        'total_episodes': record.total_episodes,
         'in_list': record.id in user_list_record_ids
     } for record in results]
     
@@ -177,7 +185,18 @@ def update_list_item(user_list_id):
     if item.user_id != current_user.id: return jsonify({'success': False, 'message': 'Yetkisiz işlem.'}), 403
     data = request.get_json()
     item.status = data.get('status', item.status)
-    item.current_chapter = data.get('current_chapter', item.current_chapter)
+    # Bölüm sayısını toplam bölümle sınırla
+    requested_chapter = data.get('current_chapter', item.current_chapter)
+    try:
+        requested_chapter = int(requested_chapter)
+    except Exception:
+        requested_chapter = item.current_chapter
+    total_eps = item.record.total_episodes or 0
+    if total_eps and requested_chapter > total_eps:
+        requested_chapter = total_eps
+    if requested_chapter < 0:
+        requested_chapter = 0
+    item.current_chapter = requested_chapter
     item.user_score = data.get('user_score', item.user_score)
     item.notes = data.get('notes', item.notes)
     db.session.commit()
