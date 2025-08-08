@@ -55,11 +55,7 @@ def create_app():
         from main import main_bp
         app.register_blueprint(main_bp)
 
-    @app.route('/language/<lang>')
-    def set_language(lang=None):
-        if lang in app.config['LANGUAGES']:
-            session['language'] = lang
-        return redirect(request.referrer or url_for('main.index'))
+
 
     @app.route('/uploads/<path:filename>')
     def uploaded_file(filename):

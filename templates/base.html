@@ -22,6 +22,8 @@
             </div>
 
             <div class="header-actions">
+                <a href="{{ url_for('main.set_language', lang='tr') }}" class="header-link" style="font-weight: 600; {% if get_locale() == 'tr' %}color: var(--accent-primary);{% endif %}">TR</a>
+                <a href="{{ url_for('main.set_language', lang='en') }}" class="header-link" style="font-weight: 600; {% if get_locale() == 'en' %}color: var(--accent-primary);{% endif %}">EN</a>
                 {% if current_user.is_authenticated %}
                     {% if current_user.is_admin %}
                         <a href="{{ url_for('admin.dashboard') }}" class="header-link">{{ _('Admin') }}</a>

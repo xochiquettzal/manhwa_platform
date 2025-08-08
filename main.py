@@ -200,7 +200,8 @@ def update_list_item(user_list_id):
     item.user_score = data.get('user_score', item.user_score)
     item.notes = data.get('notes', item.notes)
     db.session.commit()
-    flash("Kayıt başarıyla güncellendi!", "success")
+    if not data.get('silent'):
+        flash("Kayıt başarıyla güncellendi!", "success")
     return jsonify({'success': True})
 
 @main_bp.route('/list/add/<int:record_id>', methods=['POST'])
@@ -223,3 +224,34 @@ def delete_list_item(user_list_id):
     db.session.delete(item)
     db.session.commit()
     return jsonify({'success': True, 'message': "Kayıt listenizden başarıyla kaldırıldı."})
+
+@main_bp.route('/api/record/<int:record_id>')
+def get_record_details(record_id):
+    """Search modalı için kayıt detaylarını döndürür."""
+    record = MasterRecord.query.get_or_404(record_id)
+    return jsonify({
+        'id': record.id,
+        'original_title': record.original_title,
+        'english_title': record.english_title,
+        'image_url': record.image_url,
+        'synopsis': record.synopsis,
+        'release_year': record.release_year,
+        'source': record.source,
+        'studios': record.studios,
+        'demographics': record.demographics,
+        'themes': record.themes,
+        'tags': record.tags,
+        'record_type': record.record_type,
+        'mal_type': record.mal_type,
+        'total_episodes': record.total_episodes,
+        'score': record.score,
+        'status': record.status
+    })
+
+@main_bp.route('/language/<lang>')
+def set_language(lang=None):
+    """Dil değiştirme endpointi."""
+    from flask import session
+    if lang in ['tr', 'en']:
+        session['language'] = lang
+    return redirect(request.referrer or url_for('main.index'))

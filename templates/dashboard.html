@@ -95,6 +95,12 @@
                         </span>
                         {% endif %}
                     </div>
+                    {% if item.record.total_episodes %}
+                        {% set pct = (item.list_item.current_chapter * 100 / (item.record.total_episodes if item.record.total_episodes else 1)) | round(0, 'floor') %}
+                        <div class="progress-bar" title="{{ pct }}%">
+                            <div class="progress" data-pct="{{ pct }}"></div>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         {% else %}

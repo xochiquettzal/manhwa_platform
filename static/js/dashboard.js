@@ -25,6 +25,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const updateForm = document.getElementById('update-item-form');
     const closeModalBtn = document.getElementById('close-update-modal-btn');
     const listItems = listContainer.querySelectorAll('.manhwa-card');
+    const updateCardProgress = (card) => {
+        if (!card) return;
+        const total = parseInt(card.dataset.totalEpisodes || '0', 10) || 0;
+        const current = parseInt(card.dataset.chapter || '0', 10) || 0;
+        if (total > 0) {
+            const pct = Math.floor((current * 100) / total);
+            const progress = card.querySelector('.progress');
+            if (progress) progress.style.width = `${pct}%`;
+        }
+    };
     const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
     const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
     let itemToDeleteId = null;
@@ -180,7 +190,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const next = total > 0 ? Math.min(current + 1, total) : current + 1;
             if (next === current) return; // zaten maksimum
 
-            const payload = { current_chapter: next };
+            const payload = { current_chapter: next, silent: true };
             const response = await fetch(`/list/update/${userListId}`, {
                 method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
             });
@@ -191,6 +201,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const totalText = total ? ` / ${total}` : '';
                     counter.textContent = `Bölüm: ${next}${totalText}`;
                 }
+                updateCardProgress(card);
             } else {
                 alert('Güncelleme sırasında bir hata oluştu.');
             }
@@ -251,12 +262,16 @@ document.addEventListener('DOMContentLoaded', function() {
             const chapterInput = updateForm.querySelector('#chapter-input');
             chapterInput.value = item.dataset.chapter;
             if (totalEpisodes > 0) { chapterInput.setAttribute('max', String(totalEpisodes)); }
+            updateCardProgress(item);
             updateForm.querySelector('#user-score-input').value = item.dataset.userScore;
             updateForm.querySelector('#notes-input').value = item.dataset.notes;
             
             openModal(updateModal);
         });
     });
+
+    // İlk yüklemede progressleri hizala
+    listItems.forEach(updateCardProgress);
 
     // --- MODAL KAPATMA ---
     closeModalBtn.addEventListener('click', () => closeModal(updateModal));

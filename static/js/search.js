@@ -119,15 +119,22 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     // --- SONSUZ KAYDIRMA (INFINITE SCROLL) ---
-    window.onscroll = () => {
-        if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500 && !isLoading && hasNextPage) {
-            currentPage++;
-            fetchResults(currentPage, true);
-        }
-    };
+    const sentinel = document.createElement('div');
+    sentinel.id = 'infinite-sentinel';
+    resultsContainer.after(sentinel);
+    const io = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting && !isLoading && hasNextPage) {
+                currentPage++;
+                fetchResults(currentPage, true);
+            }
+        });
+    }, { rootMargin: '600px 0px 600px 0px' });
+    io.observe(sentinel);
     
     // --- OLAY DİNLEYİCİLERİ ---
     let searchTimeout;
+    let inflightController;
     const toggleClear = () => {
         if (!clearBtn) return;
         if (searchBox.value && searchBox.value.length > 0) clearBtn.classList.remove('hidden');
@@ -135,7 +142,8 @@ document.addEventListener('DOMContentLoaded', function() {
     };
     searchBox.addEventListener('keyup', () => {
         clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(resetAndFetch, 500);
+        if (inflightController) { inflightController.abort(); }
+        searchTimeout = setTimeout(resetAndFetch, 350);
         toggleClear();
     });
     toggleClear();
@@ -234,7 +242,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         } else if (targetCard) {
             const recordId = targetCard.dataset.recordId;
-            const response = await fetch(`/admin/api/record/${recordId}`);
+            const response = await fetch(`/api/record/${recordId}`);
             if(!response.ok) return;
 
             const record = await response.json();
