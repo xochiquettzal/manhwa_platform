@@ -11,7 +11,13 @@ load_dotenv()
 
 def create_app():
     app = Flask(__name__)
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///platform.db'
+    # Render PostgreSQL için DATABASE_URL ortam değişkenini kullan,
+    # yoksa yerel geliştirme için sqlite kullan.
+    database_url = os.environ.get('DATABASE_URL')
+    if database_url and database_url.startswith("postgres://"):
+        database_url = database_url.replace("postgres://", "postgresql://", 1)
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url or 'sqlite:///platform.db'
+    
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'default-super-secret-key-change-it')
     app.config['UPLOAD_FOLDER'] = 'uploads'
     app.config['LANGUAGES'] = ['en', 'tr']
@@ -70,3 +76,6 @@ if __name__ == '__main__':
         if not os.path.exists(upload_folder_path):
             os.makedirs(upload_folder_path)
     app.run(debug=True)
+
+# Gunicorn'un kullanması için app nesnesini oluştur
+app = create_app()

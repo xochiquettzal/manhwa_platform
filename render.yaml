@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: manhwa-platform
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn app:app"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: manhwa-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: PYTHON_VERSION
+        value: 3.11.4 # Kullandığınız Python sürümüne göre güncelleyebilirsiniz
+
+databases:
+  - name: manhwa-db
+    databaseName: manhwa_db
+    user: manhwa_user
+    plan: free # Ücretsiz planı kullanır
