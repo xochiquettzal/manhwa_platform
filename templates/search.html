@@ -2,24 +2,65 @@
 {% block content %}
     <h1 class="page-title">{{ _('Kütüphanede Ara') }}</h1>
     <div class="page-controls">
-        <div id="search-container">
-            <div class="search-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M10.5 3.75a6.75 6.75 0 100 13.5 6.75 6.75 0 000-13.5zM2.25 10.5a8.25 8.25 0 1114.59 5.28l4.69 4.69a.75.75 0 11-1.06 1.06l-4.69-4.69A8.25 8.25 0 012.25 10.5z" clip-rule="evenodd" /></svg></div>
-            <input type="text" id="search-box" placeholder="{{ _('Anime, manga, vb. ara...') }}">
+        <div id="search-container" class="search-container">
+            <div class="search-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path fill-rule="evenodd" d="M10.5 3.75a6.75 6.75 0 100 13.5 6.75 6.75 0 000-13.5zM2.25 10.5a8.25 8.25 0 1114.59 5.28l4.69 4.69a.75.75 0 11-1.06 1.06l-4.69-4.69A8.25 8.25 0 012.25 10.5z" clip-rule="evenodd" /></svg></div>
+            <input type="text" id="search-box" class="search-box" placeholder="{{ _('Anime, manga, vb. ara...') }}" autocomplete="off">
+            <button id="search-clear-btn" class="search-clear-btn hidden" aria-label="{{ _('Temizle') }}">&times;</button>
         </div>
         <!-- GELİŞMİŞ FİLTRELEME ALANI -->
-        <div id="filter-container" class="search-filters">
-            <select id="studio-filter" class="filter-btn">
+        <div id="filter-container" class="filters-group">
+            <select id="studio-filter" class="filter-btn" style="max-width: 240px;">
                 <option value="">{{ _('Tüm Stüdyolar') }}</option>
                 {% for studio in studios %}
                     <option value="{{ studio }}">{{ studio }}</option>
                 {% endfor %}
             </select>
+            <select id="year-filter" class="filter-btn">
+                <option value="">{{ _('Tüm Yıllar') }}</option>
+                {% for y in years %}
+                    <option value="{{ y }}">{{ y }}</option>
+                {% endfor %}
+            </select>
+            <div id="search-tag-multiselect" class="tag-multiselect">
+                <button type="button" class="filter-btn tag-toggle" id="search-tag-toggle">{{ _('Filtreler') }}</button>
+                <div class="selected-chips" id="search-selected-chips"></div>
+                <div class="tag-panel" id="search-tag-panel">
+                    <div class="tag-list">
+                        <strong style="grid-column: 1 / -1; color: var(--text-primary);">{{ _('Genre') }}</strong>
+                        {% for tag in tags %}
+                        <label class="tag-item">
+                            <input type="checkbox" data-kind="genre" value="{{ tag }}">
+                            <span>{{ tag }}</span>
+                        </label>
+                        {% endfor %}
+                        <strong style="grid-column: 1 / -1; margin-top: .5rem; color: var(--text-primary);">{{ _('Theme') }}</strong>
+                        {% for tag in themes %}
+                        <label class="tag-item">
+                            <input type="checkbox" data-kind="theme" value="{{ tag }}">
+                            <span>{{ tag }}</span>
+                        </label>
+                        {% endfor %}
+                        <strong style="grid-column: 1 / -1; margin-top: .5rem; color: var(--text-primary);">{{ _('Demografi') }}</strong>
+                        {% for tag in demographics %}
+                        <label class="tag-item">
+                            <input type="checkbox" data-kind="demographic" value="{{ tag }}">
+                            <span>{{ tag }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                    <div class="tag-actions">
+                        <button type="button" class="btn btn-secondary" id="search-clear-tags">{{ _('Temizle') }}</button>
+                        <button type="button" class="btn btn-primary" id="search-apply-tags">{{ _('Uygula') }}</button>
+                    </div>
+                </div>
+            </div>
             <select id="sort-by-filter" class="filter-btn">
                 <option value="popularity">{{ _('Popülerliğe Göre Sırala') }}</option>
                 <option value="score">{{ _('Puana Göre Sırala') }}</option>
             </select>
         </div>
     </div>
+    <div id="search-selected-bar" class="selected-bar"></div>
     <div id="results-container">
         <!-- Arama sonuçları JavaScript ile buraya yüklenecek -->
     </div>
@@ -36,10 +77,12 @@
                     <img id="details-image" src="" alt="Kapak Fotoğrafı" class="details-image">
                     <div class="details-form-container">
                         <h2 id="details-title"></h2>
-                         <div class="details-bottom-section" style="margin-top: 0;">
+            <div class="details-bottom-section" style="margin-top: 0;">
                             <div class="info-item"><span class="info-label">{{ _('Yayın Yılı:') }}</span> <span id="details-release-year"></span></div>
                             <div class="info-item"><span class="info-label">{{ _('Kaynak:') }}</span> <span id="details-source"></span></div>
                             <div class="info-item"><span class="info-label">{{ _('Stüdyo:') }}</span> <span id="details-studios"></span></div>
+                <div class="info-item"><span class="info-label">{{ _('Demografi:') }}</span> <span id="details-demographics"></span></div>
+                <div class="info-item"><span class="info-label">{{ _('Tema:') }}</span> <span id="details-themes"></span></div>
                             <div class="info-item tags full-width"><span class="info-label">{{ _('Etiketler:') }}</span> <span id="details-tags"></span></div>
                         </div>
                     </div>

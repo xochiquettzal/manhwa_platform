@@ -2,13 +2,9 @@
 
 {% block content %}
     <h1 class="page-title">{{ _('Listem') }}</h1>
+    <!-- Üst sıra: Durum filtreleri -->
     <div class="page-controls">
-        <!-- ID'ler bu sayfaya özel olarak değiştirildi -->
-        <div id="my-list-search-container" class="search-container">
-            <div class="search-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M10.5 3.75a6.75 6.75 0 100 13.5 6.75 6.75 0 000-13.5zM2.25 10.5a8.25 8.25 0 1114.59 5.28l4.69 4.69a.75.75 0 11-1.06 1.06l-4.69-4.69A8.25 8.25 0 012.25 10.5z" clip-rule="evenodd" /></svg></div>
-            <input type="text" id="my-list-search-box" class="search-box" placeholder="{{ _('Listemde ara...') }}">
-        </div>
-        <div id="my-list-filter-container" class="filter-container">
+        <div id="my-list-status-container" class="segmented-group">
             <button class="filter-btn active" data-status="all">{{ _('Tümü') }}</button>
             <button class="filter-btn" data-status="İzleniyor">{{ _('İzleniyor') }}</button>
             <button class="filter-btn" data-status="Okunuyor">{{ _('Okunuyor') }}</button>
@@ -17,6 +13,49 @@
             <button class="filter-btn" data-status="Bırakıldı">{{ _('Bırakıldı') }}</button>
         </div>
     </div>
+
+    <!-- Alt sıra: Arama ve ileri filtreler -->
+    <div class="page-controls">
+        <div id="my-list-search-container" class="search-container">
+            <div class="search-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path fill-rule="evenodd" d="M10.5 3.75a6.75 6.75 0 100 13.5 6.75 6.75 0 000-13.5zM2.25 10.5a8.25 8.25 0 1114.59 5.28l4.69 4.69a.75.75 0 11-1.06 1.06l-4.69-4.69A8.25 8.25 0 012.25 10.5z" clip-rule="evenodd" /></svg></div>
+            <input type="text" id="my-list-search-box" class="search-box" placeholder="{{ _('Listemde ara...') }}" autocomplete="off">
+            <button id="my-list-clear-btn" class="search-clear-btn hidden" aria-label="{{ _('Temizle') }}">&times;</button>
+        </div>
+        <div id="my-list-filters" class="filters-group">
+            <select id="my-list-year-filter" class="filter-btn filter-select">
+                <option value="">{{ _('Tüm Yıllar') }}</option>
+                {% for y in years %}
+                    <option value="{{ y }}">{{ y }}</option>
+                {% endfor %}
+            </select>
+            <select id="my-list-studio-filter" class="filter-btn filter-select">
+                <option value="">{{ _('Tüm Stüdyolar') }}</option>
+                {% for studio in studios %}
+                    <option value="{{ studio }}">{{ studio }}</option>
+                {% endfor %}
+            </select>
+            <div id="my-list-tag-multiselect" class="tag-multiselect">
+                <button type="button" class="filter-btn tag-toggle" id="my-list-tag-toggle">{{ _('Filtreler') }}</button>
+                <div class="tag-panel" id="my-list-tag-panel">
+                    <div class="tag-list">
+                        <strong style="grid-column: 1 / -1; color: var(--text-primary);">{{ _('Genre') }}</strong>
+                        {% for tag in tags %}
+                        <label class="tag-item">
+                            <input type="checkbox" data-kind="genre" value="{{ tag }}">
+                            <span>{{ tag }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                    <div class="tag-actions">
+                        <button type="button" class="btn btn-secondary" id="my-list-clear-tags">{{ _('Temizle') }}</button>
+                        <button type="button" class="btn btn-primary" id="my-list-apply-tags">{{ _('Uygula') }}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="my-list-selected-bar" class="selected-bar"></div>
     
     <div id="results-container">
         {% for item in user_list %}
@@ -39,7 +78,12 @@
                 <div class="card-info">
                     <h3 class="card-title">{{ item.record.original_title }}</h3>
                     <div class="card-bottom-info">
-                        <span>{{ _('Bölüm:') }} {{ item.list_item.current_chapter }}</span>
+                        <span>
+                            {{ _('Bölüm:') }} {{ item.list_item.current_chapter }}
+                            {% if item.record.total_episodes %}
+                                / {{ item.record.total_episodes }}
+                            {% endif %}
+                        </span>
                         {% if item.list_item.user_score > 0 %}
                         <span class="user-score">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.007z" clip-rule="evenodd" /></svg>
@@ -84,6 +128,8 @@
                     <div class="info-item"><span class="info-label">{{ _('Yayın Yılı:') }}</span> <span id="details-release-year"></span></div>
                     <div class="info-item"><span class="info-label">{{ _('Kaynak:') }}</span> <span id="details-source"></span></div>
                     <div class="info-item"><span class="info-label">{{ _('Stüdyo:') }}</span> <span id="details-studios"></span></div>
+                    <div class="info-item"><span class="info-label">{{ _('Demografi:') }}</span> <span id="details-demographics"></span></div>
+                    <div class="info-item"><span class="info-label">{{ _('Tema:') }}</span> <span id="details-themes"></span></div>
                     <div class="info-item tags full-width"><span class="info-label">{{ _('Etiketler:') }}</span> <span id="details-tags"></span></div>
                     <div class="details-notes full-width"><h3 class="info-label">{{ _('Konu') }}</h3><p id="details-synopsis"></p></div>
                 </div>

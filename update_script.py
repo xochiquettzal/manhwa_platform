@@ -36,12 +36,32 @@ def update_dynamic_data():
                     print(f"--> Uyarı: {record.original_title} için API'den 'data' alınamadı, atlanıyor.")
                     continue
                 
-                # Verileri güncelle
+                # Verileri güncelle (dinamik alanlar + yeni alanlar)
                 record.score = data.get('score')
                 record.popularity = data.get('popularity')
                 record.scored_by = data.get('scored_by')
+                record.members = data.get('members')
+                record.favorites = data.get('favorites')
+
+                # Status ve yayın tarihleri: geçişleri yakala
+                aired = data.get('aired') or {}
+                from_date = aired.get('from')
+                to_date = aired.get('to')
+                record.aired_from = from_date or record.aired_from
+                record.aired_to = to_date or record.aired_to
+                # Themes (bazı serilerde returns under "themes" array)
+                theme_names = []
+                for t in (data.get('themes') or []):
+                    name = t.get('name') if isinstance(t, dict) else None
+                    if name: theme_names.append(name)
+                if theme_names:
+                    record.themes = ", ".join(sorted(set(theme_names)))
+
+                # Status değişimi (Currently Airing -> Finished Airing gibi)
+                status_from_api = data.get('status')
+                record.status = status_from_api or record.status
                 
-                print(f"--> Guncellendi: Puan: {record.score}, Popülerlik: {record.popularity}, Oylayan: {record.scored_by}")
+                print(f"--> Guncellendi: Puan: {record.score}, Popülerlik: {record.popularity}, Oylayan: {record.scored_by}, Status: {record.status}")
                 
                 # Her başarılı güncellemeden sonra commit'lemek, bir hata durumunda
                 # önceki başarılı işlemleri korur.

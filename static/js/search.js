@@ -8,7 +8,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const loader = document.getElementById('loader');
     const detailsModal = document.getElementById('details-modal');
     const studioFilter = document.getElementById('studio-filter');
+    const yearFilter = document.getElementById('year-filter');
+    // tag multiselect controls for search
+    const tagPanel = document.getElementById('search-tag-panel');
+    const tagToggle = document.getElementById('search-tag-toggle');
+    const tagApply = document.getElementById('search-apply-tags');
+    const tagClear = document.getElementById('search-clear-tags');
+    const selectedBar = document.getElementById('search-selected-bar');
     const sortByFilter = document.getElementById('sort-by-filter');
+    const clearBtn = document.getElementById('search-clear-btn');
     
     if (!searchBox || !resultsContainer || !detailsModal) {
         console.error("Arama sayfası için gerekli elementler bulunamadı.");
@@ -21,6 +29,10 @@ document.addEventListener('DOMContentLoaded', function() {
     let hasNextPage = true;
     let currentQuery = '';
     let currentStudio = '';
+    let currentYear = '';
+    let currentTags = [];
+    let currentThemes = [];
+    let currentDemos = [];
     let currentSortBy = 'popularity';
 
     // --- YARDIMCI FONKSİYONLAR ---
@@ -36,10 +48,19 @@ document.addEventListener('DOMContentLoaded', function() {
         currentQuery = searchBox.value;
         currentStudio = studioFilter.value;
         currentSortBy = sortByFilter.value;
+        currentYear = yearFilter ? yearFilter.value : '';
+        const checked = Array.from(tagPanel ? tagPanel.querySelectorAll('input[type="checkbox"]:checked') : []);
+        currentTags = checked.filter(cb => cb.dataset.kind === 'genre').map(cb => cb.value);
+        currentThemes = checked.filter(cb => cb.dataset.kind === 'theme').map(cb => cb.value);
+        currentDemos = checked.filter(cb => cb.dataset.kind === 'demographic').map(cb => cb.value);
         
         const params = new URLSearchParams({
             q: currentQuery,
             studio: currentStudio,
+            year: currentYear,
+            tags: currentTags.join(','),
+            themes: currentThemes.join(','),
+            demographics: currentDemos.join(','),
             sort_by: currentSortBy,
             page: page
         });
@@ -100,12 +121,74 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // --- OLAY DİNLEYİCİLERİ ---
     let searchTimeout;
+    const toggleClear = () => {
+        if (!clearBtn) return;
+        if (searchBox.value && searchBox.value.length > 0) clearBtn.classList.remove('hidden');
+        else clearBtn.classList.add('hidden');
+    };
     searchBox.addEventListener('keyup', () => {
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(resetAndFetch, 500);
+        toggleClear();
     });
+    toggleClear();
+    if (clearBtn) {
+        clearBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            searchBox.value = '';
+            toggleClear();
+            resetAndFetch();
+            searchBox.focus();
+        });
+    }
 
     studioFilter.addEventListener('change', resetAndFetch);
+    if (yearFilter) yearFilter.addEventListener('change', resetAndFetch);
+    // --- TAG MULTISELECT (SEARCH) ---
+    const refreshChips = () => {
+        if (!selectedBar) return;
+        selectedBar.innerHTML = '';
+        // year
+        if (yearFilter && yearFilter.value) {
+            const chip = document.createElement('span'); chip.className = 'chip';
+            chip.innerHTML = `${yearFilter.value}<button class="remove" aria-label="Sil">&times;</button>`;
+            chip.querySelector('.remove').addEventListener('click', () => { yearFilter.value=''; resetAndFetch(); refreshChips(); });
+            selectedBar.appendChild(chip);
+        }
+        // studio
+        if (studioFilter && studioFilter.value) {
+            const chip = document.createElement('span'); chip.className = 'chip';
+            chip.innerHTML = `${studioFilter.value}<button class="remove" aria-label="Sil">&times;</button>`;
+            chip.querySelector('.remove').addEventListener('click', () => { studioFilter.value=''; resetAndFetch(); refreshChips(); });
+            selectedBar.appendChild(chip);
+        }
+        // tags
+        if (tagPanel) {
+            const checked = Array.from(tagPanel.querySelectorAll('input[type="checkbox"]:checked'));
+            checked.forEach(cb => {
+                const label = cb.dataset.kind === 'theme' ? 'Theme' : (cb.dataset.kind === 'demographic' ? 'Demo' : 'Genre');
+                const chip = document.createElement('span'); chip.className = 'chip';
+                chip.innerHTML = `${label}: ${cb.value}<button class="remove" aria-label="Sil">&times;</button>`;
+                chip.querySelector('.remove').addEventListener('click', () => { cb.checked = false; refreshChips(); resetAndFetch(); });
+                selectedBar.appendChild(chip);
+            });
+        }
+    };
+    if (tagToggle && tagPanel) {
+        tagToggle.addEventListener('click', () => tagPanel.classList.toggle('open'));
+        document.addEventListener('click', (e) => {
+            if (!tagPanel.contains(e.target) && e.target !== tagToggle) tagPanel.classList.remove('open');
+        });
+        tagPanel.addEventListener('change', () => { refreshChips(); resetAndFetch(); });
+    }
+    if (tagApply) tagApply.addEventListener('click', () => { tagPanel.classList.remove('open'); resetAndFetch(); });
+    if (tagClear) tagClear.addEventListener('click', () => {
+        if (!tagPanel) return;
+        tagPanel.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+        refreshChips();
+        resetAndFetch();
+    });
+    refreshChips();
     sortByFilter.addEventListener('change', resetAndFetch);
     
     // --- KARTLARA TIKLAMA MANTIĞI (LİSTEYE EKLEME & DETAY) ---
@@ -145,6 +228,8 @@ document.addEventListener('DOMContentLoaded', function() {
             detailsModal.querySelector('#details-release-year').textContent = record.release_year || 'N/A';
             detailsModal.querySelector('#details-source').textContent = record.source || 'N/A';
             detailsModal.querySelector('#details-studios').textContent = record.studios || 'N/A';
+            const demEl = detailsModal.querySelector('#details-demographics'); if (demEl) demEl.textContent = record.demographics || 'N/A';
+            const thEl = detailsModal.querySelector('#details-themes'); if (thEl) thEl.textContent = record.themes || 'N/A';
             const tagsContainer = detailsModal.querySelector('#details-tags');
             tagsContainer.innerHTML = '';
             if (record.tags) {

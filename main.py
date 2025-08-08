@@ -10,7 +10,7 @@ main_bp = Blueprint('main', __name__)
 @main_bp.route('/')
 def index():
     # Ana sayfa artık Top listesine yönlendiriyor
-    return redirect(url_for('main.top_records'))
+    return redirect(url_for('main.search_page'))
 
 @main_bp.route('/my-list')
 @login_required
@@ -19,20 +19,33 @@ def my_list():
     # Bu sorgu bir demet listesi döndürür: [(UserList_obj, MasterRecord_obj), ...]
     user_list_items_tuples = db.session.query(UserList, MasterRecord).join(MasterRecord).filter(UserList.user_id == current_user.id).all()
     
-    # Tüm etiketleri toplayıp filtreleme için hazırlama
+    # Filtreleme için kullanıcı listesinden etiket, yıl ve stüdyo değerlerini hazırla
     all_tags = set()
+    years = set()
+    studios = set()
     # DÖNGÜ DÜZELTMESİ: Demeti doğrudan "açıyoruz" (unpacking)
     for user_list_obj, record_obj in user_list_items_tuples:
         if record_obj and record_obj.tags:
             for tag in record_obj.tags.split(','):
                 all_tags.add(tag.strip())
+        if record_obj and record_obj.release_year:
+            years.add(record_obj.release_year)
+        if record_obj and record_obj.studios:
+            studios.add(record_obj.studios)
     
     # Şablona göndereceğimiz veriyi oluşturuyoruz
     user_list = [
         {'list_item': user_list_obj, 'record': record_obj} 
         for user_list_obj, record_obj in user_list_items_tuples
     ]
-    return render_template('dashboard.html', title='Listem', user_list=user_list, tags=sorted(list(all_tags)))
+    return render_template(
+        'dashboard.html',
+        title='Listem',
+        user_list=user_list,
+        tags=sorted(list(all_tags)),
+        years=sorted(list(years), reverse=True),
+        studios=sorted(list(studios))
+    )
 
 @main_bp.route('/search')
 def search_page():
@@ -40,6 +53,7 @@ def search_page():
     studios = db.session.query(MasterRecord.studios).filter(MasterRecord.studios.isnot(None)).distinct().order_by(MasterRecord.studios).all()
     studios = [s[0] for s in studios if s[0]]
     
+    # Genre listesi
     tags_query = db.session.query(MasterRecord.tags).filter(MasterRecord.tags.isnot(None)).all()
     all_tags = set()
     for row in tags_query:
@@ -47,7 +61,26 @@ def search_page():
             for tag in row[0].split(','):
                 all_tags.add(tag.strip())
 
-    return render_template('search.html', title='Arama', studios=studios, tags=sorted(list(all_tags)))
+    # Theme listesi
+    themes_query = db.session.query(MasterRecord.themes).filter(MasterRecord.themes.isnot(None)).all()
+    all_themes = set()
+    for row in themes_query:
+        if row[0]:
+            for tag in row[0].split(','):
+                all_themes.add(tag.strip())
+
+    # Demographics listesi
+    demos_query = db.session.query(MasterRecord.demographics).filter(MasterRecord.demographics.isnot(None)).all()
+    all_demos = set()
+    for row in demos_query:
+        if row[0]:
+            for tag in row[0].split(','):
+                all_demos.add(tag.strip())
+
+    years = db.session.query(MasterRecord.release_year).filter(MasterRecord.release_year.isnot(None)).distinct().order_by(MasterRecord.release_year.desc()).all()
+    years = [y[0] for y in years if y[0]]
+
+    return render_template('search.html', title='Arama', studios=studios, tags=sorted(list(all_tags)), themes=sorted(list(all_themes)), demographics=sorted(list(all_demos)), years=years)
 
 @main_bp.route('/top')
 def top_records():
@@ -78,6 +111,9 @@ def advanced_search():
     per_page = 20
     query = request.args.get('q', '', type=str)
     tags = request.args.get('tags', '', type=str)
+    themes = request.args.get('themes', '', type=str)
+    demos = request.args.get('demographics', '', type=str)
+    year = request.args.get('year', '', type=str)
     studio = request.args.get('studio', '', type=str)
     sort_by = request.args.get('sort_by', 'popularity', type=str)
     
@@ -91,9 +127,24 @@ def advanced_search():
         tag_list = [f"%{tag.strip()}%" for tag in tags.split(',')]
         for tag in tag_list:
             base_query = base_query.filter(MasterRecord.tags.ilike(tag))
+    if themes:
+        theme_list = [f"%{t.strip()}%" for t in themes.split(',')]
+        for t in theme_list:
+            base_query = base_query.filter(MasterRecord.themes.ilike(t))
+    if demos:
+        demo_list = [f"%{d.strip()}%" for d in demos.split(',')]
+        for d in demo_list:
+            base_query = base_query.filter(MasterRecord.demographics.ilike(d))
             
     if studio:
         base_query = base_query.filter(MasterRecord.studios == studio)
+    
+    if year:
+        try:
+            year_int = int(year)
+            base_query = base_query.filter(MasterRecord.release_year == year_int)
+        except ValueError:
+            pass
         
     if sort_by == 'score':
         base_query = base_query.order_by(MasterRecord.score.desc().nullslast())

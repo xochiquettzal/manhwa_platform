@@ -4,7 +4,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- ELEMENT SEÇİMLERİ (Spesifik ID'ler ile) ---
     const searchBox = document.getElementById('my-list-search-box');
-    const filterContainer = document.getElementById('my-list-filter-container');
+    const clearBtn = document.getElementById('my-list-clear-btn');
+    const filterContainer = document.getElementById('my-list-status-container');
+    const yearFilter = document.getElementById('my-list-year-filter');
+    const studioFilter = document.getElementById('my-list-studio-filter');
+    // Tag multiselect controls
+    const tagPanel = document.getElementById('my-list-tag-panel');
+    const tagToggle = document.getElementById('my-list-tag-toggle');
+    const tagApply = document.getElementById('my-list-apply-tags');
+    const tagClear = document.getElementById('my-list-clear-tags');
+    const selectedBar = document.getElementById('my-list-selected-bar');
     const listContainer = document.getElementById('results-container');
     const updateModal = document.getElementById('update-item-modal');
     const confirmDeleteModal = document.getElementById('confirm-delete-modal');
@@ -32,16 +41,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const statusToFilter = activeFilterButton.dataset.status;
         const searchQuery = searchBox ? searchBox.value.toLowerCase() : '';
+        const selectedYear = yearFilter ? yearFilter.value : '';
+        const selectedStudio = studioFilter ? studioFilter.value : '';
+        const selectedTags = Array.from(tagPanel ? tagPanel.querySelectorAll('input[type=\"checkbox\"]:checked') : []).map(c => c.value.toLowerCase());
 
         listItems.forEach(item => {
             const title = (item.dataset.recordTitle || '').toLowerCase();
             const englishTitle = (item.dataset.recordEnglishTitle || '').toLowerCase();
             const status = item.dataset.status;
+            const releaseYear = (item.dataset.releaseYear || '').toString();
+            const studios = (item.dataset.studios || '').toLowerCase();
+            const tags = (item.dataset.tags || '').toLowerCase();
 
             const statusMatch = (statusToFilter === 'all' || status === statusToFilter);
             const searchMatch = (title.includes(searchQuery) || englishTitle.includes(searchQuery));
+            const yearMatch = (!selectedYear || releaseYear === selectedYear);
+            const studioMatch = (!selectedStudio || studios === selectedStudio.toLowerCase());
+            const tagsMatch = (selectedTags.length === 0 || selectedTags.every(t => tags.includes(t)));
 
-            if (statusMatch && searchMatch) {
+            if (statusMatch && searchMatch && yearMatch && studioMatch && tagsMatch) {
                 item.style.display = 'block';
             } else {
                 item.style.display = 'none';
@@ -62,8 +80,93 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     if (searchBox) {
-        searchBox.addEventListener('keyup', applyFilters);
+        const toggleClear = () => {
+            if (!clearBtn) return;
+            if (searchBox.value && searchBox.value.length > 0) {
+                clearBtn.classList.remove('hidden');
+            } else {
+                clearBtn.classList.add('hidden');
+            }
+        };
+
+        searchBox.addEventListener('input', () => {
+            toggleClear();
+            applyFilters();
+        });
+        // initial state
+        toggleClear();
     }
+
+    if (clearBtn) {
+        clearBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            searchBox.value = '';
+            clearBtn.classList.add('hidden');
+            applyFilters();
+            searchBox.focus();
+        });
+    }
+    if (yearFilter) yearFilter.addEventListener('change', applyFilters);
+    if (studioFilter) studioFilter.addEventListener('change', applyFilters);
+    // --- TAG MULTISELECT ---
+    const refreshChips = () => {
+        if (!selectedBar || !tagPanel) return;
+        selectedBar.innerHTML = '';
+        // status chip
+        const activeBtn = filterContainer ? filterContainer.querySelector('.filter-btn.active') : null;
+        if (activeBtn && activeBtn.dataset.status !== 'all') {
+            const chip = document.createElement('span'); chip.className = 'chip';
+            chip.textContent = activeBtn.textContent.trim();
+            selectedBar.appendChild(chip);
+        }
+        // year chip
+        if (yearFilter && yearFilter.value) {
+            const chip = document.createElement('span'); chip.className = 'chip';
+            chip.innerHTML = `${yearFilter.value}<button class="remove" aria-label="Sil">&times;</button>`;
+            chip.querySelector('.remove').addEventListener('click', () => { yearFilter.value=''; applyFilters(); refreshChips(); });
+            selectedBar.appendChild(chip);
+        }
+        // studio chip
+        if (studioFilter && studioFilter.value) {
+            const chip = document.createElement('span'); chip.className = 'chip';
+            chip.innerHTML = `${studioFilter.value}<button class="remove" aria-label="Sil">&times;</button>`;
+            chip.querySelector('.remove').addEventListener('click', () => { studioFilter.value=''; applyFilters(); refreshChips(); });
+            selectedBar.appendChild(chip);
+        }
+        // tag chips
+        const checked = Array.from(tagPanel.querySelectorAll('input[type="checkbox"]:checked'));
+        checked.forEach(cb => {
+            const chip = document.createElement('span'); chip.className = 'chip';
+            chip.innerHTML = `${cb.value}<button class="remove" aria-label="Sil">&times;</button>`;
+            chip.querySelector('.remove').addEventListener('click', () => {
+                cb.checked = false; refreshChips(); applyFilters();
+            });
+            selectedBar.appendChild(chip);
+        });
+    };
+
+    if (tagToggle && tagPanel) {
+        tagToggle.addEventListener('click', () => {
+            tagPanel.classList.toggle('open');
+        });
+        document.addEventListener('click', (e) => {
+            if (!tagPanel.contains(e.target) && e.target !== tagToggle) {
+                tagPanel.classList.remove('open');
+            }
+        });
+        tagPanel.addEventListener('change', () => {
+            refreshChips();
+        });
+    }
+    if (tagApply) tagApply.addEventListener('click', () => { tagPanel.classList.remove('open'); applyFilters(); });
+    if (tagClear) tagClear.addEventListener('click', () => {
+        if (!tagPanel) return;
+        tagPanel.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+        refreshChips();
+        applyFilters();
+    });
+    // initial selected chips render
+    refreshChips();
     
     // --- GÜNCELLEME MODALI'NI AÇMA ---
     listItems.forEach(item => {
