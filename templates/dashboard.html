@@ -45,6 +45,20 @@
                             <span>{{ tag }}</span>
                         </label>
                         {% endfor %}
+                        <strong style="grid-column: 1 / -1; margin-top: .5rem; color: var(--text-primary);">{{ _('Theme') }}</strong>
+                        {% for theme in themes %}
+                        <label class="tag-item">
+                            <input type="checkbox" data-kind="theme" value="{{ theme }}">
+                            <span>{{ theme }}</span>
+                        </label>
+                        {% endfor %}
+                        <strong style="grid-column: 1 / -1; margin-top: .5rem; color: var(--text-primary);">{{ _('Demografi') }}</strong>
+                        {% for demo in demographics %}
+                        <label class="tag-item">
+                            <input type="checkbox" data-kind="demographic" value="{{ demo }}">
+                            <span>{{ demo }}</span>
+                        </label>
+                        {% endfor %}
                     </div>
                     <div class="tag-actions">
                         <button type="button" class="btn btn-secondary" id="my-list-clear-tags">{{ _('Temizle') }}</button>

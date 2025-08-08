@@ -53,7 +53,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const searchQuery = searchBox ? searchBox.value.toLowerCase() : '';
         const selectedYear = yearFilter ? yearFilter.value : '';
         const selectedStudio = studioFilter ? studioFilter.value : '';
-        const selectedTags = Array.from(tagPanel ? tagPanel.querySelectorAll('input[type=\"checkbox\"]:checked') : []).map(c => c.value.toLowerCase());
+        const selectedTags = Array.from(tagPanel ? tagPanel.querySelectorAll('input[data-kind="genre"]:checked') : []).map(c => c.value.toLowerCase());
+        const selectedThemes = Array.from(tagPanel ? tagPanel.querySelectorAll('input[data-kind="theme"]:checked') : []).map(c => c.value.toLowerCase());
+        const selectedDemos = Array.from(tagPanel ? tagPanel.querySelectorAll('input[data-kind="demographic"]:checked') : []).map(c => c.value.toLowerCase());
 
         listItems.forEach(item => {
             const title = (item.dataset.recordTitle || '').toLowerCase();
@@ -62,14 +64,18 @@ document.addEventListener('DOMContentLoaded', function() {
             const releaseYear = (item.dataset.releaseYear || '').toString();
             const studios = (item.dataset.studios || '').toLowerCase();
             const tags = (item.dataset.tags || '').toLowerCase();
+            const themes = (item.dataset.themes || '').toLowerCase();
+            const demographics = (item.dataset.demographics || '').toLowerCase();
 
             const statusMatch = (statusToFilter === 'all' || status === statusToFilter);
             const searchMatch = (title.includes(searchQuery) || englishTitle.includes(searchQuery));
             const yearMatch = (!selectedYear || releaseYear === selectedYear);
             const studioMatch = (!selectedStudio || studios === selectedStudio.toLowerCase());
             const tagsMatch = (selectedTags.length === 0 || selectedTags.every(t => tags.includes(t)));
+            const themesMatch = (selectedThemes.length === 0 || selectedThemes.every(t => themes.includes(t)));
+            const demosMatch = (selectedDemos.length === 0 || selectedDemos.every(d => demographics.includes(d)));
 
-            if (statusMatch && searchMatch && yearMatch && studioMatch && tagsMatch) {
+            if (statusMatch && searchMatch && yearMatch && studioMatch && tagsMatch && themesMatch && demosMatch) {
                 item.style.display = 'block';
             } else {
                 item.style.display = 'none';

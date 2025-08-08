@@ -22,6 +22,8 @@ def my_list():
     
     # Filtreleme için kullanıcı listesinden etiket, yıl ve stüdyo değerlerini hazırla
     all_tags = set()
+    all_themes = set()
+    all_demographics = set()
     years = set()
     studios = set()
     # DÖNGÜ DÜZELTMESİ: Demeti doğrudan "açıyoruz" (unpacking)
@@ -29,6 +31,12 @@ def my_list():
         if record_obj and record_obj.tags:
             for tag in record_obj.tags.split(','):
                 all_tags.add(tag.strip())
+        if record_obj and record_obj.themes:
+            for theme in record_obj.themes.split(','):
+                all_themes.add(theme.strip())
+        if record_obj and record_obj.demographics:
+            for demo in record_obj.demographics.split(','):
+                all_demographics.add(demo.strip())
         if record_obj and record_obj.release_year:
             years.add(record_obj.release_year)
         if record_obj and record_obj.studios:
@@ -44,6 +52,8 @@ def my_list():
         title=_('Listem'),
         user_list=user_list,
         tags=sorted(list(all_tags)),
+        themes=sorted(list(all_themes)),
+        demographics=sorted(list(all_demographics)),
         years=sorted(list(years), reverse=True),
         studios=sorted(list(studios))
     )
