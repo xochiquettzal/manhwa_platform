@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-08-08 15:11+0300\n"
+"POT-Creation-Date: 2025-08-08 15:56+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,20 +17,82 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: templates/base.html:6
-msgid "Anasayfa"
+#: auth.py:24
+msgid "Lütfen E-postanızı Onaylayın"
 msgstr ""
 
-#: templates/base.html:18 templates/dashboard.html:4
+#: auth.py:25
+msgid "Onay linki e-posta adresinize gönderildi."
+msgstr ""
+
+#: auth.py:27 templates/auth/register.html:42 templates/base.html:34
+msgid "Kayıt Ol"
+msgstr ""
+
+#: auth.py:33
+msgid "Onay linki geçersiz veya süresi dolmuş."
+msgstr ""
+
+#: auth.py:37
+msgid "Hesap zaten onaylanmış. Lütfen giriş yapın."
+msgstr ""
+
+#: auth.py:43
+msgid "Hesabınızı onayladığınız için teşekkürler! Hoş geldiniz!"
+msgstr ""
+
+#: auth.py:54
+msgid "Lütfen giriş yapmadan önce e-posta adresinizi onaylayın."
+msgstr ""
+
+#: auth.py:60
+msgid "Geçersiz E-posta/Kullanıcı Adı veya Şifre."
+msgstr ""
+
+#: auth.py:61 templates/auth/login.html:5 templates/auth/login.html:26
+#: templates/auth/register.html:47 templates/base.html:33
+msgid "Giriş Yap"
+msgstr ""
+
+#: main.py:44 templates/base.html:18 templates/dashboard.html:4
 msgid "Listem"
 msgstr ""
 
-#: templates/base.html:20
+#: main.py:84 templates/base.html:20
 msgid "Arama"
 msgstr ""
 
-#: templates/base.html:21
+#: main.py:104 templates/base.html:21
 msgid "En İyiler"
+msgstr ""
+
+#: main.py:186 main.py:224
+msgid "Yetkisiz işlem."
+msgstr ""
+
+#: main.py:205
+msgid "Kayıt başarıyla güncellendi!"
+msgstr ""
+
+#: main.py:212
+msgid "Bu kayıt zaten listenizde."
+msgstr ""
+
+#: main.py:214
+msgid "Kayıt bulunamadı."
+msgstr ""
+
+#: main.py:218
+#, python-format
+msgid "'%(title)s' başarıyla listenize eklendi!"
+msgstr ""
+
+#: main.py:227
+msgid "Kayıt listenizden başarıyla kaldırıldı."
+msgstr ""
+
+#: templates/base.html:6
+msgid "Anasayfa"
 msgstr ""
 
 #: templates/base.html:29
@@ -39,15 +101,6 @@ msgstr ""
 
 #: templates/base.html:31
 msgid "Çıkış Yap"
-msgstr ""
-
-#: templates/auth/login.html:5 templates/auth/login.html:26
-#: templates/auth/register.html:47 templates/base.html:33
-msgid "Giriş Yap"
-msgstr ""
-
-#: templates/auth/register.html:42 templates/base.html:34
-msgid "Kayıt Ol"
 msgstr ""
 
 #: templates/base.html:36

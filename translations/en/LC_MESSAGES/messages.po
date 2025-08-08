@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-08-08 15:11+0300\n"
-"PO-Revision-Date: 2025-08-06 22:24+0300\n"
+"POT-Creation-Date: 2025-08-08 15:56+0300\n"
+"PO-Revision-Date: 2025-08-08 16:02+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
 "Language-Team: en <LL@li.org>\n"
@@ -18,21 +18,83 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: templates/base.html:6
-msgid "Anasayfa"
-msgstr "Homepage"
+#: auth.py:24
+msgid "Lütfen E-postanızı Onaylayın"
+msgstr "Please Confirm Your Email"
 
-#: templates/base.html:18 templates/dashboard.html:4
+#: auth.py:25
+msgid "Onay linki e-posta adresinize gönderildi."
+msgstr "A confirmation link has been sent to your email address."
+
+#: auth.py:27 templates/auth/register.html:42 templates/base.html:34
+msgid "Kayıt Ol"
+msgstr "Sign Up"
+
+#: auth.py:33
+msgid "Onay linki geçersiz veya süresi dolmuş."
+msgstr "The confirmation link is invalid or has expired."
+
+#: auth.py:37
+msgid "Hesap zaten onaylanmış. Lütfen giriş yapın."
+msgstr "Account already confirmed. Please login."
+
+#: auth.py:43
+msgid "Hesabınızı onayladığınız için teşekkürler! Hoş geldiniz!"
+msgstr "Thank you for confirming your account! Welcome!"
+
+#: auth.py:54
+msgid "Lütfen giriş yapmadan önce e-posta adresinizi onaylayın."
+msgstr "Please confirm your email address before logging in."
+
+#: auth.py:60
+msgid "Geçersiz E-posta/Kullanıcı Adı veya Şifre."
+msgstr "Invalid Email/Username or Password."
+
+#: auth.py:61 templates/auth/login.html:5 templates/auth/login.html:26
+#: templates/auth/register.html:47 templates/base.html:33
+msgid "Giriş Yap"
+msgstr "Login"
+
+#: main.py:44 templates/base.html:18 templates/dashboard.html:4
 msgid "Listem"
 msgstr "My List"
 
-#: templates/base.html:20
+#: main.py:84 templates/base.html:20
 msgid "Arama"
 msgstr "Search"
 
-#: templates/base.html:21
+#: main.py:104 templates/base.html:21
 msgid "En İyiler"
 msgstr "Top"
+
+#: main.py:186 main.py:224
+msgid "Yetkisiz işlem."
+msgstr "Unauthorized action."
+
+#: main.py:205
+msgid "Kayıt başarıyla güncellendi!"
+msgstr "Entry updated successfully!"
+
+#: main.py:212
+msgid "Bu kayıt zaten listenizde."
+msgstr "This entry is already in your list."
+
+#: main.py:214
+msgid "Kayıt bulunamadı."
+msgstr "Entry not found."
+
+#: main.py:218
+#, python-format
+msgid "'%(title)s' başarıyla listenize eklendi!"
+msgstr "'%(title)s' has been successfully added to your list!"
+
+#: main.py:227
+msgid "Kayıt listenizden başarıyla kaldırıldı."
+msgstr "Entry successfully removed from your list."
+
+#: templates/base.html:6
+msgid "Anasayfa"
+msgstr "Homepage"
 
 #: templates/base.html:29
 msgid "Admin"
@@ -41,15 +103,6 @@ msgstr "Admin"
 #: templates/base.html:31
 msgid "Çıkış Yap"
 msgstr "Logout"
-
-#: templates/auth/login.html:5 templates/auth/login.html:26
-#: templates/auth/register.html:47 templates/base.html:33
-msgid "Giriş Yap"
-msgstr "Login"
-
-#: templates/auth/register.html:42 templates/base.html:34
-msgid "Kayıt Ol"
-msgstr "Sign Up"
 
 #: templates/base.html:36
 msgid "Temayı Değiştir"
@@ -96,7 +149,6 @@ msgid "Bırakıldı"
 msgstr "Dropped"
 
 #: templates/dashboard.html:21
-#, fuzzy
 msgid "Listemde ara..."
 msgstr "Search in my list..."
 
@@ -150,7 +202,6 @@ msgid "Puan Yok"
 msgstr "No Score"
 
 #: templates/dashboard.html:127
-#, fuzzy
 msgid "İzlenen/Okunan Bölüm:"
 msgstr "Progress/Chapter:"
 
@@ -197,7 +248,6 @@ msgid "Konu"
 msgstr "Synopsis"
 
 #: templates/search.html:3
-#, fuzzy
 msgid "Kütüphanede Ara"
 msgstr "Search Library"
 
@@ -252,7 +302,6 @@ msgid "Konu bilgisi mevcut değil."
 msgstr "Synopsis not available."
 
 #: templates/top_records.html:30
-#, fuzzy
 msgid "kullanıcı"
 msgstr "users"
 
@@ -273,7 +322,6 @@ msgid "Toplu Ekle"
 msgstr "Bulk Add"
 
 #: templates/admin/dashboard.html:17
-#, fuzzy
 msgid "Yeni Ekle"
 msgstr "Add New"
 
@@ -322,9 +370,8 @@ msgid "Kaydı Sil"
 msgstr "Delete Entry"
 
 #: templates/admin/dashboard.html:118
-#, fuzzy
 msgid "Toplu Kayıt Ekle"
-msgstr "Add New Entry"
+msgstr "Bulk Add Entry"
 
 #: templates/admin/dashboard.html:119
 msgid "Lütfen .json formatında bir dosya seçin."
@@ -343,23 +390,20 @@ msgid "Hesap Onayı"
 msgstr "Account Confirmation"
 
 #: templates/auth/confirm_email.html:8
-#, fuzzy
 msgid "Hesabınızı Onaylayın"
-msgstr "Account Confirmation"
+msgstr "Confirm Your Account"
 
 #: templates/auth/confirm_email.html:9
 msgid "Merhaba"
 msgstr "Hello"
 
 #: templates/auth/confirm_email.html:10
-#, fuzzy
 msgid "Lyst. hesabınızı aktif hale getirmek için lütfen aşağıdaki linke tıklayın:"
-msgstr "Please click the link below to confirm your account:"
+msgstr "Please click the link below to activate your Lyst account:"
 
 #: templates/auth/confirm_email.html:13
-#, fuzzy
 msgid "Hesabı Onayla"
-msgstr "Account Confirmation"
+msgstr "Confirm Account"
 
 #: templates/auth/confirm_email.html:16
 msgid ""
@@ -370,7 +414,6 @@ msgstr ""
 "browser:"
 
 #: templates/auth/confirm_email.html:19
-#, fuzzy
 msgid "Eğer bu isteği siz yapmadıysanız, bu e-postayı görmezden gelebilirsiniz."
 msgstr "If you did not make this request, please ignore this email."
 

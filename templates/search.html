@@ -98,5 +98,11 @@
 {% endblock %}
 
 {% block scripts %}
+    <script>
+        const translations = {
+            episodes: "{{ _('bölüm') }}",
+            chapters: "{{ _('chapter') }}"
+        };
+    </script>
     <script src="{{ url_for('static', filename='js/search.js') }}"></script>
 {% endblock %}

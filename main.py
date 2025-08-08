@@ -1,6 +1,7 @@
 # main.py (Nihai ve Düzeltilmiş Sürüm)
 
 from flask import Blueprint, render_template, request, jsonify, flash, redirect, url_for
+from flask_babel import _
 from flask_login import login_required, current_user
 from models import db, MasterRecord, UserList
 from sqlalchemy import case, func
@@ -40,7 +41,7 @@ def my_list():
     ]
     return render_template(
         'dashboard.html',
-        title='Listem',
+        title=_('Listem'),
         user_list=user_list,
         tags=sorted(list(all_tags)),
         years=sorted(list(years), reverse=True),
@@ -80,7 +81,7 @@ def search_page():
     years = db.session.query(MasterRecord.release_year).filter(MasterRecord.release_year.isnot(None)).distinct().order_by(MasterRecord.release_year.desc()).all()
     years = [y[0] for y in years if y[0]]
 
-    return render_template('search.html', title='Arama', studios=studios, tags=sorted(list(all_tags)), themes=sorted(list(all_themes)), demographics=sorted(list(all_demos)), years=years)
+    return render_template('search.html', title=_('Arama'), studios=studios, tags=sorted(list(all_tags)), themes=sorted(list(all_themes)), demographics=sorted(list(all_demos)), years=years)
 
 @main_bp.route('/top')
 def top_records():
@@ -100,7 +101,7 @@ def top_records():
         weighted_score_formula.desc()
     ).limit(50).all()
     
-    return render_template('top_records.html', title='En İyiler', top_list=top_list_query)
+    return render_template('top_records.html', title=_('En İyiler'), top_list=top_list_query)
 
 # --- API Endpoints ---
 
@@ -182,7 +183,7 @@ def advanced_search():
 @login_required
 def update_list_item(user_list_id):
     item = UserList.query.get_or_404(user_list_id)
-    if item.user_id != current_user.id: return jsonify({'success': False, 'message': 'Yetkisiz işlem.'}), 403
+    if item.user_id != current_user.id: return jsonify({'success': False, 'message': _('Yetkisiz işlem.')}), 403
     data = request.get_json()
     item.status = data.get('status', item.status)
     # Bölüm sayısını toplam bölümle sınırla
@@ -201,29 +202,29 @@ def update_list_item(user_list_id):
     item.notes = data.get('notes', item.notes)
     db.session.commit()
     if not data.get('silent'):
-        flash("Kayıt başarıyla güncellendi!", "success")
+        flash(_("Kayıt başarıyla güncellendi!"), "success")
     return jsonify({'success': True})
 
 @main_bp.route('/list/add/<int:record_id>', methods=['POST'])
 @login_required
 def add_to_list(record_id):
     existing_entry = UserList.query.filter_by(user_id=current_user.id, master_record_id=record_id).first()
-    if existing_entry: return jsonify({'success': False, 'message': 'Bu kayıt zaten listenizde.'}), 409
+    if existing_entry: return jsonify({'success': False, 'message': _('Bu kayıt zaten listenizde.')}), 409
     master_record = MasterRecord.query.get(record_id)
-    if not master_record: return jsonify({'success': False, 'message': 'Kayıt bulunamadı.'}), 404
+    if not master_record: return jsonify({'success': False, 'message': _('Kayıt bulunamadı.')}), 404
     new_list_item = UserList(user_id=current_user.id, master_record_id=record_id, status='Planlandı')
     db.session.add(new_list_item)
     db.session.commit()
-    return jsonify({'success': True, 'message': f"'{master_record.original_title}' başarıyla listenize eklendi!"})
+    return jsonify({'success': True, 'message': _("'%(title)s' başarıyla listenize eklendi!", title=master_record.original_title)})
 
 @main_bp.route('/list/delete/<int:user_list_id>', methods=['POST'])
 @login_required
 def delete_list_item(user_list_id):
     item = UserList.query.get_or_404(user_list_id)
-    if item.user_id != current_user.id: return jsonify({'success': False, 'message': 'Yetkisiz işlem.'}), 403
+    if item.user_id != current_user.id: return jsonify({'success': False, 'message': _('Yetkisiz işlem.')}), 403
     db.session.delete(item)
     db.session.commit()
-    return jsonify({'success': True, 'message': "Kayıt listenizden başarıyla kaldırıldı."})
+    return jsonify({'success': True, 'message': _("Kayıt listenizden başarıyla kaldırıldı.")})
 
 @main_bp.route('/api/record/<int:record_id>')
 def get_record_details(record_id):

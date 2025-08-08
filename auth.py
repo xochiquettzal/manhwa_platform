@@ -1,6 +1,7 @@
 # auth.py (Nihai Sürüm)
 
 from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask_babel import _
 from models import db, User
 from forms import LoginForm, RegistrationForm
 from utils import send_email, generate_confirmation_token, confirm_token
@@ -20,26 +21,26 @@ def register():
         token = generate_confirmation_token(user.email)
         confirm_url = url_for('auth.confirm_email', token=token, _external=True)
         html = render_template('auth/confirm_email.html', confirm_url=confirm_url, user=user)
-        send_email(user.email, 'Lütfen E-postanızı Onaylayın', html)
-        flash('Onay linki e-posta adresinize gönderildi.', 'info')
+        send_email(user.email, _('Lütfen E-postanızı Onaylayın'), html)
+        flash(_('Onay linki e-posta adresinize gönderildi.'), 'info')
         return redirect(url_for('auth.login'))
-    return render_template('auth/register.html', title='Kayıt Ol', form=form)
+    return render_template('auth/register.html', title=_('Kayıt Ol'), form=form)
 
 @auth_bp.route('/confirm/<token>')
 def confirm_email(token):
     try: email = confirm_token(token)
     except:
-        flash('Onay linki geçersiz veya süresi dolmuş.', 'danger')
+        flash(_('Onay linki geçersiz veya süresi dolmuş.'), 'danger')
         return redirect(url_for('main.index'))
     user = User.query.filter_by(email=email).first_or_404()
     if user.confirmed:
-        flash('Hesap zaten onaylanmış. Lütfen giriş yapın.', 'success')
+        flash(_('Hesap zaten onaylanmış. Lütfen giriş yapın.'), 'success')
     else:
         user.confirmed = True
         db.session.add(user)
         db.session.commit()
         login_user(user)
-        flash('Hesabınızı onayladığınız için teşekkürler! Hoş geldiniz!', 'success')
+        flash(_('Hesabınızı onayladığınız için teşekkürler! Hoş geldiniz!'), 'success')
     return redirect(url_for('main.index'))
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
@@ -50,14 +51,14 @@ def login():
         user = User.query.filter((User.email == form.login.data) | (User.username == form.login.data)).first()
         if user and user.check_password(form.password.data):
             if not user.confirmed:
-                flash('Lütfen giriş yapmadan önce e-posta adresinizi onaylayın.', 'warning')
+                flash(_('Lütfen giriş yapmadan önce e-posta adresinizi onaylayın.'), 'warning')
                 return redirect(url_for('auth.login'))
             login_user(user, remember=form.remember_me.data)
             next_page = request.args.get('next')
             return redirect(next_page) if next_page else redirect(url_for('main.index'))
         else:
-            flash('Geçersiz E-posta/Kullanıcı Adı veya Şifre.', 'danger')
-    return render_template('auth/login.html', title='Giriş Yap', form=form)
+            flash(_('Geçersiz E-posta/Kullanıcı Adı veya Şifre.'), 'danger')
+    return render_template('auth/login.html', title=_('Giriş Yap'), form=form)
 
 @auth_bp.route('/logout')
 @login_required

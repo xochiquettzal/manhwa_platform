@@ -81,6 +81,7 @@ document.addEventListener('DOMContentLoaded', function() {
             card.className = 'manhwa-card';
             card.dataset.recordId = record.id;
             
+            const episodeText = record.mal_type && record.mal_type.toLowerCase().includes('manga') ? translations.chapters : translations.episodes;
             card.innerHTML = `
                 <div class="card-image-wrapper">
                     <img src="${record.image || 'https://via.placeholder.com/250x350.png?text=Yok'}" class="card-image" loading="lazy">
@@ -98,7 +99,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="card-bottom-info" style="margin-top: .25rem;">
                         <div class="badges-row">
                             ${record.status ? `<span class="badge ${record.status && record.status.toLowerCase().includes('airing') ? 'status-airing' : 'status-finished'}">${record.status}</span>` : ''}
-                            ${record.total_episodes ? `<span class="badge episodes">${record.total_episodes} bölüm</span>` : ''}
+                            ${record.total_episodes ? `<span class="badge episodes">${record.total_episodes} ${episodeText}</span>` : ''}
                         </div>
                         ${record.score ? `<small style="color: var(--accent-primary); font-weight: 700;">⭐ ${record.score.toFixed ? record.score.toFixed(2) : record.score}</small>` : ''}
                     </div>
