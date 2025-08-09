@@ -10,6 +10,7 @@ venv/
 
 # Instance Folder
 instance/
+migrations/
 
 # Database
 *.db
