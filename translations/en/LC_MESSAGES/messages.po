@@ -593,3 +593,31 @@ msgstr "Your profile statistics will appear here after you add entries to your l
 #: templates/profile.html:48
 msgid "Seri Sayısı"
 msgstr "Number of Series"
+
+#: templates/dashboard.html:27
+msgid "Sıralama Yok"
+msgstr "Default Order"
+
+#: templates/dashboard.html:28
+msgid "Başlık (A-Z)"
+msgstr "Title (A-Z)"
+
+#: templates/dashboard.html:29
+msgid "Başlık (Z-A)"
+msgstr "Title (Z-A)"
+
+#: templates/dashboard.html:30
+msgid "Puanım (Yüksekten Düşüğe)"
+msgstr "My Score (High to Low)"
+
+#: templates/dashboard.html:31
+msgid "Puanım (Düşükten Yükseğe)"
+msgstr "My Score (Low to High)"
+
+#: templates/dashboard.html:32
+msgid "Yıl (Yeniden Eskiye)"
+msgstr "Year (Newest to Oldest)"
+
+#: templates/dashboard.html:33
+msgid "Yıl (Eskiden Yeniye)"
+msgstr "Year (Oldest to Newest)"

@@ -586,3 +586,31 @@ msgstr "Profil istatistikleriniz, listenize kayıt ekledikten sonra burada gör�
 #: templates/profile.html:48
 msgid "Seri Sayısı"
 msgstr "Seri Sayısı"
+
+#: templates/dashboard.html:27
+msgid "Sıralama Yok"
+msgstr "Sıralama Yok"
+
+#: templates/dashboard.html:28
+msgid "Başlık (A-Z)"
+msgstr "Başlık (A-Z)"
+
+#: templates/dashboard.html:29
+msgid "Başlık (Z-A)"
+msgstr "Başlık (Z-A)"
+
+#: templates/dashboard.html:30
+msgid "Puanım (Yüksekten Düşüğe)"
+msgstr "Puanım (Yüksekten Düşüğe)"
+
+#: templates/dashboard.html:31
+msgid "Puanım (Düşükten Yükseğe)"
+msgstr "Puanım (Düşükten Yükseğe)"
+
+#: templates/dashboard.html:32
+msgid "Yıl (Yeniden Eskiye)"
+msgstr "Yıl (Yeniden Eskiye)"
+
+#: templates/dashboard.html:33
+msgid "Yıl (Eskiden Yeniye)"
+msgstr "Yıl (Eskiden Yeniye)"

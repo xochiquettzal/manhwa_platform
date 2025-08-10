@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-
 {% block content %}
     <h1 class="page-title">{{ _('Listem') }}</h1>
     <!-- Üst sıra: Durum filtreleri -->
@@ -13,7 +12,6 @@
             <button class="filter-btn" data-status="Bırakıldı">{{ _('Bırakıldı') }}</button>
         </div>
     </div>
-
     <!-- Alt sıra: Arama ve ileri filtreler -->
     <div class="page-controls">
         <div id="my-list-search-container" class="search-container">
@@ -22,43 +20,35 @@
             <button id="my-list-clear-btn" class="search-clear-btn hidden" aria-label="{{ _('Temizle') }}">&times;</button>
         </div>
         <div id="my-list-filters" class="filters-group">
+            <!-- YENİ SIRALAMA DROPDOWN'I -->
+            <select id="my-list-sort-by" class="filter-btn filter-select">
+                <option value="default">{{ _('Sıralama Yok') }}</option>
+                <option value="title-asc">{{ _('Başlık (A-Z)') }}</option>
+                <option value="title-desc">{{ _('Başlık (Z-A)') }}</option>
+                <option value="score-desc">{{ _('Puanım (Yüksekten Düşüğe)') }}</option>
+                <option value="score-asc">{{ _('Puanım (Düşükten Yükseğe)') }}</option>
+                <option value="year-desc">{{ _('Yıl (Yeniden Eskiye)') }}</option>
+                <option value="year-asc">{{ _('Yıl (Eskiden Yeniye)') }}</option>
+            </select>
+            <!-- MEVCUT FİLTRELER -->
             <select id="my-list-year-filter" class="filter-btn filter-select">
                 <option value="">{{ _('Tüm Yıllar') }}</option>
-                {% for y in years %}
-                    <option value="{{ y }}">{{ y }}</option>
-                {% endfor %}
+                {% for y in years %}<option value="{{ y }}">{{ y }}</option>{% endfor %}
             </select>
             <select id="my-list-studio-filter" class="filter-btn filter-select">
                 <option value="">{{ _('Tüm Stüdyolar') }}</option>
-                {% for studio in studios %}
-                    <option value="{{ studio }}">{{ studio }}</option>
-                {% endfor %}
+                {% for studio in studios %}<option value="{{ studio }}">{{ studio }}</option>{% endfor %}
             </select>
             <div id="my-list-tag-multiselect" class="tag-multiselect">
                 <button type="button" class="filter-btn tag-toggle" id="my-list-tag-toggle">{{ _('Filtreler') }}</button>
                 <div class="tag-panel" id="my-list-tag-panel">
                     <div class="tag-list">
                         <strong style="grid-column: 1 / -1; color: var(--text-primary);">{{ _('Genre') }}</strong>
-                        {% for tag in tags %}
-                        <label class="tag-item">
-                            <input type="checkbox" data-kind="genre" value="{{ tag }}">
-                            <span>{{ tag }}</span>
-                        </label>
-                        {% endfor %}
+                        {% for tag in tags %}<label class="tag-item"><input type="checkbox" data-kind="genre" value="{{ tag }}"><span>{{ tag }}</span></label>{% endfor %}
                         <strong style="grid-column: 1 / -1; margin-top: .5rem; color: var(--text-primary);">{{ _('Theme') }}</strong>
-                        {% for theme in themes %}
-                        <label class="tag-item">
-                            <input type="checkbox" data-kind="theme" value="{{ theme }}">
-                            <span>{{ theme }}</span>
-                        </label>
-                        {% endfor %}
+                        {% for theme in themes %}<label class="tag-item"><input type="checkbox" data-kind="theme" value="{{ theme }}"><span>{{ theme }}</span></label>{% endfor %}
                         <strong style="grid-column: 1 / -1; margin-top: .5rem; color: var(--text-primary);">{{ _('Demografi') }}</strong>
-                        {% for demo in demographics %}
-                        <label class="tag-item">
-                            <input type="checkbox" data-kind="demographic" value="{{ demo }}">
-                            <span>{{ demo }}</span>
-                        </label>
-                        {% endfor %}
+                        {% for demo in demographics %}<label class="tag-item"><input type="checkbox" data-kind="demographic" value="{{ demo }}"><span>{{ demo }}</span></label>{% endfor %}
                     </div>
                     <div class="tag-actions">
                         <button type="button" class="btn btn-secondary" id="my-list-clear-tags">{{ _('Temizle') }}</button>
@@ -68,14 +58,12 @@
             </div>
         </div>
     </div>
-
     <div id="my-list-selected-bar" class="selected-bar"></div>
-    
     <div id="results-container">
         {% for item in user_list %}
             <div class="manhwa-card" 
                 data-user-list-id="{{ item.list_item.id }}" 
-                data-user-score="{{ item.list_item.user_score }}"
+                data-user-score="{{ item.list_item.user_score or 0 }}"
                 data-status="{{ item.list_item.status }}" 
                 data-chapter="{{ item.list_item.current_chapter }}" 
                 data-notes="{{ item.list_item.notes or '' }}" 
@@ -89,18 +77,13 @@
                 data-demographics="{{ item.record.demographics or '' }}"
                 data-source="{{ item.record.source or '' }}"
                 data-studios="{{ item.record.studios or '' }}"
-                data-release-year="{{ item.record.release_year or '' }}"
+                data-release-year="{{ item.record.release_year or 0 }}"
                 data-total-episodes="{{ item.record.total_episodes or '' }}">
                 <div class="card-image-wrapper"><img src="{{ item.record.image_url or 'https://via.placeholder.com/250x350.png?text=Yok' }}" class="card-image" loading="lazy"></div>
                 <div class="card-info">
                     <h3 class="card-title">{{ item.record.original_title }}</h3>
                     <div class="card-bottom-info">
-                        <span>
-                            {{ _('Bölüm:') }} {{ item.list_item.current_chapter }}
-                            {% if item.record.total_episodes %}
-                                / {{ item.record.total_episodes }}
-                            {% endif %}
-                        </span>
+                        <span>{{ _('Bölüm:') }} {{ item.list_item.current_chapter }}{% if item.record.total_episodes %} / {{ item.record.total_episodes }}{% endif %}</span>
                         <button class="inc-chapter-btn" title="{{ _('Bir bölüm arttır') }}">+1</button>
                         {% if item.list_item.user_score > 0 %}
                         <span class="user-score">
@@ -111,9 +94,7 @@
                     </div>
                     {% if item.record.total_episodes %}
                         {% set pct = (item.list_item.current_chapter * 100 / (item.record.total_episodes if item.record.total_episodes else 1)) | round(0, 'floor') %}
-                        <div class="progress-bar" title="{{ pct }}%">
-                            <div class="progress" data-pct="{{ pct }}"></div>
-                        </div>
+                        <div class="progress-bar" title="{{ pct }}%"><div class="progress" data-pct="{{ pct }}"></div></div>
                     {% endif %}
                 </div>
             </div>
@@ -121,8 +102,7 @@
             <p style="color: var(--text-secondary); grid-column: 1 / -1; text-align: center;">{{ _('Listen henüz boş. Arama yaparak yeni kayıtlar ekleyebilirsin!') }}</p>
         {% endfor %}
     </div>
-
-    <!-- GÜNCELLEME/DETAY MODALI -->
+    <!-- GÜNCELLEME/DETAY MODALI (Değişiklik yok) -->
     <div id="update-item-modal" class="modal">
         <div class="modal-content details-modal-content">
             <span id="close-update-modal-btn" class="close-btn">&times;</span>
