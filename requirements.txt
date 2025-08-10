@@ -12,5 +12,4 @@ Werkzeug
 itsdangerous
 requests
 SQLAlchemy
-Flask-Caching
 Flask-Limiter

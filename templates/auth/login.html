@@ -1,33 +1,29 @@
 {% extends "base.html" %}
-
 {% block content %}
 <div class="form-wrapper">
     <h1>{{ _('Giriş Yap') }}</h1>
-
     <form method="POST" action="">
         {{ form.hidden_tag() }}
-        
         <div class="form-group">
             <label for="login">{{ _('E-posta veya Kullanıcı Adı') }}</label>
             {{ form.login(placeholder=_('Kullanıcı adınız veya e-postanız')) }}
         </div>
-        
         <div class="form-group">
             <label for="password">{{ _('Şifre') }}</label>
             {{ form.password(placeholder="••••••••") }}
         </div>
-        
         <div class="form-group form-group-checkbox">
             {{ form.remember_me(id="remember-me-checkbox") }}
             <label for="remember-me-checkbox">{{ _('Beni hatırla') }}</label>
         </div>
-        
         <div class="form-group">
             <button type="submit" class="btn btn-primary">{{ _('Giriş Yap') }}</button>
         </div>
     </form>
-    
     <p class="subtext">
+        <a href="{{ url_for('auth.request_reset') }}">{{ _('Şifreni mi unuttun?') }}</a>
+    </p>
+    <p class="subtext" style="margin-top: 0.5rem;">
         {{ _('Hesabın yok mu?') }} <a href="{{ url_for('auth.register') }}">{{ _('Hemen Kayıt Ol') }}</a>
     </p>
 </div>

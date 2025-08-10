@@ -479,3 +479,70 @@ msgstr "Şifrenizi tekrar girin"
 msgid "Zaten bir hesabın var mı?"
 msgstr "Zaten bir hesabın var mı?"
 
+#: forms.py:31
+msgid "Bu e-posta adresi ile kayıtlı bir hesap bulunamadı."
+msgstr "Bu e-posta adresi ile kayıtlı bir hesap bulunamadı."
+
+#: forms.py:36
+msgid "Yeni Şifre"
+msgstr "Yeni Şifre"
+
+#: forms.py:38
+msgid "Yeni Şifreyi Doğrula"
+msgstr "Yeni Şifreyi Doğrula"
+
+#: auth.py:102
+msgid "Şifre Sıfırlama İsteği"
+msgstr "Şifre Sıfırlama İsteği"
+
+#: auth.py:104
+msgid "Şifre sıfırlama linki e-posta adresinize gönderildi."
+msgstr "Şifre sıfırlama linki e-posta adresinize gönderildi."
+
+#: auth.py:105 templates/auth/request_reset.html:5
+msgid "Şifre Sıfırla"
+msgstr "Şifre Sıfırla"
+
+#: auth.py:114
+msgid "Şifre sıfırlama linki geçersiz veya süresi dolmuş."
+msgstr "Şifre sıfırlama linki geçersiz veya süresi dolmuş."
+
+#: auth.py:120
+msgid "Şifreniz başarıyla güncellendi! Giriş yapabilirsiniz."
+msgstr "Şifreniz başarıyla güncellendi! Giriş yapabilirsiniz."
+
+#: auth.py:121 templates/auth/reset_password.html:5
+msgid "Yeni Şifre Belirle"
+msgstr "Yeni Şifre Belirle"
+
+#: templates/auth/login.html:30
+msgid "Şifreni mi unuttun?"
+msgstr "Şifreni mi unuttun?"
+
+#: templates/auth/request_reset.html:6
+msgid "Kayıtlı e-posta adresinizi girerek sıfırlama bağlantısı talep edebilirsiniz."
+msgstr "Kayıtlı e-posta adresinizi girerek sıfırlama bağlantısı talep edebilirsiniz."
+
+#: templates/auth/request_reset.html:9
+msgid "E-posta Adresi"
+msgstr "E-posta Adresi"
+
+#: templates/auth/request_reset.html:16
+msgid "Sıfırlama Bağlantısı Gönder"
+msgstr "Sıfırlama Bağlantısı Gönder"
+
+#: templates/auth/reset_password.html:18
+msgid "Şifreyi Güncelle"
+msgstr "Şifreyi Güncelle"
+
+#: templates/auth/reset_password_email.html:5
+msgid "Şifre Sıfırlama"
+msgstr "Şifre Sıfırlama"
+
+#: templates/auth/reset_password_email.html:8
+msgid "Şifrenizi Sıfırlayın"
+msgstr "Şifrenizi Sıfırlayın"
+
+#: templates/auth/reset_password_email.html:10
+msgid "Lyst. hesabınız için şifre sıfırlama talebinde bulundunuz. Yeni bir şifre belirlemek için lütfen aşağıdaki linke tıklayın. Bu link 1 saat geçerlidir:"
+msgstr "Lyst. hesabınız için şifre sıfırlama talebinde bulundunuz. Yeni bir şifre belirlemek için lütfen aşağıdaki linke tıklayın. Bu link 1 saat geçerlidir:"

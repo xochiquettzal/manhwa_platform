@@ -6,13 +6,27 @@
     <title>{{ title or _('Anasayfa') }} - Lyst.</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📚</text></svg>">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* Butonu link gibi göstermek için küçük bir stil */
+        .btn-link {
+            background: none!important;
+            border: none;
+            padding: 0!important;
+            font-family: inherit;
+            font-size: inherit;
+            color: var(--text-secondary);
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .btn-link:hover {
+            color: var(--text-primary);
+        }
+    </style>
 </head>
 <body data-theme="dark">
-
     <div class="container">
         <header>
             <a href="{{ url_for('main.top_records') }}" class="logo">Lyst.</a>
-            
             <div class="nav-links">
                 {% if current_user.is_authenticated %}
                     <a href="{{ url_for('main.my_list') }}" class="header-link {% if request.endpoint == 'main.my_list' %}active{% endif %}">{{ _('Listem') }}</a>
@@ -20,7 +34,6 @@
                 <a href="{{ url_for('main.search_page') }}" class="header-link {% if request.endpoint == 'main.search_page' %}active{% endif %}">{{ _('Arama') }}</a>
                 <a href="{{ url_for('main.top_records') }}" class="header-link {% if request.endpoint == 'main.top_records' or request.endpoint == 'main.index' %}active{% endif %}">{{ _('En İyiler') }}</a>
             </div>
-
             <div class="header-actions">
                 <a href="{{ url_for('main.set_language', lang='tr') }}" class="header-link" style="font-weight: 600; {% if get_locale() == 'tr' %}color: var(--accent-primary);{% endif %}">TR</a>
                 <a href="{{ url_for('main.set_language', lang='en') }}" class="header-link" style="font-weight: 600; {% if get_locale() == 'en' %}color: var(--accent-primary);{% endif %}">EN</a>
@@ -28,7 +41,13 @@
                     {% if current_user.is_admin %}
                         <a href="{{ url_for('admin.dashboard') }}" class="header-link">{{ _('Admin') }}</a>
                     {% endif %}
-                    <a href="{{ url_for('auth.logout') }}" class="header-link">{{ _('Çıkış Yap') }}</a>
+                    
+                    <!-- DEĞİŞİKLİK BURADA -->
+                    <form action="{{ url_for('auth.logout') }}" method="post" style="display: inline;">
+                        <button type="submit" class="header-link btn-link">{{ _('Çıkış Yap') }}</button>
+                    </form>
+                    <!-- DEĞİŞİKLİK SONU -->
+
                 {% else %}
                     <a href="{{ url_for('auth.login') }}" class="header-link">{{ _('Giriş Yap') }}</a>
                     <a href="{{ url_for('auth.register') }}" class="header-link">{{ _('Kayıt Ol') }}</a>
@@ -47,7 +66,6 @@
             {% block content %}{% endblock %}
         </main>
     </div>
-    
     <div id="confirm-delete-modal" class="modal">
         <div class="modal-content confirm-modal-content">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z" clip-rule="evenodd" /></svg>
@@ -59,7 +77,6 @@
             </div>
         </div>
     </div>
-    
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const themeBtn = document.getElementById('theme-btn');
