@@ -1,0 +1,14 @@
+Flask
+Flask-Login
+Flask-Mail
+Flask-Babel
+Flask-Migrate
+Flask-SQLAlchemy
+Flask-WTF
+WTForms
+email-validator
+python-dotenv
+Werkzeug
+itsdangerous
+requests
+SQLAlchemy
