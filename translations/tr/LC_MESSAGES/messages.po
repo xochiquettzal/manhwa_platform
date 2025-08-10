@@ -546,3 +546,43 @@ msgstr "Şifrenizi Sıfırlayın"
 #: templates/auth/reset_password_email.html:10
 msgid "Lyst. hesabınız için şifre sıfırlama talebinde bulundunuz. Yeni bir şifre belirlemek için lütfen aşağıdaki linke tıklayın. Bu link 1 saat geçerlidir:"
 msgstr "Lyst. hesabınız için şifre sıfırlama talebinde bulundunuz. Yeni bir şifre belirlemek için lütfen aşağıdaki linke tıklayın. Bu link 1 saat geçerlidir:"
+
+#: main.py:143 templates/base.html:36
+msgid "Profilim"
+msgstr "Profilim"
+
+#: templates/profile.html:4
+msgid "Profil"
+msgstr "Profil"
+
+#: templates/profile.html:9
+msgid "Genel İstatistikler"
+msgstr "Genel İstatistikler"
+
+#: templates/profile.html:11
+msgid "Listedeki Toplam Seri"
+msgstr "Listedeki Toplam Seri"
+
+#: templates/profile.html:12
+msgid "Tamamlanan Seri"
+msgstr "Tamamlanan Seri"
+
+#: templates/profile.html:13
+msgid "Okunan/İzlenen Bölüm"
+msgstr "Okunan/İzlenen Bölüm"
+
+#: templates/profile.html:14
+msgid "Ortalama Puan"
+msgstr "Ortalama Puan"
+
+#: templates/profile.html:19
+msgid "Liste Durum Dağılımı"
+msgstr "Liste Durum Dağılımı"
+
+#: templates/profile.html:25
+msgid "Profil istatistikleriniz, listenize kayıt ekledikten sonra burada görünecektir."
+msgstr "Profil istatistikleriniz, listenize kayıt ekledikten sonra burada görünecektir."
+
+#: templates/profile.html:48
+msgid "Seri Sayısı"
+msgstr "Seri Sayısı"

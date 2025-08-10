@@ -1,4 +1,4 @@
-# main.py
+# main.py (Nihai ve Düzeltilmiş Sürüm - Profil Sayfası ve Grafik Çevirisi ile)
 from flask import Blueprint, render_template, request, jsonify, flash, redirect, url_for
 from flask_babel import _
 from flask_login import login_required, current_user
@@ -14,6 +14,7 @@ def index():
 @main_bp.route('/my-list')
 @login_required
 def my_list():
+    """Kullanıcının ana paneli - My List sayfası."""
     user_list_items_tuples = db.session.query(UserList, MasterRecord).join(MasterRecord).filter(UserList.user_id == current_user.id).all()
     
     all_tags, all_themes, all_demographics, years, studios = set(), set(), set(), set(), set()
@@ -43,6 +44,7 @@ def my_list():
 
 @main_bp.route('/search')
 def search_page():
+    """Gelişmiş arama sayfasını render eder."""
     studios = db.session.query(MasterRecord.studios).filter(MasterRecord.studios.isnot(None)).distinct().order_by(MasterRecord.studios).all()
     studios = [s[0] for s in studios if s[0]]
     
@@ -71,6 +73,7 @@ def search_page():
 
 @main_bp.route('/top')
 def top_records():
+    """Weighted Score'a göre sıralanmış Top listesini gösterir."""
     m = 1000 
     C = db.session.query(func.avg(MasterRecord.score)).filter(MasterRecord.score.isnot(None)).scalar() or 7.0
     
@@ -88,7 +91,6 @@ def top_records():
 
     return render_template('top_records.html', title=_('En İyiler'), top_list=top_list_query)
 
-# YENİ EKLENDİ
 @main_bp.route('/profile')
 @login_required
 def profile():
@@ -117,15 +119,23 @@ def profile():
         'total_chapters': total_chapters_query or 0
     }
 
-    # Pasta grafik için veri hazırla
-    chart_labels = list(status_counts.keys())
+    # Pasta grafik için ham etiketleri ve verileri al
+    chart_labels_raw = list(status_counts.keys())
     chart_data = list(status_counts.values())
 
-    return render_template('profile.html', title=_('Profilim'), stats=stats, chart_labels=chart_labels, chart_data=chart_data)
+    # Ham etiketleri _() fonksiyonu ile çevir
+    translated_chart_labels = [_(label) for label in chart_labels_raw]
 
-# --- API Endpoints (değişiklik yok) ---
+    return render_template('profile.html', 
+                           title=_('Profilim'), 
+                           stats=stats, 
+                           chart_labels=translated_chart_labels, # Çevrilmiş listeyi gönder
+                           chart_data=chart_data)
+
+# --- API Endpoints ---
 @main_bp.route('/api/advanced-search')
 def advanced_search():
+    """Gelişmiş arama ve sonsuz kaydırma için API."""
     page = request.args.get('page', 1, type=int)
     per_page = 20
     query = request.args.get('q', '', type=str)
@@ -230,6 +240,7 @@ def delete_list_item(user_list_id):
     return jsonify({'success': True, 'message': _("Kayıt listenizden başarıyla kaldırıldı.")})
 @main_bp.route('/api/record/<int:record_id>')
 def get_record_details(record_id):
+    """Search modalı için kayıt detaylarını döndürür."""
     record = MasterRecord.query.get_or_404(record_id)
     return jsonify({
         'id': record.id,
@@ -251,6 +262,7 @@ def get_record_details(record_id):
     })
 @main_bp.route('/language/<lang>')
 def set_language(lang=None):
+    """Dil değiştirme endpointi."""
     from flask import session
     if lang in ['tr', 'en']:
         session['language'] = lang
