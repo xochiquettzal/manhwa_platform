@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="page-title">{{ current_user.username }} - {{ _('Profil') }}</h1>
+
+{% if stats.total > 0 %}
+<div class="profile-layout" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+    
+    <!-- İstatistik Kartları -->
+    <div class="stats-container">
+        <h2 style="margin-top: 0;">{{ _('Genel İstatistikler') }}</h2>
+        <div class="stats-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="info-item"><span class="info-label">{{ _('Listedeki Toplam Seri') }}</span> {{ stats.total }}</div>
+            <div class="info-item"><span class="info-label">{{ _('Tamamlanan Seri') }}</span> {{ stats.completed }}</div>
+            <div class="info-item"><span class="info-label">{{ _('Okunan/İzlenen Bölüm') }}</span> {{ stats.total_chapters }}</div>
+            <div class="info-item"><span class="info-label">{{ _('Ortalama Puan') }}</span> {{ stats.avg_score }}</div>
+        </div>
+    </div>
+
+    <!-- Grafik -->
+    <div class="chart-container" style="background-color: var(--bg-secondary); padding: 1.5rem; border-radius: var(--border-radius); box-shadow: var(--shadow-md);">
+        <h2 style="margin-top: 0;">{{ _('Liste Durum Dağılımı') }}</h2>
+        <!-- Canvas elementi verileri data-* özelliklerinde taşıyacak -->
+        <canvas id="statusChart" 
+                data-labels='{{ chart_labels|tojson }}' 
+                data-data='{{ chart_data|tojson }}'
+                data-serieslabel='{{ _("Seri Sayısı") }}'
+                style="max-height: 300px;"></canvas>
+    </div>
+</div>
+{% else %}
+<p style="color: var(--text-secondary); text-align: center; padding: 3rem; background-color: var(--bg-secondary); border-radius: var(--border-radius);">
+    {{ _('Profil istatistikleriniz, listenize kayıt ekledikten sonra burada görünecektir.') }}
+</p>
+{% endif %}
+{% endblock %}
+
+
+{% block scripts %}
+{% if stats.total > 0 %}
+<!-- Chart.js ve profil scriptlerini ekliyoruz -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='js/profile.js') }}"></script>
+{% endif %}
+{% endblock %}

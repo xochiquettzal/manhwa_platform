@@ -1,10 +1,9 @@
-# main.py (Nihai ve Düzeltilmiş Sürüm - Cache Kaldırıldı)
+# main.py
 from flask import Blueprint, render_template, request, jsonify, flash, redirect, url_for
 from flask_babel import _
 from flask_login import login_required, current_user
 from models import db, MasterRecord, UserList
 from sqlalchemy import case, func
-# from extensions import cache # Kaldırıldı
 
 main_bp = Blueprint('main', __name__)
 
@@ -43,7 +42,6 @@ def my_list():
     )
 
 @main_bp.route('/search')
-# @cache.cached(timeout=3600) # Kaldırıldı
 def search_page():
     studios = db.session.query(MasterRecord.studios).filter(MasterRecord.studios.isnot(None)).distinct().order_by(MasterRecord.studios).all()
     studios = [s[0] for s in studios if s[0]]
@@ -72,7 +70,6 @@ def search_page():
     return render_template('search.html', title=_('Arama'), studios=studios, tags=sorted(list(all_tags)), themes=sorted(list(all_themes)), demographics=sorted(list(all_demos)), years=years)
 
 @main_bp.route('/top')
-# @cache.cached(timeout=3600) # Kaldırıldı
 def top_records():
     m = 1000 
     C = db.session.query(func.avg(MasterRecord.score)).filter(MasterRecord.score.isnot(None)).scalar() or 7.0
@@ -90,6 +87,41 @@ def top_records():
     ).limit(50).all()
 
     return render_template('top_records.html', title=_('En İyiler'), top_list=top_list_query)
+
+# YENİ EKLENDİ
+@main_bp.route('/profile')
+@login_required
+def profile():
+    """Kullanıcı profili ve istatistikleri sayfasını render eder."""
+    
+    # Veritabanından durum bazında sayıları çek (daha verimli)
+    status_counts_query = db.session.query(UserList.status, func.count(UserList.id)).filter_by(user_id=current_user.id).group_by(UserList.status).all()
+    
+    # Ortalama puanı hesapla (0 olan puanları dahil etme)
+    avg_score_query = db.session.query(func.avg(UserList.user_score)).filter(UserList.user_id == current_user.id, UserList.user_score > 0).scalar()
+    
+    # Toplam bölüm sayısını hesapla
+    total_chapters_query = db.session.query(func.sum(UserList.current_chapter)).filter_by(user_id=current_user.id).scalar()
+
+    # Sorgu sonuçlarını kolay kullanılabilir bir sözlüğe dönüştür
+    status_counts = {status: count for status, count in status_counts_query}
+    
+    stats = {
+        'total': sum(status_counts.values()),
+        'watching': status_counts.get('İzleniyor', 0),
+        'reading': status_counts.get('Okunuyor', 0),
+        'completed': status_counts.get('Tamamlandı', 0),
+        'planned': status_counts.get('Planlandı', 0),
+        'dropped': status_counts.get('Bırakıldı', 0),
+        'avg_score': f"{avg_score_query:.2f}" if avg_score_query else "N/A",
+        'total_chapters': total_chapters_query or 0
+    }
+
+    # Pasta grafik için veri hazırla
+    chart_labels = list(status_counts.keys())
+    chart_data = list(status_counts.values())
+
+    return render_template('profile.html', title=_('Profilim'), stats=stats, chart_labels=chart_labels, chart_data=chart_data)
 
 # --- API Endpoints (değişiklik yok) ---
 @main_bp.route('/api/advanced-search')

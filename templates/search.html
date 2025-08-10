@@ -68,7 +68,6 @@
     <div id="loader" style="display: none; text-align: center; padding: 2rem;">
         <p>{{ _('Daha fazla sonuç yükleniyor...') }}</p>
     </div>
-
     <!-- Arama Sonucu Detay Modalı -->
     <div id="details-modal" class="modal">
         <div class="modal-content details-modal-content">
@@ -96,9 +95,9 @@
         </div>
     </div>
 {% endblock %}
-
 {% block scripts %}
     <script>
+        // Bu global değişken search.js'in çalışması için gerekli
         const translations = {
             episodes: "{{ _('bölüm') }}",
             chapters: "{{ _('chapter') }}"
