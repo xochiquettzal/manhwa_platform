@@ -1,10 +1,10 @@
 # main.py (Nihai ve Düzeltilmiş Sürüm)
-
 from flask import Blueprint, render_template, request, jsonify, flash, redirect, url_for
 from flask_babel import _
 from flask_login import login_required, current_user
 from models import db, MasterRecord, UserList
 from sqlalchemy import case, func
+from extensions import cache # Eklendi
 
 main_bp = Blueprint('main', __name__)
 
@@ -26,6 +26,7 @@ def my_list():
     all_demographics = set()
     years = set()
     studios = set()
+
     # DÖNGÜ DÜZELTMESİ: Demeti doğrudan "açıyoruz" (unpacking)
     for user_list_obj, record_obj in user_list_items_tuples:
         if record_obj and record_obj.tags:
@@ -41,12 +42,13 @@ def my_list():
             years.add(record_obj.release_year)
         if record_obj and record_obj.studios:
             studios.add(record_obj.studios)
-    
+
     # Şablona göndereceğimiz veriyi oluşturuyoruz
     user_list = [
         {'list_item': user_list_obj, 'record': record_obj} 
         for user_list_obj, record_obj in user_list_items_tuples
     ]
+
     return render_template(
         'dashboard.html',
         title=_('Listem'),
@@ -59,6 +61,7 @@ def my_list():
     )
 
 @main_bp.route('/search')
+@cache.cached(timeout=3600) # Filtre verileri de 1 saat cache'lenebilir
 def search_page():
     """Gelişmiş arama sayfasını render eder."""
     studios = db.session.query(MasterRecord.studios).filter(MasterRecord.studios.isnot(None)).distinct().order_by(MasterRecord.studios).all()
@@ -71,7 +74,7 @@ def search_page():
         if row[0]:
             for tag in row[0].split(','):
                 all_tags.add(tag.strip())
-
+    
     # Theme listesi
     themes_query = db.session.query(MasterRecord.themes).filter(MasterRecord.themes.isnot(None)).all()
     all_themes = set()
@@ -79,7 +82,7 @@ def search_page():
         if row[0]:
             for tag in row[0].split(','):
                 all_themes.add(tag.strip())
-
+    
     # Demographics listesi
     demos_query = db.session.query(MasterRecord.demographics).filter(MasterRecord.demographics.isnot(None)).all()
     all_demos = set()
@@ -94,6 +97,7 @@ def search_page():
     return render_template('search.html', title=_('Arama'), studios=studios, tags=sorted(list(all_tags)), themes=sorted(list(all_themes)), demographics=sorted(list(all_demos)), years=years)
 
 @main_bp.route('/top')
+@cache.cached(timeout=3600) # Bu sayfa 1 saat (3600 saniye) cache'lenecek
 def top_records():
     """Weighted Score'a göre sıralanmış Top listesini gösterir."""
     m = 1000 
@@ -110,11 +114,11 @@ def top_records():
     ).order_by(
         weighted_score_formula.desc()
     ).limit(50).all()
-    
+
     return render_template('top_records.html', title=_('En İyiler'), top_list=top_list_query)
 
 # --- API Endpoints ---
-
+# ... (API endpointleri genellikle dinamik olduğu için cache'lenmez)
 @main_bp.route('/api/advanced-search')
 def advanced_search():
     """Gelişmiş arama ve sonsuz kaydırma için API."""
@@ -127,7 +131,7 @@ def advanced_search():
     year = request.args.get('year', '', type=str)
     studio = request.args.get('studio', '', type=str)
     sort_by = request.args.get('sort_by', 'popularity', type=str)
-    
+
     base_query = MasterRecord.query
 
     if query:
@@ -138,25 +142,27 @@ def advanced_search():
         tag_list = [f"%{tag.strip()}%" for tag in tags.split(',')]
         for tag in tag_list:
             base_query = base_query.filter(MasterRecord.tags.ilike(tag))
+    
     if themes:
         theme_list = [f"%{t.strip()}%" for t in themes.split(',')]
         for t in theme_list:
             base_query = base_query.filter(MasterRecord.themes.ilike(t))
+    
     if demos:
         demo_list = [f"%{d.strip()}%" for d in demos.split(',')]
         for d in demo_list:
             base_query = base_query.filter(MasterRecord.demographics.ilike(d))
-            
+
     if studio:
         base_query = base_query.filter(MasterRecord.studios == studio)
-    
+
     if year:
         try:
             year_int = int(year)
             base_query = base_query.filter(MasterRecord.release_year == year_int)
         except ValueError:
             pass
-        
+
     if sort_by == 'score':
         base_query = base_query.order_by(MasterRecord.score.desc().nullslast())
     else:
@@ -164,7 +170,7 @@ def advanced_search():
 
     pagination = base_query.paginate(page=page, per_page=per_page, error_out=False)
     results = pagination.items
-    
+
     user_list_record_ids = set()
     if current_user.is_authenticated:
         user_list_record_ids = {item.master_record_id for item in current_user.list_items}
@@ -182,7 +188,7 @@ def advanced_search():
         'total_episodes': record.total_episodes,
         'in_list': record.id in user_list_record_ids
     } for record in results]
-    
+
     return jsonify({
         'results': results_dict,
         'has_next': pagination.has_next
@@ -194,23 +200,29 @@ def advanced_search():
 def update_list_item(user_list_id):
     item = UserList.query.get_or_404(user_list_id)
     if item.user_id != current_user.id: return jsonify({'success': False, 'message': _('Yetkisiz işlem.')}), 403
+    
     data = request.get_json()
     item.status = data.get('status', item.status)
+    
     # Bölüm sayısını toplam bölümle sınırla
     requested_chapter = data.get('current_chapter', item.current_chapter)
     try:
         requested_chapter = int(requested_chapter)
     except Exception:
         requested_chapter = item.current_chapter
+
     total_eps = item.record.total_episodes or 0
     if total_eps and requested_chapter > total_eps:
         requested_chapter = total_eps
     if requested_chapter < 0:
         requested_chapter = 0
+
     item.current_chapter = requested_chapter
     item.user_score = data.get('user_score', item.user_score)
     item.notes = data.get('notes', item.notes)
+    
     db.session.commit()
+    
     if not data.get('silent'):
         flash(_("Kayıt başarıyla güncellendi!"), "success")
     return jsonify({'success': True})
@@ -220,11 +232,14 @@ def update_list_item(user_list_id):
 def add_to_list(record_id):
     existing_entry = UserList.query.filter_by(user_id=current_user.id, master_record_id=record_id).first()
     if existing_entry: return jsonify({'success': False, 'message': _('Bu kayıt zaten listenizde.')}), 409
+
     master_record = MasterRecord.query.get(record_id)
     if not master_record: return jsonify({'success': False, 'message': _('Kayıt bulunamadı.')}), 404
+    
     new_list_item = UserList(user_id=current_user.id, master_record_id=record_id, status='Planlandı')
     db.session.add(new_list_item)
     db.session.commit()
+    
     return jsonify({'success': True, 'message': _("'%(title)s' başarıyla listenize eklendi!", title=master_record.original_title)})
 
 @main_bp.route('/list/delete/<int:user_list_id>', methods=['POST'])
@@ -232,8 +247,10 @@ def add_to_list(record_id):
 def delete_list_item(user_list_id):
     item = UserList.query.get_or_404(user_list_id)
     if item.user_id != current_user.id: return jsonify({'success': False, 'message': _('Yetkisiz işlem.')}), 403
+    
     db.session.delete(item)
     db.session.commit()
+    
     return jsonify({'success': True, 'message': _("Kayıt listenizden başarıyla kaldırıldı.")})
 
 @main_bp.route('/api/record/<int:record_id>')
