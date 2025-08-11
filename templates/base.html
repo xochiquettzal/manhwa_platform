@@ -11,7 +11,7 @@
     <div class="container">
         <header>
             <div class="header-left">
-                <a href="{{ url_for('main.top_records') }}" class="logo">Kurolist</a>
+                <a href="{{ url_for('main.search_page') }}" class="logo">Kurolist</a>
                 <nav class="main-nav">
                     <a href="{{ url_for('main.search_page') }}" class="header-link {% if request.endpoint == 'main.search_page' %}active{% endif %}">{{ _('Arama') }}</a>
                     {% if current_user.is_authenticated %}
