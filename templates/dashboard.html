@@ -20,7 +20,6 @@
             <button id="my-list-clear-btn" class="search-clear-btn hidden" aria-label="{{ _('Temizle') }}">&times;</button>
         </div>
         <div id="my-list-filters" class="filters-group">
-            <!-- YENİ SIRALAMA DROPDOWN'I -->
             <select id="my-list-sort-by" class="filter-btn filter-select">
                 <option value="default">{{ _('Sıralama Yok') }}</option>
                 <option value="title-asc">{{ _('Başlık (A-Z)') }}</option>
@@ -30,7 +29,6 @@
                 <option value="year-desc">{{ _('Yıl (Yeniden Eskiye)') }}</option>
                 <option value="year-asc">{{ _('Yıl (Eskiden Yeniye)') }}</option>
             </select>
-            <!-- MEVCUT FİLTRELER -->
             <select id="my-list-year-filter" class="filter-btn filter-select">
                 <option value="">{{ _('Tüm Yıllar') }}</option>
                 {% for y in years %}<option value="{{ y }}">{{ y }}</option>{% endfor %}
@@ -141,4 +139,11 @@
         </div>
     </div>
 {% endblock %}
-{% block scripts %}<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>{% endblock %}
+{% block scripts %}
+    <script>
+        const translations = {
+            progress_label: "{{ _('Bölüm:') }}"
+        };
+    </script>
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

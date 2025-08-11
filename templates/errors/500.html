@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="error-page-container" style="text-align: center; padding: 4rem 1rem;">
+    <h1 style="font-size: 6rem; font-weight: 800; margin: 0; color: var(--danger-primary);">500</h1>
+    <h2 class="page-title" style="margin-top: 0; margin-bottom: 1rem;">{{ _('Beklenmedik Bir Hata Oluştu') }}</h2>
+    <p style="color: var(--text-secondary); max-width: 450px; margin: 0 auto 2rem auto;">
+        {{ _('Bir şeyler ters gitti. Ekibimiz bu sorundan haberdar edildi ve çözmek için çalışıyoruz. Lütfen daha sonra tekrar deneyin.') }}
+    </p>
+    <a href="{{ url_for('main.index') }}" class="btn btn-primary">{{ _('Anasayfaya Dön') }}</a>
+</div>
+{% endblock %}

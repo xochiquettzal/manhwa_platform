@@ -1,4 +1,4 @@
-// static/js/dashboard.js (Nihai Sürüm - Sıralama ile)
+// static/js/dashboard.js (Nihai Sürüm - Çeviri ve Sıralama ile)
 document.addEventListener('DOMContentLoaded', function() {
     // --- ELEMENT SEÇİMLERİ ---
     const searchBox = document.getElementById('my-list-search-box');
@@ -42,7 +42,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const sortAndReorder = () => {
         const sortValue = sortByFilter ? sortByFilter.value : 'default';
         if (sortValue === 'default') {
-            // Orijinal HTML sırasına geri dönmek için (ID'ye göre sıralayabiliriz)
             listItems.sort((a, b) => parseInt(a.dataset.userListId) - parseInt(b.dataset.userListId));
         } else {
             const [key, direction] = sortValue.split('-');
@@ -64,8 +63,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 return direction === 'asc' ? valA - valB : valB - valA;
             });
         }
-        
-        // DOM'u yeniden sırala
         listItems.forEach(item => listContainer.appendChild(item));
     };
 
@@ -101,8 +98,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
             item.style.display = (statusMatch && searchMatch && yearMatch && studioMatch && tagsMatch && themesMatch && demosMatch) ? 'block' : 'none';
         });
-
-        // Her filtrelemeden sonra sıralamayı uygula
         sortAndReorder();
     };
 
@@ -195,6 +190,7 @@ document.addEventListener('DOMContentLoaded', function() {
         applyFilters();
     });
     refreshChips();
+
     // --- KARTTA +1 BÖLÜM ---
     listContainer.addEventListener('click', async (e) => {
         const incBtn = e.target.closest('.inc-chapter-btn');
@@ -215,7 +211,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 const counter = card.querySelector('.card-bottom-info span');
                 if (counter) {
                     const totalText = total ? ` / ${total}` : '';
-                    counter.textContent = `Bölüm: ${next}${totalText}`;
+                    // DEĞİŞİKLİK BURADA: Sabit metin yerine 'translations' değişkeni kullanıldı.
+                    counter.textContent = `${translations.progress_label} ${next}${totalText}`;
                 }
                 updateCardProgress(card);
             } else {
@@ -223,6 +220,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
+
     // --- GÜNCELLEME MODALI'NI AÇMA ---
     listItems.forEach(item => {
         item.addEventListener('click', (e) => {
@@ -277,6 +275,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     listItems.forEach(updateCardProgress);
+
     // --- MODAL KAPATMA ---
     closeModalBtn.addEventListener('click', () => closeModal(updateModal));
     window.addEventListener('click', (e) => {
@@ -285,6 +284,7 @@ document.addEventListener('DOMContentLoaded', function() {
             closeModal(confirmDeleteModal);
         }
     });
+
     // --- GÜNCELLEME FORMUNU GÖNDERME ---
     updateForm.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -306,6 +306,7 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('Güncelleme sırasında bir hata oluştu.');
         }
     });
+    
     // --- LİSTEDEN SİLME MANTIĞI ---
     const deleteBtn = document.getElementById('delete-item-btn');
     if(deleteBtn) {
