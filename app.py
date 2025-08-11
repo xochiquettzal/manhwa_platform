@@ -1,8 +1,8 @@
-# app.py (Final Sürümü - Cache Kaldırıldı)
+# app.py (Final Sürümü - Hata Sayfaları ile)
 import os
-from flask import Flask, send_from_directory, request, session, redirect, url_for
+from flask import Flask, send_from_directory, request, session, redirect, url_for, render_template # render_template eklendi
 from flask_babel import get_locale
-from extensions import db, migrate, login_manager, mail, babel, limiter # cache kaldırıldı
+from extensions import db, migrate, login_manager, mail, babel, limiter
 from models import User
 from dotenv import load_dotenv
 load_dotenv()
@@ -25,7 +25,7 @@ def create_app():
     db.init_app(app)
     migrate.init_app(app, db)
     mail.init_app(app)
-    limiter.init_app(app)   # Limiter yerinde duruyor
+    limiter.init_app(app)
 
     def locale_selector():
         if 'language' in session and session['language'] in app.config['LANGUAGES']:
@@ -58,6 +58,16 @@ def create_app():
         limiter.limit("120 per minute", methods=["GET"])(main_bp)
         limiter.limit("60 per minute", methods=["POST"])(main_bp)
         app.register_blueprint(main_bp)
+
+    # YENİ EKLENDİ: HATA İŞLEYİCİLER
+    @app.errorhandler(404)
+    def not_found_error(error):
+        return render_template('errors/404.html'), 404
+
+    @app.errorhandler(500)
+    def internal_error(error):
+        db.session.rollback() # Beklenmedik hatalarda veritabanı oturumunu geri al
+        return render_template('errors/500.html'), 500
 
     @app.route('/uploads/<path:filename>')
     def uploaded_file(filename):

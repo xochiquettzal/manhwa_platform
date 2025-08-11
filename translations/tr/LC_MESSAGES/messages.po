@@ -614,3 +614,23 @@ msgstr "Yıl (Yeniden Eskiye)"
 #: templates/dashboard.html:33
 msgid "Yıl (Eskiden Yeniye)"
 msgstr "Yıl (Eskiden Yeniye)"
+
+#: templates/errors/404.html:6
+msgid "Sayfa Bulunamadı"
+msgstr "Sayfa Bulunamadı"
+
+#: templates/errors/404.html:8
+msgid "Aradığınız sayfa kaldırılmış, adı değiştirilmiş veya hiç var olmamış olabilir."
+msgstr "Aradığınız sayfa kaldırılmış, adı değiştirilmiş veya hiç var olmamış olabilir."
+
+#: templates/errors/404.html:11 templates/errors/500.html:11
+msgid "Anasayfaya Dön"
+msgstr "Anasayfaya Dön"
+
+#: templates/errors/500.html:6
+msgid "Beklenmedik Bir Hata Oluştu"
+msgstr "Beklenmedik Bir Hata Oluştu"
+
+#: templates/errors/500.html:8
+msgid "Bir şeyler ters gitti. Ekibimiz bu sorundan haberdar edildi ve çözmek için çalışıyoruz. Lütfen daha sonra tekrar deneyin."
+msgstr "Bir şeyler ters gitti. Ekibimiz bu sorundan haberdar edildi ve çözmek için çalışıyoruz. Lütfen daha sonra tekrar deneyin."
