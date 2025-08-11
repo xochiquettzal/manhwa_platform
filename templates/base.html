@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title or _('Anasayfa') }} - Lyst.</title>
+    <title>{{ title or _('Anasayfa') }} - Kurolist</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📚</text></svg>">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
@@ -11,7 +11,7 @@
     <div class="container">
         <header>
             <div class="header-left">
-                <a href="{{ url_for('main.top_records') }}" class="logo">Lyst.</a>
+                <a href="{{ url_for('main.top_records') }}" class="logo">Kurolist</a>
                 <nav class="main-nav">
                     <a href="{{ url_for('main.search_page') }}" class="header-link {% if request.endpoint == 'main.search_page' %}active{% endif %}">{{ _('Arama') }}</a>
                     {% if current_user.is_authenticated %}
@@ -26,9 +26,7 @@
                     <a href="{{ url_for('main.set_language', lang='tr') }}" class="lang-link {% if get_locale() == 'tr' %}active-lang{% endif %}">TR</a>
                     <a href="{{ url_for('main.set_language', lang='en') }}" class="lang-link {% if get_locale() == 'en' %}active-lang{% endif %}">EN</a>
                 </div>
-                
-                <button id="theme-btn" title="{{ _('Temayı Değiştir') }}"><svg id="theme-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"></svg></button>
-                
+                <button id="theme-btn" class="theme-btn" title="{{ _('Temayı Değiştir') }}"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"></svg></button>
                 {% if current_user.is_authenticated %}
                 <div class="user-menu">
                     <button id="user-menu-btn" class="user-menu-btn">
@@ -50,16 +48,47 @@
                     <a href="{{ url_for('auth.login') }}" class="btn btn-secondary">{{ _('Giriş Yap') }}</a>
                     <a href="{{ url_for('auth.register') }}" class="btn btn-primary">{{ _('Kayıt Ol') }}</a>
                 {% endif %}
-
-                <!-- Mobil Menü Butonu (Hamburger) -->
-                <button id="mobile-menu-btn" class="mobile-menu-btn" aria-label="Toggle Menu">
-                    <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"></path></svg>
-                </button>
             </div>
 
-            <!-- Mobil Navigasyon Kapsayıcısı (JS ile doldurulacak) -->
-            <div id="mobile-nav-container" class="mobile-nav-container"></div>
+            <button id="mobile-menu-btn" class="mobile-menu-btn" aria-label="Toggle Menu">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"></path></svg>
+            </button>
+            
+            <!-- DÜZELTME: Mobil Panel Header'ın İÇİNE ALINDI -->
+            <div id="mobile-nav-panel" class="mobile-nav-panel">
+                <nav class="mobile-main-nav">
+                    <a href="{{ url_for('main.search_page') }}" class="header-link">{{ _('Arama') }}</a>
+                    {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('main.my_list') }}" class="header-link">{{ _('Listem') }}</a>
+                    {% endif %}
+                    <a href="{{ url_for('main.top_records') }}" class="header-link">{{ _('En İyiler') }}</a>
+                </nav>
+                <div class="mobile-actions">
+                    {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('main.profile') }}" class="dropdown-item">{{ _('Profilim') }}</a>
+                        {% if current_user.is_admin %}
+                            <a href="{{ url_for('admin.dashboard') }}" class="dropdown-item">{{ _('Admin') }}</a>
+                        {% endif %}
+                        <div class="dropdown-divider"></div>
+                        <form action="{{ url_for('auth.logout') }}" method="post">
+                            <button type="submit" class="dropdown-item logout-btn">{{ _('Çıkış Yap') }}</button>
+                        </form>
+                    {% else %}
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-secondary">{{ _('Giriş Yap') }}</a>
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-primary">{{ _('Kayıt Ol') }}</a>
+                    {% endif %}
+                    <div class="dropdown-divider"></div>
+                    <div class="mobile-controls">
+                        <div class="language-switcher">
+                            <a href="{{ url_for('main.set_language', lang='tr') }}" class="lang-link {% if get_locale() == 'tr' %}active-lang{% endif %}">TR</a>
+                            <a href="{{ url_for('main.set_language', lang='en') }}" class="lang-link {% if get_locale() == 'en' %}active-lang{% endif %}">EN</a>
+                        </div>
+                        <button id="theme-btn-mobile" class="theme-btn" title="{{ _('Temayı Değiştir') }}"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"></svg></button>
+                    </div>
+                </div>
+            </div>
         </header>
+        
         <main>
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}

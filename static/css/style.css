@@ -1,4 +1,4 @@
-/* static/css/style.css (v4 - Gelişmiş Header ve Mobil Uyumlu - TAM SÜRÜM) */
+/* static/css/style.css (v5.1 - KESİN ÇÖZÜM) */
 
 /* --- 1. Global & Tema Değişkenleri --- */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -26,14 +26,7 @@ html { scrollbar-gutter: stable both-edges; }
 .page-title { font-size: 2rem; font-weight: 700; margin-bottom: 2rem; }
 
 /* --- 3. YENİ HEADER TASARIMI --- */
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid var(--border-primary);
-    margin-bottom: 2rem;
-}
+header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-primary); margin-bottom: 2rem; position: relative; }
 .header-left, .header-right { display: flex; align-items: center; gap: 2rem; }
 header .logo { font-size: 1.75rem; font-weight: 700; text-decoration: none; color: var(--text-primary); transition: var(--transition); }
 header .logo:hover { opacity: 0.8; }
@@ -44,24 +37,19 @@ header .logo:hover { opacity: 0.8; }
 .language-switcher { display: flex; gap: 0.5rem; background-color: var(--bg-tertiary); padding: 4px; border-radius: 9999px; }
 .lang-link { font-weight: 600; padding: 0.25rem 0.75rem; border-radius: 9999px; text-decoration: none; color: var(--text-secondary); transition: var(--transition); }
 .lang-link.active-lang { background-color: var(--bg-secondary); color: var(--text-primary); box-shadow: var(--shadow-sm); }
-#theme-btn { background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 0.5rem; border-radius: 9999px; display: flex; align-items: center; transition: var(--transition); }
-#theme-btn:hover { background-color: var(--bg-tertiary); transform: scale(1.1); }
-#theme-btn svg { width: 22px; height: 22px; }
-
-/* Kullanıcı Dropdown Menüsü */
+.theme-btn { background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 0.5rem; border-radius: 9999px; display: flex; align-items: center; transition: var(--transition); }
+.theme-btn:hover { background-color: var(--bg-tertiary); transform: scale(1.1); }
+.theme-btn svg { width: 22px; height: 22px; }
 .user-menu { position: relative; }
 .user-menu-btn { display: flex; align-items: center; gap: 0.25rem; background: none; border: none; color: var(--text-primary); font-family: inherit; font-size: 0.95rem; font-weight: 500; cursor: pointer; padding: 0.5rem; border-radius: var(--border-radius); }
 .user-menu-btn:hover { background-color: var(--bg-tertiary); }
 .user-menu-dropdown { display: none; position: absolute; top: calc(100% + 10px); right: 0; background-color: var(--bg-secondary); border-radius: var(--border-radius); border: 1px solid var(--border-primary); box-shadow: var(--shadow-lg); z-index: 100; min-width: 180px; padding: 0.5rem; animation: slideInDown 0.2s ease-out; }
 .user-menu-dropdown.active { display: block; }
-.dropdown-item { display: block; width: 100%; padding: 0.75rem 1rem; text-decoration: none; color: var(--text-primary); border-radius: 6px; text-align: left; }
+.dropdown-item { display: block; width: 100%; box-sizing: border-box; padding: 0.75rem 1rem; text-decoration: none; color: var(--text-primary); border-radius: 6px; text-align: left; }
 .dropdown-item:hover { background-color: var(--bg-tertiary); }
 .dropdown-divider { height: 1px; background-color: var(--border-primary); margin: 0.5rem 0; }
 .logout-btn { background: none; border: none; font-family: inherit; font-size: inherit; cursor: pointer; width: 100%; }
-
-/* Mobil Menü */
-.mobile-menu-btn { display: none; }
-.mobile-nav-container { display: none; }
+.mobile-menu-btn, .mobile-nav-panel { display: none; }
 
 /* --- 4. Formlar (Login, Register, Modal) --- */
 .form-wrapper { max-width: 450px; margin: 3rem auto; padding: 2.5rem; background-color: var(--bg-secondary); border-radius: var(--border-radius); border: 1px solid var(--border-primary); box-shadow: var(--shadow-lg); }
@@ -213,6 +201,10 @@ header .logo:hover { opacity: 0.8; }
   0% { transform: translateY(20px) scale(0.95); opacity: 0; }
   100% { transform: translateY(0) scale(1); opacity: 1; }
 }
+@keyframes slideInDown {
+    from { transform: translateY(-10px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
 
 /******************************************/
 /* --- 10. MOBİL UYUMLULUK BÖLÜMÜ --- */
@@ -237,82 +229,67 @@ header .logo:hover { opacity: 0.8; }
     } 
 }
 
-/* Genel Kırılma Noktası (Breakpoint) - 992px altı */
 @media (max-width: 992px) {
-    /* Genel Ayarlamalar */
     .container { padding-top: 1rem; padding-bottom: 1rem; }
     header { padding-bottom: 1rem; margin-bottom: 1.5rem; }
     .page-title { font-size: 1.75rem; }
-
-    /* Yeni Header Yapısı */
-    .main-nav { display: none; }
-    .header-right .language-switcher, 
-    .header-right .user-menu, 
-    .header-right .btn { display: none; }
-    .mobile-menu-btn { 
-        display: block; 
-        background: none; 
-        border: none; 
-        color: var(--text-primary); 
-        cursor: pointer; 
-        z-index: 101; 
-        padding: 0.5rem;
-    }
-    .header-left { gap: 1rem; }
-
-    /* Mobil menü paneli */
-    .mobile-nav-container {
+    .main-nav, .header-right { display: none; }
+    .mobile-menu-btn { display: block; }
+    .header-left { flex-grow: 1; justify-content: space-between; }
+    .mobile-nav-panel {
         display: none;
         position: absolute;
-        top: calc(100% + 10px);
+        top: 100%;
         left: 0;
         right: 0;
         background-color: var(--bg-secondary);
         padding: 1rem;
-        border-radius: var(--border-radius);
+        border-radius: 0 0 var(--border-radius) var(--border-radius);
         box-shadow: var(--shadow-lg);
         z-index: 100;
         animation: slideInDown 0.3s ease-out;
     }
-    .mobile-nav-container.active { display: block; }
-    .mobile-nav-container a, 
-    .mobile-nav-container button {
-        display: block;
-        width: 100%;
-        padding: 0.75rem 1rem;
-        text-decoration: none;
-        color: var(--text-primary);
-        border-radius: 6px;
-        text-align: left;
-        box-sizing: border-box;
-    }
-    .mobile-nav-container a:hover,
-    .mobile-nav-container button:hover { background-color: var(--bg-tertiary); }
-    .mobile-nav-container .logout-btn { background: none; border: none; font-family: inherit; font-size: inherit; cursor: pointer; }
-
-    /* Sayfa Kontrolleri (Filtreler/Arama) */
+    .mobile-nav-panel.active { display: block; }
+    .mobile-nav-panel .mobile-main-nav { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-primary); }
+    .mobile-nav-panel .mobile-actions { display: flex; flex-direction: column; gap: 0.5rem; }
+    .mobile-nav-panel .btn { margin: 0.25rem 0; text-align: center; justify-content: center; }
+    .mobile-nav-panel a, .mobile-nav-panel button { display: block; width: 100%; padding: 0.75rem 1rem; text-decoration: none; color: var(--text-primary); border-radius: 6px; text-align: left; box-sizing: border-box; font-size: 1rem; }
+    .mobile-nav-panel a:hover, .mobile-nav-panel button:hover { background-color: var(--bg-tertiary); }
+    .mobile-nav-panel .logout-btn { background: none; border: none; font-family: inherit; cursor: pointer; }
+    .mobile-nav-panel .mobile-controls { display: flex; justify-content: space-between; align-items: center; }
     .page-controls { flex-direction: column; align-items: stretch; gap: 1rem; }
     .segmented-group, .filters-group { justify-content: center; }
-    #my-list-search-container { max-width: none; }
-
-    /* Kart Grid Yapısı */
     #results-container, #admin-records-list, #user-list-container {
         grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
         gap: 1rem;
     }
     .card-image-wrapper { height: 210px; }
     .card-title { font-size: 0.9rem; }
-
-    /* Modal İçerikleri */
     .details-image { max-width: 200px; height: auto; margin: 0 auto 1.5rem auto; }
     .details-bottom-section { grid-template-columns: 1fr 1fr; }
-    
-    /* Top Listesi */
     .top-list-item { flex-direction: column; align-items: center; text-align: center; gap: 1rem; }
     .top-rank { display: none; }
     .top-image { width: 80px; height: 120px; }
     .top-info { text-align: center; }
     .top-score-container { text-align: center; }
+
+    .tag-panel {
+        position: fixed !important;
+        top: 50% !important;
+        left: 50% !important;
+        right: auto !important;
+        transform: translate(-50%, -50%);
+        width: 90%;
+        max-width: 360px;
+        animation: popIn 0.3s ease-out;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.2s ease, visibility 0.2s ease;
+    }
+    .tag-panel.open {
+        opacity: 1;
+        visibility: visible;
+    }
 }
 
 @media (max-width: 480px) {
@@ -320,10 +297,4 @@ header .logo:hover { opacity: 0.8; }
     .form-wrapper { padding: 1.5rem; }
     .page-title { font-size: 1.5rem; }
     #results-container, #admin-records-list, #user-list-container { grid-template-columns: 1fr 1fr; }
-    .tag-panel { width: calc(100vw - 2rem); }
-}
-
-@keyframes slideInDown {
-    from { transform: translateY(-10px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
 }
