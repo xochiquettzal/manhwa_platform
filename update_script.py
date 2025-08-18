@@ -2,8 +2,26 @@
 
 import requests
 import time
+from datetime import datetime
 from app import create_app, db
 from models import MasterRecord
+
+def parse_date_string(date_string):
+    """Jikan API'den gelen tarih string'ini Python datetime objesine çevirir."""
+    if not date_string:
+        return None
+    
+    try:
+        # Jikan API formatı: '1963-01-01T00:00:00+00:00' veya '1963-01-01'
+        if 'T' in date_string:
+            # ISO format: '1963-01-01T00:00:00+00:00'
+            return datetime.fromisoformat(date_string.replace('Z', '+00:00'))
+        else:
+            # Date only format: '1963-01-01'
+            return datetime.strptime(date_string, '%Y-%m-%d')
+    except ValueError as e:
+        print(f"Tarih parse hatası '{date_string}': {e}")
+        return None
 
 def update_dynamic_data():
     """Veritabanındaki tüm kayıtların dinamik verilerini (puan, popülerlik, oy sayısı) günceller."""
@@ -47,8 +65,18 @@ def update_dynamic_data():
                 aired = data.get('aired') or {}
                 from_date = aired.get('from')
                 to_date = aired.get('to')
-                record.aired_from = from_date or record.aired_from
-                record.aired_to = to_date or record.aired_to
+                
+                # Tarih string'lerini datetime objelerine çevir
+                if from_date:
+                    parsed_from_date = parse_date_string(from_date)
+                    if parsed_from_date:
+                        record.aired_from = parsed_from_date
+                
+                if to_date:
+                    parsed_to_date = parse_date_string(to_date)
+                    if parsed_to_date:
+                        record.aired_to = parsed_to_date
+                
                 # Themes (bazı serilerde returns under "themes" array)
                 theme_names = []
                 for t in (data.get('themes') or []):

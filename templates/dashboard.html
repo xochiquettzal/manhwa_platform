@@ -1,6 +1,39 @@
 {% extends "base.html" %}
 {% block content %}
     <h1 class="page-title">{{ _('Listem') }}</h1>
+    
+    <!-- Üst sıra: Import ve Toplu İşlemler -->
+    <div class="page-controls">
+        <div class="actions-group">
+            <button id="import-mal-btn" class="btn btn-secondary" style="font-size: 0.9rem; padding: 0.5rem 1rem;">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="14" height="14" style="margin-right: 6px;">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+                {{ _('MAL Import') }}
+            </button>
+            <button id="select-all-btn" class="btn btn-secondary" style="font-size: 0.9rem; padding: 0.5rem 1rem;">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="14" height="14" style="margin-right: 6px;">
+                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                </svg>
+                {{ _('Tümünü Seç') }}
+            </button>
+            <button id="bulk-delete-btn" class="btn btn-danger" style="font-size: 0.9rem; padding: 0.5rem 1rem; display: none;">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="14" height="14" style="margin-right: 6px;">
+                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                </svg>
+                {{ _('Seçilenleri Sil') }}
+            </button>
+        </div>
+        <div id="my-list-status-container" class="segmented-group">
+            <button class="filter-btn active" data-status="all">{{ _('Tümü') }}</button>
+            <button class="filter-btn" data-status="İzleniyor">{{ _('İzleniyor') }}</button>
+            <button class="filter-btn" data-status="Okunuyor">{{ _('Okunuyor') }}</button>
+            <button class="filter-btn" data-status="Tamamlandı">{{ _('Tamamlandı') }}</button>
+            <button class="filter-btn" data-status="Planlandı">{{ _('Planlandı') }}</button>
+            <button class="filter-btn" data-status="Bırakıldı">{{ _('Bırakıldı') }}</button>
+        </div>
+    </div>
+    
     <!-- Üst sıra: Durum filtreleri -->
     <div class="page-controls">
         <div id="my-list-status-container" class="segmented-group">
@@ -77,6 +110,9 @@
                 data-studios="{{ item.record.studios or '' }}"
                 data-release-year="{{ item.record.release_year or 0 }}"
                 data-total-episodes="{{ item.record.total_episodes or '' }}">
+                <div class="card-checkbox">
+                    <input type="checkbox" class="card-select-checkbox" data-user-list-id="{{ item.list_item.id }}">
+                </div>
                 <div class="card-image-wrapper"><img src="{{ item.record.image_url or 'https://via.placeholder.com/250x350.png?text=Yok' }}" class="card-image" loading="lazy"></div>
                 <div class="card-info">
                     <h3 class="card-title">{{ item.record.original_title }}</h3>
@@ -134,6 +170,67 @@
                     <div class="info-item"><span class="info-label">{{ _('Tema:') }}</span> <span id="details-themes"></span></div>
                     <div class="info-item tags full-width"><span class="info-label">{{ _('Etiketler:') }}</span> <span id="details-tags"></span></div>
                     <div class="details-notes full-width"><h3 class="info-label">{{ _('Konu') }}</h3><p id="details-synopsis"></p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- MyAnimeList Import Modal -->
+    <div id="import-mal-modal" class="modal">
+        <div class="modal-content">
+            <span id="close-import-modal-btn" class="close-btn">&times;</span>
+            <h2>{{ _('MyAnimeList Listesini İçe Aktar') }}</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                {{ _('MyAnimeList\'ten export ettiğiniz XML dosyasını yükleyin. Mevcut listenizle birleştirilecektir.') }}
+            </p>
+            
+            <form id="import-mal-form" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="mal-file">{{ _('XML Dosyası:') }}</label>
+                    <input type="file" id="mal-file" name="mal_file" accept=".xml" required>
+                    <small style="color: var(--text-secondary);">
+                        {{ _('Sadece MyAnimeList export XML dosyaları desteklenir.') }}
+                    </small>
+                </div>
+                
+                <div class="form-group">
+                    <label>{{ _('İçe Aktar Seçenekleri:') }}</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="import-scores" name="import_scores" checked>
+                            <span>{{ _('Kullanıcı puanlarını içe aktar') }}</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="import-notes" name="import_notes" checked>
+                            <span>{{ _('Kullanıcı notlarını içe aktar') }}</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="import-dates" name="import_dates" checked>
+                            <span>{{ _('İzleme tarihlerini içe aktar') }}</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" id="cancel-import-btn" class="btn btn-secondary">{{ _('İptal') }}</button>
+                    <button type="submit" id="submit-import-btn" class="btn btn-primary">
+                        {{ _('İçe Aktar') }}
+                    </button>
+                </div>
+            </form>
+            
+            <div id="import-progress" style="display: none;">
+                <div class="progress-info">
+                    <div class="progress-bar">
+                        <div class="progress" id="import-progress-bar"></div>
+                    </div>
+                    <p id="import-status-text">{{ _('İçe aktarım başlatılıyor...') }}</p>
+                    <div class="progress-details">
+                        <small style="color: var(--text-secondary);">
+                            {{ _('Bu işlem, veritabanında olmayan anime/manga\'lar için Jikan API\'den veri çekecektir.') }}
+                            <br>{{ _('Lütfen bekleyiniz, bu biraz zaman alabilir...') }}
+                        </small>
+                    </div>
                 </div>
             </div>
         </div>

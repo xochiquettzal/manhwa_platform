@@ -260,6 +260,341 @@ def get_record_details(record_id):
         'score': record.score,
         'status': record.status
     })
+@main_bp.route('/import/mal', methods=['POST'])
+@login_required
+def import_mal_list():
+    """MyAnimeList XML export dosyasını içe aktarır."""
+    if 'mal_file' not in request.files:
+        return jsonify({'success': False, 'message': _('Dosya yüklenmedi.')}), 400
+    
+    file = request.files['mal_file']
+    if file.filename == '':
+        return jsonify({'success': False, 'message': _('Dosya seçilmedi.')}), 400
+    
+    if not file.filename.endswith('.xml'):
+        return jsonify({'success': False, 'message': _('Sadece XML dosyaları desteklenir.')}), 400
+    
+    try:
+        import xml.etree.ElementTree as ET
+        import requests
+        import time
+        from datetime import datetime
+        
+        # XML'i parse et
+        tree = ET.parse(file)
+        root = tree.getroot()
+        
+        # MyAnimeList namespace'i
+        namespace = {'mal': 'http://myanimelist.net/xsd/1.0'}
+        
+        # Kullanıcı bilgilerini al
+        user_info = root.find('myinfo', namespace)
+        if user_info is None:
+            return jsonify({'success': False, 'message': _('Geçersiz MyAnimeList export dosyası.')}), 400
+        
+        # Anime listesini al
+        anime_list = root.findall('anime', namespace)
+        if not anime_list:
+            return jsonify({'success': False, 'message': _('Anime listesi bulunamadı.')}), 400
+        
+        # İçe aktarım seçenekleri
+        import_scores = request.form.get('import_scores', 'false').lower() == 'true'
+        import_notes = request.form.get('import_notes', 'false').lower() == 'true'
+        import_dates = request.form.get('import_dates', 'false').lower() == 'true'
+        
+        imported_count = 0
+        updated_count = 0
+        skipped_count = 0
+        errors = []
+        new_records_created = 0
+        updated_records_count = 0
+        
+        # Jikan API rate limiting: 1 istek/saniye
+        delay_between_requests = 1.2
+        
+        def fetch_from_jikan(mal_id, record_type):
+            """Jikan API'den anime/manga detaylarını çeker."""
+            try:
+                # Record type'a göre endpoint seç
+                if record_type.lower() == 'manga':
+                    url = f"https://api.jikan.moe/v4/manga/{mal_id}"
+                else:
+                    url = f"https://api.jikan.moe/v4/anime/{mal_id}"
+                
+                response = requests.get(url)
+                response.raise_for_status()
+                data = response.json().get('data')
+                
+                if not data:
+                    return None
+                
+                # Parse date string helper
+                def parse_date_string(date_string):
+                    if not date_string:
+                        return None
+                    try:
+                        if 'T' in date_string:
+                            return datetime.fromisoformat(date_string.replace('Z', '+00:00'))
+                        else:
+                            return datetime.strptime(date_string, '%Y-%m-%d')
+                    except ValueError:
+                        return None
+                
+                # Yeni MasterRecord oluştur
+                new_record = MasterRecord(
+                    mal_id=mal_id,
+                    original_title=data.get('title', ''),
+                    english_title=data.get('title_english', ''),
+                    record_type='Anime' if record_type.lower() == 'anime' else 'Manga',
+                    mal_type=data.get('type', ''),
+                    image_url=data.get('images', {}).get('jpg', {}).get('image_url', ''),
+                    synopsis=data.get('synopsis', ''),
+                    tags=", ".join([g.get('name', '') for g in data.get('genres', []) if g.get('name')]),
+                    themes=", ".join([t.get('name', '') for t in data.get('themes', []) if t.get('name')]),
+                    source=data.get('source', ''),
+                    studios=", ".join([s.get('name', '') for s in data.get('studios', []) if s.get('name')]) if record_type.lower() == 'anime' else '',
+                    release_year=data.get('year'),
+                    total_episodes=data.get('episodes') if record_type.lower() == 'anime' else data.get('chapters'),
+                    score=data.get('score'),
+                    popularity=data.get('popularity'),
+                    scored_by=data.get('scored_by'),
+                    status=data.get('status', ''),
+                    aired_from=parse_date_string(data.get('aired', {}).get('from') if record_type.lower() == 'anime' else data.get('published', {}).get('from')),
+                    aired_to=parse_date_string(data.get('aired', {}).get('to') if record_type.lower() == 'anime' else data.get('published', {}).get('to')),
+                    duration=data.get('duration', '') if record_type.lower() == 'anime' else '',
+                    demographics=", ".join([d.get('name', '') for d in data.get('demographics', []) if d.get('name')]),
+                    rating=data.get('rating', ''),
+                    members=data.get('members'),
+                    favorites=data.get('favorites'),
+                    relations=str(data.get('relations', [])),
+                    licensors=", ".join([l.get('name', '') for l in data.get('licensors', []) if l.get('name')]),
+                    producers=", ".join([p.get('name', '') for p in (data.get('producers', []) if record_type.lower() == 'anime' else data.get('authors', [])) if p.get('name')])
+                )
+                
+                return new_record
+                
+            except Exception as e:
+                print(f"Jikan API hatası (MAL ID {mal_id}): {e}")
+                return None
+        
+        for anime in anime_list:
+            try:
+                # MAL ID'yi al
+                mal_id = anime.find('series_animedb_id', namespace)
+                if mal_id is None or mal_id.text is None:
+                    continue
+                
+                mal_id = int(mal_id.text)
+                
+                # MasterRecord'u bul veya oluştur
+                master_record = MasterRecord.query.filter_by(mal_id=mal_id).first()
+                
+                # Check if we need to fetch data (either new record or existing record with missing data)
+                needs_data_fetch = False
+                if not master_record:
+                    needs_data_fetch = True
+                elif not master_record.image_url or not master_record.synopsis or not master_record.source:
+                    # Existing record but missing key data
+                    needs_data_fetch = True
+                    print(f"Mevcut kayıt için eksik veri tespit edildi: MAL ID {mal_id}")
+                
+                if needs_data_fetch:
+                    # Jikan API'den detaylı bilgileri çek
+                    record_type = anime.find('series_type', namespace)
+                    record_type_text = record_type.text if record_type is not None else 'anime'
+                    
+                    print(f"Jikan API'den veri çekiliyor: MAL ID {mal_id} ({record_type_text})")
+                    fetched_record = fetch_from_jikan(mal_id, record_type_text)
+                    
+                    if fetched_record:
+                        if not master_record:
+                            # New record
+                            master_record = fetched_record
+                            db.session.add(master_record)
+                            new_records_created += 1
+                            print(f"--> Yeni kayıt oluşturuldu: {master_record.original_title}")
+                        else:
+                            # Update existing record with fetched data
+                            master_record.image_url = fetched_record.image_url
+                            master_record.synopsis = fetched_record.synopsis
+                            master_record.source = fetched_record.source
+                            master_record.studios = fetched_record.studios
+                            master_record.demographics = fetched_record.demographics
+                            master_record.tags = fetched_record.tags
+                            master_record.themes = fetched_record.themes
+                            master_record.english_title = fetched_record.english_title
+                            master_record.mal_type = fetched_record.mal_type
+                            master_record.release_year = fetched_record.release_year
+                            master_record.total_episodes = fetched_record.total_episodes
+                            master_record.score = fetched_record.score
+                            master_record.popularity = fetched_record.popularity
+                            master_record.scored_by = fetched_record.scored_by
+                            master_record.status = fetched_record.status
+                            master_record.aired_from = fetched_record.aired_from
+                            master_record.aired_to = fetched_record.aired_to
+                            master_record.duration = fetched_record.duration
+                            master_record.rating = fetched_record.rating
+                            master_record.members = fetched_record.members
+                            master_record.favorites = fetched_record.favorites
+                            master_record.relations = fetched_record.relations
+                            master_record.licensors = fetched_record.licensors
+                            master_record.producers = fetched_record.producers
+                            print(f"--> Mevcut kayıt güncellendi: {master_record.original_title}")
+                            updated_records_count += 1
+                        
+                        db.session.flush()  # ID'yi almak için flush
+                        
+                        # Rate limiting
+                        time.sleep(delay_between_requests)
+                    else:
+                        # Jikan API'den veri çekilemezse basit kayıt oluştur
+                        if not master_record:
+                            title = anime.find('series_title', namespace)
+                            title_text = title.text if title is not None else f"Unknown {mal_id}"
+                            
+                            master_record = MasterRecord(
+                                mal_id=mal_id,
+                                original_title=title_text,
+                                record_type='Anime' if record_type_text.lower() == 'anime' else 'Manga',
+                                mal_type=record_type_text,
+                                total_episodes=int(anime.find('series_episodes', namespace).text) if anime.find('series_episodes', namespace) is not None and anime.find('series_episodes', namespace).text.isdigit() else None
+                            )
+                            db.session.add(master_record)
+                            db.session.flush()
+                            print(f"--> Basit kayıt oluşturuldu: {title_text}")
+                
+                # Kullanıcının listesinde var mı kontrol et
+                existing_item = UserList.query.filter_by(
+                    user_id=current_user.id, 
+                    master_record_id=master_record.id
+                ).first()
+                
+                if existing_item:
+                    # Mevcut öğeyi güncelle
+                    if import_scores:
+                        score = anime.find('my_score', namespace)
+                        if score is not None and score.text and score.text.isdigit():
+                            existing_item.user_score = int(score.text)
+                    
+                    if import_notes:
+                        comments = anime.find('my_comments', namespace)
+                        if comments is not None and comments.text:
+                            existing_item.notes = comments.text
+                    
+                    if import_dates:
+                        # İzleme durumunu güncelle
+                        status = anime.find('my_status', namespace)
+                        if status is not None and status.text:
+                            mal_status = status.text.lower()
+                            if mal_status == 'completed':
+                                existing_item.status = 'Tamamlandı'
+                                existing_item.current_chapter = master_record.total_episodes or 0
+                            elif mal_status == 'watching':
+                                existing_item.status = 'İzleniyor'
+                            elif mal_status == 'plan to watch':
+                                existing_item.status = 'Planlandı'
+                            elif mal_status == 'on-hold':
+                                existing_item.status = 'Bırakıldı'
+                            elif mal_status == 'dropped':
+                                existing_item.status = 'Bırakıldı'
+                        
+                        # İzlenen bölüm sayısını güncelle
+                        watched_eps = anime.find('my_watched_episodes', namespace)
+                        if watched_eps is not None and watched_eps.text and watched_eps.text.isdigit():
+                            existing_item.current_chapter = int(watched_eps.text)
+                    
+                    updated_count += 1
+                else:
+                    # Yeni öğe ekle
+                    new_item = UserList(
+                        user_id=current_user.id,
+                        master_record_id=master_record.id,
+                        status='Planlandı',
+                        current_chapter=0,
+                        user_score=0,
+                        notes=''
+                    )
+                    
+                    # Durum ve bölüm bilgilerini ayarla
+                    status = anime.find('my_status', namespace)
+                    if status is not None and status.text:
+                        mal_status = status.text.lower()
+                        if mal_status == 'completed':
+                            new_item.status = 'Tamamlandı'
+                            new_item.current_chapter = master_record.total_episodes or 0
+                        elif mal_status == 'watching':
+                            new_item.status = 'İzleniyor'
+                        elif mal_status == 'plan to watch':
+                            new_item.status = 'Planlandı'
+                        elif mal_status == 'on-hold':
+                            new_item.status = 'Bırakıldı'
+                        elif mal_status == 'dropped':
+                            new_item.status = 'Bırakıldı'
+                    
+                    # İzlenen bölüm sayısını ayarla
+                    watched_eps = anime.find('my_watched_episodes', namespace)
+                    if watched_eps is not None and watched_eps.text and watched_eps.text.isdigit():
+                        new_item.current_chapter = int(watched_eps.text)
+                    
+                    # Puan ve notları ayarla
+                    if import_scores:
+                        score = anime.find('my_score', namespace)
+                        if score is not None and score.text and score.text.isdigit():
+                            new_item.user_score = int(score.text)
+                        else:
+                            new_item.user_score = 0
+                    else:
+                        new_item.user_score = 0
+                    
+                    if import_notes:
+                        comments = anime.find('my_comments', namespace)
+                        if comments is not None and comments.text:
+                            new_item.notes = comments.text
+                        else:
+                            new_item.notes = ''
+                    else:
+                        new_item.notes = ''
+                    
+                    db.session.add(new_item)
+                    imported_count += 1
+                
+            except Exception as e:
+                errors.append(f"Anime {mal_id}: {str(e)}")
+                skipped_count += 1
+                continue
+        
+        # Değişiklikleri kaydet
+        db.session.commit()
+        
+        message = _('İçe aktarım tamamlandı! %(imported)d yeni öğe eklendi, %(updated)d öğe güncellendi, %(skipped)d öğe atlandı.', 
+                   imported=imported_count, updated=updated_count, skipped=skipped_count)
+        
+        if new_records_created > 0:
+            message += f" {new_records_created} yeni anime/manga veritabanına eklendi."
+        
+        if updated_records_count > 0:
+            message += f" {updated_records_count} mevcut anime/manga kaydı güncellendi."
+        
+        if errors:
+            message += f" {len(errors)} hata oluştu."
+        
+        return jsonify({
+            'success': True, 
+            'message': message,
+            'imported': imported_count,
+            'updated': updated_count,
+            'skipped': skipped_count,
+            'new_records': new_records_created,
+            'updated_records': updated_records_count,
+            'errors': errors
+        })
+        
+    except ET.ParseError:
+        return jsonify({'success': False, 'message': _('XML dosyası parse edilemedi.')}), 400
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': f'{_("İçe aktarım sırasında hata:")} {str(e)}'}), 500
+
 @main_bp.route('/language/<lang>')
 def set_language(lang=None):
     """Dil değiştirme endpointi."""

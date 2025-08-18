@@ -16,6 +16,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const updateModal = document.getElementById('update-item-modal');
     const confirmDeleteModal = document.getElementById('confirm-delete-modal');
     
+    // Toplu işlem elementleri
+    const selectAllBtn = document.getElementById('select-all-btn');
+    const bulkDeleteBtn = document.getElementById('bulk-delete-btn');
+    
     if (!listContainer) return;
     
     const updateForm = document.getElementById('update-item-form');
@@ -224,7 +228,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- GÜNCELLEME MODALI'NI AÇMA ---
     listItems.forEach(item => {
         item.addEventListener('click', (e) => {
+            // Checkbox'a tıklandıysa modal açma
+            if (e.target.closest('.card-checkbox') || e.target.closest('.card-select-checkbox')) {
+                e.stopPropagation();
+                return;
+            }
+            
             if (e.target.closest('.inc-chapter-btn')) return;
+            
             const recordType = item.dataset.recordType;
             const statusSelect = updateForm.querySelector('#status-input');
             Array.from(statusSelect.options).forEach(opt => opt.style.display = 'block');
@@ -296,8 +307,7 @@ document.addEventListener('DOMContentLoaded', function() {
             notes: document.getElementById('notes-input').value
         };
         const response = await fetch(`/list/update/${userListId}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         });
         if (response.ok) {
@@ -327,4 +337,198 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
+    
+    // --- MYANIMELIST İÇE AKTARIM ---
+    const importMalBtn = document.getElementById('import-mal-btn');
+    const importMalModal = document.getElementById('import-mal-modal');
+    const closeImportModalBtn = document.getElementById('close-import-modal-btn');
+    const cancelImportBtn = document.getElementById('cancel-import-btn');
+    const importMalForm = document.getElementById('import-mal-form');
+    const importProgress = document.getElementById('import-progress');
+    const importProgressBar = document.getElementById('import-progress-bar');
+    const importStatusText = document.getElementById('import-status-text');
+    const submitImportBtn = document.getElementById('submit-import-btn');
+    
+    if (importMalBtn && importMalModal) {
+        // Import modalını aç
+        importMalBtn.addEventListener('click', () => {
+            openModal(importMalModal);
+        });
+        
+        // Import modalını kapat
+        if (closeImportModalBtn) {
+            closeImportModalBtn.addEventListener('click', () => closeModal(importMalModal));
+        }
+        if (cancelImportBtn) {
+            cancelImportBtn.addEventListener('click', () => closeModal(importMalModal));
+        }
+        
+        // Import formunu gönder
+        if (importMalForm) {
+            importMalForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const formData = new FormData(importMalForm);
+                const fileInput = document.getElementById('mal-file');
+                
+                // Checkbox değerlerini manuel olarak ekle
+                const importScores = document.getElementById('import-scores').checked;
+                const importNotes = document.getElementById('import-notes').checked;
+                const importDates = document.getElementById('import-dates').checked;
+                
+                // FormData'ya checkbox değerlerini ekle
+                formData.set('import_scores', importScores.toString());
+                formData.set('import_notes', importNotes.toString());
+                formData.set('import_dates', importDates.toString());
+                
+                if (!fileInput.files[0]) {
+                    alert('Lütfen bir XML dosyası seçin.');
+                    return;
+                }
+                
+                // Progress bar'ı göster ve detaylı bilgi ver
+                importProgress.style.display = 'block';
+                submitImportBtn.disabled = true;
+                submitImportBtn.textContent = 'İçe Aktarılıyor...';
+                
+                // Progress mesajlarını güncelle
+                if (importStatusText) {
+                    importStatusText.textContent = 'XML dosyası analiz ediliyor...';
+                }
+                if (importProgressBar) {
+                    importProgressBar.style.width = '10%';
+                }
+                
+                try {
+                    const response = await fetch('/import/mal', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        // Progress bar'ı tamamla
+                        if (importProgressBar) {
+                            importProgressBar.style.width = '100%';
+                        }
+                        if (importStatusText) {
+                            importStatusText.textContent = 'İçe aktarım tamamlandı!';
+                        }
+                        
+                        // Başarı mesajını göster
+                        setTimeout(() => {
+                            alert(data.message);
+                            closeModal(importMalModal);
+                            // Sayfayı yenile
+                            window.location.reload();
+                        }, 1000);
+                    } else {
+                        // Hata
+                        if (importStatusText) {
+                            importStatusText.textContent = 'Hata oluştu!';
+                        }
+                        alert(`Hata: ${data.message}`);
+                    }
+                } catch (error) {
+                    if (importStatusText) {
+                        importStatusText.textContent = 'Bağlantı hatası!';
+                    }
+                    alert('İçe aktarım sırasında bir hata oluştu: ' + error.message);
+                } finally {
+                    // Progress bar'ı gizle
+                    setTimeout(() => {
+                        importProgress.style.display = 'none';
+                        submitImportBtn.disabled = false;
+                        submitImportBtn.textContent = 'İçe Aktar';
+                    }, 2000);
+                }
+            });
+        }
+    }
+    
+    // Import modalını dışarı tıklayınca kapat
+    window.addEventListener('click', (e) => {
+        if (e.target == importMalModal) {
+            closeModal(importMalModal);
+        }
+    });
+    
+    // --- TOPLU İŞLEM FONKSİYONLARI ---
+    
+    // Checkbox değişikliklerini dinle
+    listContainer.addEventListener('change', (e) => {
+        if (e.target.classList.contains('card-select-checkbox')) {
+            const card = e.target.closest('.manhwa-card');
+            if (e.target.checked) {
+                card.classList.add('selected');
+            } else {
+                card.classList.remove('selected');
+            }
+            updateBulkDeleteButton();
+        }
+    });
+    
+    // Tümünü seç/kaldır
+    if (selectAllBtn) {
+        selectAllBtn.addEventListener('click', () => {
+            const checkboxes = listContainer.querySelectorAll('.card-select-checkbox');
+            const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+            
+            checkboxes.forEach(cb => {
+                cb.checked = !allChecked;
+                const card = cb.closest('.manhwa-card');
+                if (!allChecked) {
+                    card.classList.add('selected');
+                } else {
+                    card.classList.remove('selected');
+                }
+            });
+            
+            updateBulkDeleteButton();
+            selectAllBtn.textContent = allChecked ? '{{ _("Tümünü Seç") }}' : '{{ _("Seçimi Kaldır") }}';
+        });
+    }
+    
+    // Toplu silme butonunu güncelle
+    function updateBulkDeleteButton() {
+        const selectedCheckboxes = listContainer.querySelectorAll('.card-select-checkbox:checked');
+        if (bulkDeleteBtn) {
+            if (selectedCheckboxes.length > 0) {
+                bulkDeleteBtn.style.display = 'inline-flex';
+                bulkDeleteBtn.textContent = `{{ _("Seçilenleri Sil") }} (${selectedCheckboxes.length})`;
+            } else {
+                bulkDeleteBtn.style.display = 'none';
+            }
+        }
+    }
+    
+    // Toplu silme işlemi
+    if (bulkDeleteBtn) {
+        bulkDeleteBtn.addEventListener('click', async () => {
+            const selectedCheckboxes = listContainer.querySelectorAll('.card-select-checkbox:checked');
+            if (selectedCheckboxes.length === 0) return;
+            
+            const confirmMessage = `{{ _("Seçilen") }} ${selectedCheckboxes.length} {{ _("kayıt kalıcı olarak silinecek. Bu işlem geri alınamaz. Devam etmek istiyor musunuz?") }}`;
+            
+            if (!confirm(confirmMessage)) return;
+            
+            const selectedIds = Array.from(selectedCheckboxes).map(cb => cb.dataset.userListId);
+            
+            try {
+                // Her bir kaydı tek tek sil
+                for (const id of selectedIds) {
+                    const response = await fetch(`/list/delete/${id}`, { method: 'POST' });
+                    if (!response.ok) {
+                        console.error(`Kayıt ${id} silinirken hata oluştu`);
+                    }
+                }
+                
+                // Sayfayı yenile
+                window.location.reload();
+            } catch (error) {
+                alert('Toplu silme işlemi sırasında bir hata oluştu: ' + error.message);
+            }
+        });
+    }
 });
