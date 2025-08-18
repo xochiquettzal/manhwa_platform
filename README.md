@@ -1,4 +1,4 @@
-# Manhwa Platform
+# Kurolist
 
 [![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://python.org)
 [![Flask](https://img.shields.io/badge/Flask-2.0+-green.svg)](https://flask.palletsprojects.com)
@@ -11,7 +11,7 @@
 
 ### 📖 Proje Hakkında
 
-Manhwa Platform, anime ve manga tutkunları için geliştirilmiş kapsamlı bir liste yönetim sistemidir. Kullanıcılar anime/manga koleksiyonlarını organize edebilir, puanlayabilir ve takip edebilir. MyAnimeList'ten veri içe aktarma özelliği ile mevcut listenizi kolayca taşıyabilirsiniz.
+Kurolist, anime ve manga tutkunları için geliştirilmiş kapsamlı bir liste yönetim sistemidir. Kullanıcılar anime/manga koleksiyonlarını organize edebilir, puanlayabilir ve takip edebilir. MyAnimeList'ten veri içe aktarma özelliği ile mevcut listenizi kolayca taşıyabilirsiniz.
 
 ### ✨ Özellikler
 
@@ -46,8 +46,8 @@ Manhwa Platform, anime ve manga tutkunları için geliştirilmiş kapsamlı bir 
 
 1. **Repository'yi klonlayın**
 ```bash
-git clone https://github.com/kullaniciadi/manhwa_platform.git
-cd manhwa_platform
+git clone https://github.com/kullaniciadi/kurolist.git
+cd kurolist
 ```
 
 2. **Sanal ortam oluşturun**
@@ -65,8 +65,19 @@ pip install -r requirements.txt
 
 4. **Çevre değişkenlerini ayarlayın**
 ```bash
-cp .env.example .env
-# .env dosyasını düzenleyin
+# .env dosyası oluşturun
+touch .env  # Linux/Mac
+# veya
+echo. > .env  # Windows
+
+# .env dosyasına aşağıdaki değişkenleri ekleyin:
+SECRET_KEY=your-super-secret-key-change-this-in-production
+MAIL_SERVER=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USE_TLS=true
+MAIL_USERNAME=your-email@gmail.com
+MAIL_PASSWORD=your-app-password
+MAIL_DEFAULT_SENDER=your-email@gmail.com
 ```
 
 5. **Veritabanını başlatın**
@@ -84,7 +95,7 @@ Uygulama `http://localhost:5000` adresinde çalışacaktır.
 ### 📁 Proje Yapısı
 
 ```
-manhwa_platform/
+kurolist/
 ├── app.py                 # Ana Flask uygulaması
 ├── main.py               # Ana blueprint ve route'lar
 ├── auth.py               # Kimlik doğrulama sistemi
@@ -198,8 +209,9 @@ Bu proje MIT lisansı altında lisanslanmıştır. Detaylar için `LICENSE` dosy
 
 ### 📞 İletişim
 
-- **Proje Linki**: [https://github.com/kullaniciadi/manhwa_platform](https://github.com/kullaniciadi/manhwa_platform)
-- **Sorun Bildirimi**: [Issues](https://github.com/kullaniciadi/manhwa_platform/issues)
+- **Canlı Site**: [https://kurolist.xyz](https://kurolist.xyz)
+- **GitHub Repository**: [https://github.com/kullaniciadi/kurolist](https://github.com/kullaniciadi/kurolist)
+- **Sorun Bildirimi**: [Issues](https://github.com/kullaniciadi/kurolist/issues)
 
 ---
 
@@ -207,7 +219,7 @@ Bu proje MIT lisansı altında lisanslanmıştır. Detaylar için `LICENSE` dosy
 
 ### 📖 About the Project
 
-Manhwa Platform is a comprehensive list management system developed for anime and manga enthusiasts. Users can organize, rate, and track their anime/manga collections. With the MyAnimeList data import feature, you can easily transfer your existing list.
+Kurolist is a comprehensive list management system developed for anime and manga enthusiasts. Users can organize, rate, and track their anime/manga collections. With the MyAnimeList data import feature, you can easily transfer your existing list.
 
 ### ✨ Features
 
@@ -242,8 +254,8 @@ Manhwa Platform is a comprehensive list management system developed for anime an
 
 1. **Clone the repository**
 ```bash
-git clone https://github.com/username/manhwa_platform.git
-cd manhwa_platform
+git clone https://github.com/username/kurolist.git
+cd kurolist
 ```
 
 2. **Create virtual environment**
@@ -261,8 +273,19 @@ pip install -r requirements.txt
 
 4. **Set environment variables**
 ```bash
-cp .env.example .env
-# Edit .env file
+# Create .env file
+touch .env  # Linux/Mac
+# or
+echo. > .env  # Windows
+
+# Add the following variables to .env file:
+SECRET_KEY=your-super-secret-key-change-this-in-production
+MAIL_SERVER=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USE_TLS=true
+MAIL_USERNAME=your-email@gmail.com
+MAIL_PASSWORD=your-app-password
+MAIL_DEFAULT_SENDER=your-email@gmail.com
 ```
 
 5. **Initialize database**
@@ -280,7 +303,7 @@ The application will run at `http://localhost:5000`.
 ### 📁 Project Structure
 
 ```
-manhwa_platform/
+kurolist/
 ├── app.py                 # Main Flask application
 ├── main.py               # Main blueprint and routes
 ├── auth.py               # Authentication system
@@ -394,14 +417,15 @@ This project is licensed under the MIT License. See the `LICENSE` file for detai
 
 ### 📞 Contact
 
-- **Project Link**: [https://github.com/username/manhwa_platform](https://github.com/username/manhwa_platform)
-- **Issue Reporting**: [Issues](https://github.com/username/manhwa_platform/issues)
+- **Live Site**: [https://kurolist.xyz](https://kurolist.xyz)
+- **GitHub Repository**: [https://github.com/username/kurolist](https://github.com/username/kurolist)
+- **Issue Reporting**: [Issues](https://github.com/username/kurolist/issues)
 
 ---
 
 ## 🌟 Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=username/manhwa_platform&type=Date)](https://star-history.com/#username/manhwa_platform&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=username/kurolist&type=Date)](https://star-history.com/#username/kurolist&Date)
 
 ---
 
