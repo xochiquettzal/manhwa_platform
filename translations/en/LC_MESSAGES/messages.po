@@ -100,6 +100,238 @@ msgstr "Homepage"
 msgid "Admin"
 msgstr "Admin"
 
+#: templates/dashboard.html:15
+msgid "Tümünü Seç"
+msgstr "Select All"
+
+#: templates/dashboard.html:20
+msgid "Seçilenleri Sil"
+msgstr "Delete Selected"
+
+#: templates/dashboard.html:25
+msgid "Seçimi Kaldır"
+msgstr "Clear Selection"
+
+#: templates/dashboard.html:30
+msgid "Tüm Yıllar"
+msgstr "All Years"
+
+#: templates/dashboard.html:32
+msgid "Tüm Stüdyolar"
+msgstr "All Studios"
+
+#: templates/dashboard.html:35
+msgid "Filtreler"
+msgstr "Filters"
+
+#: templates/dashboard.html:37
+msgid "Genre"
+msgstr "Genre"
+
+#: templates/dashboard.html:40
+msgid "Theme"
+msgstr "Theme"
+
+#: templates/dashboard.html:43
+msgid "Demografi"
+msgstr "Demographic"
+
+#: templates/dashboard.html:46
+msgid "Temizle"
+msgstr "Clear"
+
+#: templates/dashboard.html:47
+msgid "Uygula"
+msgstr "Apply"
+
+#: templates/dashboard.html:55
+msgid "Bölüm:"
+msgstr "Episode:"
+
+#: templates/dashboard.html:60
+msgid "Bir bölüm arttır"
+msgstr "Add one episode"
+
+#: templates/dashboard.html:75
+msgid "Durum:"
+msgstr "Status:"
+
+#: templates/dashboard.html:76
+msgid "İzleniyor"
+msgstr "Watching"
+
+#: templates/dashboard.html:77
+msgid "Okunuyor"
+msgstr "Reading"
+
+#: templates/dashboard.html:78
+msgid "Tamamlandı"
+msgstr "Completed"
+
+#: templates/dashboard.html:79
+msgid "Planlandı"
+msgstr "Planned"
+
+#: templates/dashboard.html:80
+msgid "Bırakıldı"
+msgstr "Dropped"
+
+#: templates/dashboard.html:82
+msgid "Puanım:"
+msgstr "My Score:"
+
+#: templates/dashboard.html:83
+msgid "Puan Yok"
+msgstr "No Score"
+
+#: templates/dashboard.html:84
+msgid "Masterpiece"
+msgstr "Masterpiece"
+
+#: templates/dashboard.html:85
+msgid "Great"
+msgstr "Great"
+
+#: templates/dashboard.html:86
+msgid "Very Good"
+msgstr "Very Good"
+
+#: templates/dashboard.html:87
+msgid "Good"
+msgstr "Good"
+
+#: templates/dashboard.html:88
+msgid "Fine"
+msgstr "Fine"
+
+#: templates/dashboard.html:89
+msgid "Average"
+msgstr "Average"
+
+#: templates/dashboard.html:90
+msgid "Bad"
+msgstr "Bad"
+
+#: templates/dashboard.html:91
+msgid "Very Bad"
+msgstr "Very Bad"
+
+#: templates/dashboard.html:92
+msgid "Horrible"
+msgstr "Horrible"
+
+#: templates/dashboard.html:93
+msgid "Appalling"
+msgstr "Appalling"
+
+#: templates/dashboard.html:95
+msgid "İzlenen/Okunan Bölüm:"
+msgstr "Watched/Read Episodes:"
+
+#: templates/dashboard.html:97
+msgid "Kişisel Notlar:"
+msgstr "Personal Notes:"
+
+#: templates/dashboard.html:100
+msgid "Listeden Sil"
+msgstr "Remove from List"
+
+#: templates/dashboard.html:101
+msgid "Değişiklikleri Kaydet"
+msgstr "Save Changes"
+
+#: templates/dashboard.html:108
+msgid "Yayın Yılı:"
+msgstr "Release Year:"
+
+#: templates/dashboard.html:110
+msgid "Kaynak:"
+msgstr "Source:"
+
+#: templates/dashboard.html:112
+msgid "Stüdyo:"
+msgstr "Studio:"
+
+#: templates/dashboard.html:115
+msgid "Tema:"
+msgstr "Theme:"
+
+#: templates/dashboard.html:118
+msgid "Etiketler:"
+msgstr "Tags:"
+
+#: templates/dashboard.html:121
+msgid "Konu"
+msgstr "Synopsis"
+
+#: templates/dashboard.html:130
+msgid "MAL Import"
+msgstr "MAL Import"
+
+#: templates/dashboard.html:135
+msgid "MyAnimeList Listesini İçe Aktar"
+msgstr "Import MyAnimeList List"
+
+#: templates/dashboard.html:137
+msgid "MyAnimeList'ten export ettiğiniz XML dosyasını yükleyin. Mevcut listenizle birleştirilecektir."
+msgstr "Upload the XML file you exported from MyAnimeList. It will be merged with your existing list."
+
+#: templates/dashboard.html:140
+msgid "XML Dosyası:"
+msgstr "XML File:"
+
+#: templates/dashboard.html:142
+msgid "Sadece MyAnimeList export XML dosyaları desteklenir."
+msgstr "Only MyAnimeList export XML files are supported."
+
+#: templates/dashboard.html:145
+msgid "İçe Aktar Seçenekleri:"
+msgstr "Import Options:"
+
+#: templates/dashboard.html:147
+msgid "Kullanıcı puanlarını içe aktar"
+msgstr "Import user scores"
+
+#: templates/dashboard.html:150
+msgid "Kullanıcı notlarını içe aktar"
+msgstr "Import user notes"
+
+#: templates/dashboard.html:153
+msgid "İzleme tarihlerini içe aktar"
+msgstr "Import watch dates"
+
+#: templates/dashboard.html:157
+msgid "İptal"
+msgstr "Cancel"
+
+#: templates/dashboard.html:158
+msgid "İçe Aktar"
+msgstr "Import"
+
+#: templates/dashboard.html:162
+msgid "İçe aktarım başlatılıyor..."
+msgstr "Import starting..."
+
+#: templates/dashboard.html:165
+msgid "Bu işlem, veritabanında olmayan anime/manga'lar için Jikan API'den veri çekecektir."
+msgstr "This process will fetch data from Jikan API for anime/manga not in the database."
+
+#: templates/dashboard.html:166
+msgid "Lütfen bekleyiniz, bu biraz zaman alabilir..."
+msgstr "Please wait, this may take some time..."
+
+#: templates/dashboard.html:175
+msgid "Listen henüz boş. Arama yaparak yeni kayıtlar ekleyebilir!"
+msgstr "Your list is still empty. You can add new entries by searching!"
+
+#: templates/dashboard.html:177
+msgid "Seçilen"
+msgstr "Selected"
+
+#: templates/dashboard.html:177
+msgid "kayıt kalıcı olarak silinecek. Bu işlem geri alınamaz. Devam etmek istiyor musunuz?"
+msgstr "entries will be permanently deleted. This action cannot be undone. Do you want to continue?"
+
 #: templates/base.html:31
 msgid "Çıkış Yap"
 msgstr "Logout"

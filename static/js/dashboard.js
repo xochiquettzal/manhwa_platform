@@ -486,7 +486,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             
             updateBulkDeleteButton();
-            selectAllBtn.textContent = allChecked ? '{{ _("Tümünü Seç") }}' : '{{ _("Seçimi Kaldır") }}';
+            selectAllBtn.textContent = allChecked ? translations.select_all : translations.clear_selection;
         });
     }
     
@@ -496,7 +496,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (bulkDeleteBtn) {
             if (selectedCheckboxes.length > 0) {
                 bulkDeleteBtn.style.display = 'inline-flex';
-                bulkDeleteBtn.textContent = `{{ _("Seçilenleri Sil") }} (${selectedCheckboxes.length})`;
+                bulkDeleteBtn.textContent = `${translations.delete_selected} (${selectedCheckboxes.length})`;
             } else {
                 bulkDeleteBtn.style.display = 'none';
             }
@@ -509,7 +509,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const selectedCheckboxes = listContainer.querySelectorAll('.card-select-checkbox:checked');
             if (selectedCheckboxes.length === 0) return;
             
-            const confirmMessage = `{{ _("Seçilen") }} ${selectedCheckboxes.length} {{ _("kayıt kalıcı olarak silinecek. Bu işlem geri alınamaz. Devam etmek istiyor musunuz?") }}`;
+            const confirmMessage = `${translations.selected} ${selectedCheckboxes.length} ${translations.entries_will_be_deleted}`;
             
             if (!confirm(confirmMessage)) return;
             

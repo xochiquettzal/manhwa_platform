@@ -239,7 +239,12 @@
 {% block scripts %}
     <script>
         const translations = {
-            progress_label: "{{ _('Bölüm:') }}"
+            progress_label: "{{ _('Bölüm:') }}",
+            select_all: "{{ _('Tümünü Seç') }}",
+            clear_selection: "{{ _('Seçimi Kaldır') }}",
+            delete_selected: "{{ _('Seçilenleri Sil') }}",
+            selected: "{{ _('Seçilen') }}",
+            entries_will_be_deleted: "{{ _('kayıt kalıcı olarak silinecek. Bu işlem geri alınamaz. Devam etmek istiyor musunuz?') }}"
         };
     </script>
     <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
