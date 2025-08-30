@@ -399,6 +399,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     importProgressBar.style.width = '10%';
                 }
                 
+                // Progress bar animasyonu
+                let progress = 10;
+                const progressInterval = setInterval(() => {
+                    if (progress < 90) {
+                        progress += Math.random() * 5;
+                        if (importProgressBar) {
+                            importProgressBar.style.width = progress + '%';
+                        }
+                    }
+                }, 500);
+                
                 try {
                     const response = await fetch('/import/mal', {
                         method: 'POST',
@@ -436,6 +447,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                     alert('İçe aktarım sırasında bir hata oluştu: ' + error.message);
                 } finally {
+                    // Progress interval'i temizle
+                    clearInterval(progressInterval);
+                    
                     // Progress bar'ı gizle
                     setTimeout(() => {
                         importProgress.style.display = 'none';
